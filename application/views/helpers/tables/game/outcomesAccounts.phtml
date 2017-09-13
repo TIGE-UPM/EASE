@@ -459,7 +459,7 @@
 					<td class="hor_group_even categories">Intereses Financiación a C.P.</td>
 					<?php foreach ($view->companies as $company){				
 							$fi_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['fi_debt_costs_st']?>
-						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['fi_debt_costs_st'],2, '.', ',').' €'?></td>
+						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['fi_debt_costs_st'],2, '.', ',').' €'?></td> 
 					<?php } ?>
 				</tr>
 				<tr>
@@ -468,6 +468,22 @@
 					<?php foreach ($view->companies as $company){				
 							$fi_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['fi_debt_costs_lt']?>
 						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['fi_debt_costs_lt'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+				<tr>
+					<td class="hor_group_even categories"></td>
+					<td class="hor_group_even categories">Intereses ganados por inversiones financieras</td>
+					<?php foreach ($view->companies as $company){				
+							$fi_investment_earnings[$company['id']]+=$view->outcomes_investments[$company['id']]['fi_investment_earnings']?>
+						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_investments[$company['id']]['fi_investment_earnings'],2, '.', ',').' €'?></td> 
+					<?php } ?>
+				</tr>
+				<tr>
+					<td class="hor_group_even categories"></td>
+					<td class="hor_group_even categories">Intereses perdidos por inversiones financieras</td>
+					<?php foreach ($view->companies as $company){				
+							$fi_investment_losses[$company['id']]+=$view->outcomes_investments[$company['id']]['fi_investment_losses']?>
+						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_investments[$company['id']]['fi_investment_losses'],2, '.', ',').' €'?></td>
 					<?php } ?>
 				</tr>
 					<tr></tr>
@@ -482,7 +498,11 @@
 						<a style="color:#000000">Total Financieros</a>
 					</th>
 					<?php foreach ($view->companies as $company){?>
-							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($fi_costs[$company['id']],2, '.', ',').' €'?></th>
+						<?php $total_fi_cost[$company['id']]=
+														$fi_costs[$company['id']]+
+														$fi_investment_losses[$company['id']]-
+														$fi_investment_earnings[$company['id']];?>		
+							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($total_fi_cost[$company['id']],2, '.', ',').' €'?></th>
 				    <?php }//for company ?>
 				</thead>						
 				<thead>			
@@ -490,7 +510,7 @@
 						<h2 style="color:#A52A2A;margin-bottom:12px;margin-left:5px">EBT</h2>
 					</th>
 					<?php foreach ($view->companies as $company){
-						$ebt[$company['id']]=$ebitda[$company['id']]-$amortization[$company['id']]-$fi_costs[$company['id']]?>
+						$ebt[$company['id']]=$ebitda[$company['id']]-$amortization[$company['id']]-$total_fi_cost[$company['id']]?>
 							<th nowrap style="color:#A52A2A"><strong><?php echo number_format($ebt[$company['id']],2, '.', ',').' €'?></strong></th>
 					<?php }//for company ?>
 				</thead>

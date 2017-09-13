@@ -1,0 +1,27 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Nombre</th>
+		<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<th class="small">%Peso Producto <?php echo $product_number?></th>
+		<?php } //for product?>
+		<th class="small">Coste asociado</th>
+	</theader>
+	<?php $n_functionalities=$view->games->getNumberOfFunctionalities($view->game_id); ?>
+	<?php for ($functionality_param_number=1;$functionality_param_number<=$n_functionalities;$functionality_param_number++){ ?>
+	<tr>
+		<td>Atributo de funcionalidad <?php echo $functionality_param_number?></td>
+		<td><input type="text" name="functionality_param_<?php echo $functionality_param_number?>[name]" class="medium" 
+		<?php echo isset($view->game_functionality_params_name)? 
+		'value="'.$view->game_functionality_params_name['functionality_param_number_'.$functionality_param_number].'"':'value =""'?>"></td>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<td><input type="text" name="functionality_param_<?php echo $functionality_param_number?>[functionality_param_weight][product_<?php echo $product_number?>]" class="small" <?php echo isset($view->game_functionality_params_weight)? 
+		'value="'.$view->game_functionality_params_weight['functionality_param_number_'.$functionality_param_number]['product_number_'.$product_number].'"':'value ="0"'?>"></td>
+		<?php } //for product?>
+		<td><input type="text" name="functionality_param_<?php echo $functionality_param_number?>[cost]" class="medium" 
+		<?php echo isset($view->game_functionality_params_cost)? 
+		'value="'.$view->game_functionality_params_cost['functionality_param_number_'.$functionality_param_number].'"':'value ="0"'?>"></td>
+	</tr>
+	<?php } //for functionality?>
+</table>

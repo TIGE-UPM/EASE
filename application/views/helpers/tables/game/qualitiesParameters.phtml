@@ -2,15 +2,23 @@
 	<theader>
 		<th class="small"></th>
 		<th class="small">Nombre</th>
-		<th class="small">%Peso</th>
+		<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<th class="small">%Peso Producto <?php echo $product_number?></th>
+		<?php } //for product?>
 	</theader>
 	<?php $n_qualities=$view->games->getNumberOfQualities($view->game_id); ?>
 	<?php for ($quality_param_number=1;$quality_param_number<=$n_qualities;$quality_param_number++){ ?>
 	<?php $quality_param=$view->game_quality_params[$quality_param_number-1]; ?>
 	<tr>
 		<td>Atributo de calidad <?php echo $quality_param_number?></td>
-		<td><input type="text" name="quality_param_<?php echo $quality_param_number?>[name]" class="medium" value="<?php echo $quality_param['name']?>"></td>
-		<td><input type="text" name="quality_param_<?php echo $quality_param_number?>[quality_param_weight]" class="small" value="<?php echo $quality_param['quality_param_weight'];?>"></td>
+		<td><input type="text" name="quality_param_<?php echo $quality_param_number?>[name]" class="medium" 
+		<?php echo isset($view->game_quality_params_name)? 
+		'value="'.$view->game_quality_params_name['quality_param_number_'.$quality_param_number].'"':'value =""'?>"></td>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<td><input type="text" name="quality_param_<?php echo $quality_param_number?>[quality_param_weight][product_<?php echo $product_number?>]" class="small" <?php echo isset($view->game_quality_params_weight)? 
+		'value="'.$view->game_quality_params_weight['quality_param_number_'.$quality_param_number]['product_number_'.$product_number].'"':'value ="0"'?>"></td>
+		<?php } //for product?>
 	</tr>
-	<?php } //for product?>
+	<?php } //for quality?>
 </table>

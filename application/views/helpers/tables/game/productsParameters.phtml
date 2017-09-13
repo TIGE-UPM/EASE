@@ -13,7 +13,7 @@
 	<?php $option[0]=array('availability'=>0, 'descriptor'=>'Inicial'); ?>
 	<?php $option[1]=array('availability'=>1, 'descriptor'=>'I+D+i'); ?>
 	<?php $this->option=$option; ?>
-	<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+	<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?> 
 	<?php $product=$view->game_products[$product_number-1]; ?>
 	<?php $product_budget=$view->game_products_budget[$product_number-1]; ?>
 	<tr>
@@ -38,4 +38,5 @@
 		<?php } ?>
 	</tr>
 	<?php } //for product?>
+	<div style="display: none;"><input type="text" name="threshold"  display="block" value='0.96'></div>
 </table>

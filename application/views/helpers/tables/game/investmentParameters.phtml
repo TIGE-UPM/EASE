@@ -1,0 +1,22 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Nombre</th>
+		<th class="small">Rendimiento medio (%)</th>
+		<th class="small">Límite (%)</th>
+	</theader>
+	<?php $n_investments=$view->games->getNumberOfInvestments($view->game_id); ?>
+	<?php for ($investment_param_number=1;$investment_param_number<=$n_investments;$investment_param_number++){ ?>
+	<tr>
+		<td>Atributo de inversión <?php echo $investment_param_number?></td>
+		<td><input type="text" name="investment_param_<?php echo $investment_param_number?>[name]" class="medium" 
+		<?php echo isset($view->game_investment_params_name)? 
+		'value="'.$view->game_investment_params_name['investment_param_number_'.$investment_param_number].'"':'value =""'?>"></td>
+		<td><input type="text" name="investment_param_<?php echo $investment_param_number?>[investment_param_average_performance]" class="small" <?php echo isset($view->game_investment_params_average_performance)? 
+		'value="'.$view->game_investment_params_average_performance['investment_param_number_'.$investment_param_number].'"':'value ="0"'?>"></td>
+		<td><input type="text" name="investment_param_<?php echo $investment_param_number?>[limit]" class="medium" 
+		<?php echo isset($view->game_investment_params_limit)? 
+		'value="'.$view->game_investment_params_limit['investment_param_number_'.$investment_param_number].'"':'value ="0"'?>"></td>
+	</tr>
+	<?php } //for investment?>
+</table>
