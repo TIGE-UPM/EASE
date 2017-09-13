@@ -1583,6 +1583,18 @@
 							<?php $fi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['fi_debt_costs_lt']?>
 						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['fi_debt_costs_lt'],2, '.', ',').' €'?></td>
 					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Intereses ganados por inversiones financieras</td>
+							<?php $fi_investment_earnings[$this->company['id']]+=$this->outcomes_investments[$this->company['id']]['fi_investment_earnings']?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_investments[$this->company['id']]['fi_investment_earnings'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Intereses perdidos por inversiones financieras</td>
+							<?php $fi_investment_losses[$this->company['id']]+=$this->outcomes_investments[$this->company['id']]['fi_investment_losses']?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_investments[$this->company['id']]['fi_investment_losses'],2, '.', ',').' €'?></td>
+					</tr>
 				</table>
 				
 				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
@@ -1592,7 +1604,11 @@
 							 Total Financieros:
 						</td>
 							<?php $ebitda[$this->company['id']]=$incomes_sum[$this->company['id']]-($total_costs[$this->company['id']]-$inventories[$this->company['id']])?>
-						<td class="col3"><?php echo number_format($fi_costs[$this->company['id']],2, '.', ',').' €'?></td>
+							<?php $total_fi_cost[$this->company['id']]=
+														$fi_costs[$this->company['id']]+
+														$fi_investment_losses[$this->company['id']]-
+														$fi_investment_earnings[$this->company['id']];?>					
+						<td class="col3"><?php echo number_format($total_fi_cost[$this->company['id']],2, '.', ',').' €'?></td>
 					</tr>
 				</table>
 				
@@ -1602,7 +1618,7 @@
 			<div  class="tabla_cuentas_resultados">	
 				<div class="titulo_cuenta_resultados invisible categories">
 					EBT:
-					<?php $ebt[$this->company['id']]=$ebitda[$this->company['id']]-$amortization[$this->company['id']]-$fi_costs[$this->company['id']]?>
+					<?php $ebt[$this->company['id']]=$ebitda[$this->company['id']]-$amortization[$this->company['id']]-$total_fi_cost[$this->company['id']]?>
 					<span id="ebt" style="font-weight: bold; color: black"><?php echo number_format($ebt[$this->company['id']],2, '.', ',').' €'?></span>
 				</div>
 				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
@@ -1761,12 +1777,13 @@
 					</div>
 					<?php $asset_no_current_sum[$this->company['id']]=0;?>
 					<?php $asset_no_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['tied_up'];
-						  $asset_no_current_sum[$this->company['id']]-=$this->outcomes_balance_sheet[$this->company['id']]['amortization'];?>
+						  $asset_no_current_sum[$this->company['id']]-=$this->outcomes_balance_sheet[$this->company['id']]['amortization'];
+						  $asset_no_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['investment_assets'];?>
 					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
 						<tr class="resultados_total">
 							<td class="col1">A)</th>
 							<td class="col2">
-								Activo no corriente (I+II)
+								Activo no corriente (I+II+III)
 							</td>				
 							<td class="col3"><?php echo number_format($asset_no_current_sum[$this->company['id']], 2, '.', ',').' €'?></td>
 						</tr>
@@ -1781,6 +1798,12 @@
 							<td class="hor_group_odd categories col2">II. Amortización de inmovilizado</td>
 							<?php $asset_sum[$this->company['id']]-=$this->outcomes_balance_sheet[$this->company['id']]['amortization'];?>
 							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['amortization'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">III. Instrumentos de inversión</td>
+							<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['investment_assets'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['investment_assets'],2, '.', ',').' €'?></td>
 						</tr>
 					</table>
 					
@@ -1820,7 +1843,7 @@
 				<!--PASIVO-->
 				<div style="float:right;  border-left: 1px solid #336699; padding-left: 10px;">
 					<div class="titulo_cuenta_resultados invisible categories">
-						PASIVO Y PATRIMONIO NETO
+						PASIVO
 					</div>
 					<?php $shareholders_funds[$this->company['id']]=0;?>
 					<?php $shareholders_funds[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['capital'];
@@ -1842,7 +1865,7 @@
 						</tr>
 						<tr>
 							<td class="hor_group_even categories col1"></td>
-							<td class="hor_group_even categories col2">II. Resultados ejercicios anteriores</td>
+							<td class="hor_group_even categories col2">II. Reservas</td>
 							<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['reserves'];?>
 							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['reserves'],2, '.', ',').' €'?></td>
 						</tr>
@@ -1918,7 +1941,7 @@
 							<tr class="resultados_total">
 								<td class="col1"></th>
 								<td class="col2">
-									Total PASIVO Y PATRIMONIO NETO (A+B+C)
+									Total PASIVO (A+B+C)
 								</td>
 								<td class="col3"><?php echo number_format($liabilities_total[$this->company['id']],2, '.', ',').' €'?></td>
 							</tr>

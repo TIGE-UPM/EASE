@@ -1,9 +1,6 @@
 <?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
 
 <div id='content'>
-	<script type="text/javascript">
-		alert("No olvidar añadir el valor umbral de nuevos \ndesarrollos en \'games_param_idi_threshold\'.\nEl sistema no lo hace automáticamente.");
-	</script>
 	<div style="width: 600px; margin-left: auto; margin-right: auto">
 		<h1>Nuevo Juego o Plantilla</h1>
 	</div>
@@ -57,6 +54,17 @@
 					<input type="number" name="newGame[n_qualities]" id="description" display="block"></input>
 				</div>
 			</div>
+			<!-- VERO-->
+			<div style="clear:both;"></div>
+			<div style="width: 100%;">
+				<div class="fieldHeader" style="float: left;">
+					Número de atributos de funcionalidades&nbsp&nbsp&nbsp
+				</div>				
+				<div id="numberField" class="fieldDiv" style="float: right;">
+					<input type="number" name="newGame[n_functionalities]" id="description" display="block"></input>
+				</div>
+			</div>
+			<!-- VERO-->
 			<div style="clear:both;"></div>
 			<div style="width: 100%;">
 				<div class="fieldHeader" style="float: left;">
@@ -84,6 +92,17 @@
 					<input type="number" name="newGame[n_media]" id="description" display="block"></input>
 				</div>
 			</div>
+			<!-- VERO-->
+			<div style="clear:both;"></div>
+			<div style="width: 100%;">
+				<div class="fieldHeader" style="float: left;">
+					Número de inversiones disponibles&nbsp&nbsp&nbsp
+				</div>				
+				<div id="numberField" class="fieldDiv" style="float: right;">
+					<input type="number" name="newGame[n_investment]" id="description" display="block"></input>
+				</div>
+			</div>
+			<!-- VERO-->
 			<div style="clear:both;"></div>
 			<div style="width: 100%;">
 				<div class="fieldHeader" style="float: left;">
@@ -95,7 +114,6 @@
 			</div>
 			<div style="clear:both;"></div>
 		<div>
-		
 		<div id="buttons" class="buttonsDiv fieldDiv">
 			<input class="button" type="submit" value="Crear">
 		</div>

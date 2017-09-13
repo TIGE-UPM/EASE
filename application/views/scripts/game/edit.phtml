@@ -204,6 +204,9 @@
 								<ul>
 									<li><a href="#productos">Productos</a></li>
 									<li><a href="#calidad">Calidad</a></li>
+									<!--VERO -->
+									<li><a href="#funcionalidades">Funcionalidades</a></li>
+									<!--VERO -->
 									<li><a href="#regiones">Regiones</a></li>
 									<li><a href="#canales_distrib">Canales de distribución</a></li>
 									<li><a href="#medios_publicitarios">Medios publicitarios</a></li>
@@ -240,6 +243,22 @@
 									</div>
 								</div>
 							</div>
+							<!--VERO -->
+							<div id="funcionalidades">
+								<div id="functionalityParametersFields"> 
+									<div id="functionalityFieldDescription" class="fieldDescription">
+										Configure los atributos de funcionalidades y su peso en la calidad total para los productos del juego. 
+									</div>
+									<div id="functionalityFieldsErrors" class="fieldErrors">
+									</div>
+									<div id="functionalityParametersContainer">
+										<div id="functionalityFields">
+										<?php $this->gameTables($this, "functionalityParameters");?>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--VERO -->
 							<div id="regiones">
 								<div id="regionsParametersFields"> 
 									<div id="regionsFieldDescription" class="fieldDescription">
@@ -610,6 +629,21 @@
 										<?php $this->gameTables($this, "fi_interestRateParameters");?>												
 									</div>
 								</div>
+								<!-- VERO -->
+								<div class="fieldCategory fieldDescription" id="investmentButton">
+									3. Tipos de inversión. <!-- Tipos de inversión></!-->
+								</div>
+								<div id="investmentFieldsErrors" class="fieldErrors">
+								</div>
+								<div id="investmentContainer">
+									<div id="investmentFieldDescription" class="fieldDescription" style="background-color: white">
+										Configure parámetros sobre las inversiones. 
+									</div>
+									<div id="investmentFields">				
+										<?php $this->gameTables($this, "investmentParameters");?>												
+									</div>
+								</div>
+								<!-- VERO -->
 							</div>
 						</div>
 					</div>
@@ -641,6 +675,7 @@
 					styleChangeBeforeAlert();
 				}
 				function guardarParametros(){
+
 					var optionsParametros = { 
 						beforeSubmit:  showRequestParametros,  // pre-submit callback 
 						success:       showResponse  // post-submit callback 
@@ -680,24 +715,7 @@
 					return validacionCorrecta1;
 				};
 				
-				function showRequestParametros(formData, jqForm, options) {
-					document.getElementById('validationParamsStartup').style.display='block';
-					document.getElementById('light1').style.display='block'; 
-					document.getElementById('fade1').style.display='block';  				
-					var validacionCorrecta2;
-					try {
-						//alert('Check the form submission, it is not correct now'); 
-						// here we could return false to prevent the form from being submitted; 
-						// returning anything other than false will allow the form submit to continue 
-						validacionCorrecta2 = validateForm("formularioParametros");
-					}
-					catch (ex) {
-						alert(ex.toString());
-						validacionCorrecta2 = false;
-					}
-					
-					return validacionCorrecta2;
-				};
+				6
 				function showRequestModulos(formData, jqForm, options) {
 					document.getElementById('validationModulosStartup').style.display='block';
 					document.getElementById('light1').style.display='block'; 
@@ -713,6 +731,7 @@
 						alert(ex.toString());
 						validacionCorrecta3 = false;
 					}
+					alert(validacionCorrecta3);
 					
 					return validacionCorrecta3;
 				};
@@ -728,6 +747,7 @@
 					// if the ajaxForm method was passed an Options Object with the dataType 
 					// property set to 'json' then the first argument to the success callback 
 					// is the json data object returned by the server 
+					alert("Validando show");
 					document.getElementById('validationGeneralStartup').style.display='none';
 					document.getElementById('validationGeneralCompleted').style.display='none';
 					document.getElementById('validationParamsStartup').style.display='none';
@@ -761,6 +781,9 @@
 				});
 				$( "#qualitiesFieldDescription" ).click(function() {
 					$( "#qualitiesParametersContainer" ).toggle( "easeInElastic" );
+				});
+				$( "#functionalityFieldDescription" ).click(function() {
+					$( "#functionalitiesParametersContainer" ).toggle( "easeInElastic" );
 				});
 				$( "#regionsFieldDescription" ).click(function() {
 					$( "#regionesContainer" ).toggle( "easeInElastic" );
@@ -831,6 +854,11 @@
 				$( "#interestRateButton" ).click(function() {
 					$( "#interestRateContainer" ).toggle( "easeInElastic" );
 				});
+				//VERO
+				$( "#InvestmentButton" ).click(function() {
+					$( "#investmentContainer" ).toggle( "easeInElastic" );
+				});
+				//VERO
 			</script>
 			
 		</div>

@@ -40,6 +40,39 @@
 				</div>
 			</div>
 			<br/>
+			<!--VERO-->
+			<div class="fieldContainer">	
+			<div class="fieldHeader">
+				Inversiones <?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"newIdiField")))?>			
+			</div>
+			<div id="investmentsField" class="fieldDiv">
+			<div id="invstmentsFieldDescription" class="fieldDescription" align="center">
+					Determine la cantidad que desea invertir y el plazo de la inversión.
+			</div>
+			<br />
+			<table align="center">
+			<thead>
+				<th class="small">Inversión</th>
+				<!--<th class="small">&nbsp;&nbsp;Lanzar&nbsp;&nbsp;</th>-->
+				<th class="small">&nbsp;&nbsp;Cantidad (en €)&nbsp;&nbsp;</th>
+				<th class="small">&nbsp;&nbsp;Plazo (en años)&nbsp;&nbsp;</th>
+			</thead>
+			<?php $investment=1;?>
+			<?php foreach ($this->investmentsType as $investmentType){?>
+					<tr>
+					<td><?php echo $investmentType?></td>
+					<td><input type="text" name="finance[investment][investment_number_<?php echo $investment?>][amount]" id="investment" display="block"
+						<?php echo isset($this->investmentDecision)? 'value="'.$this->investmentDecision['investment_number_'.$investment]['amount'].'"':""?>></input></td>
+					<td><input type="number" name="finance[investment][investment_number_<?php echo $investment?>][term]" id="investment" display="block"
+						<?php echo isset($this->investmentDecision)? 'value="'.$this->investmentDecision['investment_number_'.$investment]['term'].'"':""?>></input></td>
+						<?php $investment++;?>
+			<?php } ?>
+					</tr>
+			</table>
+			</div>
+			</div>
+			<br>
+			<!--VERO-->
 			<div class="buttonsDiv">
 				<input class="button" type="submit" value="Guardar">
 			</div>

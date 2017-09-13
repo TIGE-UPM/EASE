@@ -107,13 +107,11 @@
 				</div>		
 				<br />
 			</div>					
-			<div class="fieldHeader">
-				Calidad<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"qualityField")))?>			
-			</div>
-			<div id="qualityField" class="fieldDiv">
+							<div id="qualityField" class="fieldDiv">
 				<div id="qualityFieldDescription" class="fieldDescription" align="center">
 					Elija la calidad de fabricación de sus productos.
 				</div>
+				<?php $id=1;?>
 				<?php foreach ($this->products as $product){?>
 				<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
 				
@@ -125,6 +123,7 @@
 				<br />
 				<div class="fieldDiv" style="color:#4169E1" align="center">
 					  <?php foreach ($this->qualityParams as $qualityParam){?>
+					  <?php if ($qualityParam['product_number']==$product['product_number']){?>
 					  <?php echo $qualityParam['name'] ?> : &nbsp
 					<select disabled="disabled" name="production_decision[quality_params][product_quality_<?php echo $qualityParam['quality_param_number'];?>][product_<?php echo $product['product_number'];?>]">
 						<?php for ($i=1;$i<=10;$i++){?>
@@ -134,13 +133,49 @@
 						<?php }//for?>
 					</select>
 					&nbsp;&nbsp;
-						<?php } ?>
-						</div>
-						</div>
-						<?php } ?>
 					<?php } ?>
-				
+					<?php } ?>
+					</div>
+						
+					<!-- VERO-->
+					<div class="multiSelectDiv" style="color:#4169E1;" align="center" id="multiSelectDiv">
+					Funcionalidades:&nbsp;<br />
+					<select multiple="multiple" style="overflow: hidden;" class="multiSelect" display="block" disabled="disabled" name="production_decision[functionality_params][product_number_<?php echo $product['product_number'];?>][]]"  id="funcionalities_param_<?php echo $id?>" >	
+						<?php foreach ($this->functionalities as $functionalities){?> 
+								<option value="<?php echo $functionalities['value']?>" <?php for($i=0; $i<count($this->functionalities); $i++){?> <?php echo  (isset($this->FunctionalitiesDecision) && $this->FunctionalitiesDecision['product_number_'.$product['product_number']][$i]==$functionalities['value'])? "selected":""?><?php }//for?>>
+								<?php echo $functionalities['descriptor']?>
+								</option>
+						<?php } ?>
+					</select>
+					&nbsp;&nbsp;
+
+					</div>
+					</div>
+					<?php } ?>
+					<?php $id++;?>
+				<?php } ?>	
+				<div id="nProduct"><input type ="hidden" value="<?php echo $id;?>"></div>
 			</div>
+
+
+			<script>
+					
+				$(document).ready(function(){
+					var nProduct;
+					nProduct=document.getElementById("nProduct").getElementsByTagName("input");
+
+					for(i=1;i<=(nProduct[0].value-1); i++){
+						SizeOptions('#funcionalities_param_'+i);
+					}
+				});
+					
+				function SizeOptions(tag){
+					var select = $(tag);
+					select.attr('size', select[0].options.length);
+					
+				}
+			</script>
+			<!-- VERO-->
 			<div class="fieldHeader">
 				Unidades a Producir<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"unitsFields")))?>			
 			</div>
@@ -231,8 +266,104 @@
 				</div>
 			</div>
 			</div>
+			<!-- VERO-->
+			<div class="fieldHeader">
+				Distribución del stock<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"unitsStockField")))?>			
+			</div>
+			<div id="unitsStockField" class="fieldDiv">
+
+				<div id="unitsStockFieldDescription" class="fieldDescription" align="center">
+					Determine la cantidad de unidades de stock a distribuir en cada canal y para cada región.
+				</div>
+
+			<div id="unitsStockField" class="content">
+				<div id = "unitsStockLeftField" class='left'>
+					<div id="unitsStockLeftFieldDescription" align="center">
+						Distribución original
+					</div>
+					<div id="unitsStockLeftFieldsErrors" class="fieldErrors">
+					</div>
+					<?php foreach ($this->products as $product){?>
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+					<div class="fieldSubHeader" style="color:#F2610D">
+					<br />
+						<?php echo $product['name']?>
+					</div>
+					<div class="fieldDiv">
+						<table align="center">
+							<thead>
+								<th class="small"></th>
+								<?php foreach ($this->regions as $region){?>
+								<th class="small"><?php echo $region['name']?></th>
+								<?php } //for region?>
+							</thead>
+							<?php foreach ($this->channels as $channel){ ?>	
+							<tr>
+							<td><?php echo $channel['name']?></td>
+							<?php  foreach ($this->regions as $region){?>
+							<td><input type="text" name="stock[unitsStockLeft][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]"   class="small" disabled="disabled"
+									<?php echo isset($this->unitsStockLeftDecision)? 
+										'value = "'.$this->unitsStockLeftDecision['product_'.$product['product_number']]
+												['channel_'.$channel['channel_number']]
+												['region_'.$region['region_number']]
+										.'"':'value ="0"'?></input>
+							</td>
+							<?php } //for region?>			
+							</tr>
+							<?php } //for channel?>
+						</table>
+					</div>
+					<?php } ?>
+					<?php } // product?>
+				</div>
+
+				<div id="unitsStockRightField" class="right">
+					<div id="unitsStockRightFieldDescription" align="center">
+						Distribución final
+					</div>
+					<div id="unitsStockRightFieldsErrors" class="fieldErrors">
+					</div>
+					<?php foreach ($this->products as $product){?>
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+					<div class="fieldSubHeader" style="color:#F2610D">
+					<br />
+						<?php echo $product['name']?>
+					</div>
+					<div class="fieldDiv">
+						<table align="center">
+							<thead>
+								<th class="small"></th>
+								<?php foreach ($this->regions as $region){?>
+								<th class="small"><?php echo $region['name']?></th>
+								<?php } //for region?>
+							</thead>
+							<?php foreach ($this->channels as $channel){ ?>	
+							<tr>
+							<td><?php echo $channel['name']?></td>
+							<?php  foreach ($this->regions as $region){?>
+							<td><input type="text" name="stock[unitsStockRight][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]"  class="small"  disabled="disabled"
+											<?php echo isset($this->unitsStockRightDecision)? 
+												  'value = "'.$this->unitsStockRightDecision['product_'.$product['product_number']]
+														['channel_'.$channel['channel_number']]
+														['region_'.$region['region_number']]
+														 .'"':'value ="0"'?></input>				 
+							</td>
+							<?php } //for region?>
+							</tr>
+							<?php } //for channel?>
+						</table>
+					</div>
+					<?php } ?>
+					<?php } // product?>
+				</div>
+			</div>	
+			<div style="visibility:hidden;" >
+			<input  id="distribution_stock_information" /></div>
+			</div>
+			<!--VERO-->
 		</form>		
 	</div>
+	
 	<div id="tabs-2" class="decisions_tab" id="marketing_decision">
 	<img src="/images/marketing.gif" alt="finance" width="135" height="95" style="float:right" />
 		<form name="marketing" onsubmit="return validateMarketingForm();" method="post">
@@ -526,9 +657,36 @@
 					</tr>
 				</table>
 			</div>
-			<div class="buttonsDiv">
-				<input class="button" type="submit" value="Guardar">
+			<!--VERO-->
+			<div class="fieldHeader">
+				Inversiones <?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"newIdiField")))?>			
 			</div>
+			<div id="investmentsField" class="fieldDiv">
+			<div id="invstmentsFieldDescription" class="fieldDescription" align="center">
+					Determine la cantidad que desea invertir y el plazo de la inversión.
+			</div>
+			<br />
+			<table align="center">
+			<thead>
+				<th class="small">Inversión</th>
+				<!--<th class="small">&nbsp;&nbsp;Lanzar&nbsp;&nbsp;</th>-->
+				<th class="small">&nbsp;&nbsp;Cantidad (en €)&nbsp;&nbsp;</th>
+				<th class="small">&nbsp;&nbsp;Plazo (en años)&nbsp;&nbsp;</th>
+			</thead>
+			<?php $investment=1;?>
+			<?php foreach ($this->investmentsType as $investmentType){?>
+					<tr>
+					<td><?php echo $investmentType?></td>
+					<td><input disabled="disabled" type="text" name="finance[investment][investment_number_<?php echo $investment?>][amount]" id="investment" display="block"
+						<?php echo isset($this->investmentDecision)? 'value="'.$this->investmentDecision['investment_number_'.$investment]['amount'].'"':""?>></input></td>
+					<td><input disabled="disabled" type="text" name="finance[investment][investment_number_<?php echo $investment?>][term]" id="investment" display="block"
+						<?php echo isset($this->investmentDecision)? 'value="'.$this->investmentDecision['investment_number_'.$investment]['term'].'"':""?>></input></td>
+						<?php $investment++;?>
+			<?php } ?>
+					</tr>
+			</table>
+			</div>
+			<!--VERO-->
 			<br />
 			<div class="fieldHeader">
 				Financiación: Cuantía<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financeAmountField")))?>			

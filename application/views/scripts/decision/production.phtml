@@ -32,7 +32,7 @@
 
 <div id='content'>
 	<img src="/images/factory.gif" alt="factory" width="85" height="98" style="float:right" />	
-	<form name="production" onsubmit="return validateProductionForm();" method="post">
+	<form name="production" id="formProduction" onsubmit="return validateProductionForm();" method="post">
 		<div class="fieldContainer">
 			<div class="fieldHeader" id="regionFieldButton">
 				Región de Fabricación			
@@ -118,7 +118,7 @@
 										<div class="factoryCapacityField" id="factoryCapacityField_<?php echo $factory_number ?>">
 											&nbsp;&nbsp;Número de m&aacute;quinas:&nbsp;
 											<input type="text" name="production_decision[capacity][factory_number_<?php echo $factory_number ?>]" class="small" value="<?php echo($this->addCapacityDecision['factory_number_'.$factory_number]); ?>"></input>
-											</div>
+											
 										</div>
 									</div>		
 							<?php //}
@@ -131,7 +131,7 @@
 										<div class="factoryCapacityField" id="factoryCapacityField_<?php echo $factory_number ?>" style="visibility:hidden;">
 											&nbsp;&nbsp;Número de m&aacute;quinas:&nbsp;
 											<input type="text" name="production_decision[capacity][factory_number_<?php echo $factory_number ?>]" class="small"></input>
-											</div>
+											
 										</div>
 									</div>
 								<?php }
@@ -175,6 +175,8 @@
 				</div>
 			</div>					
 		</div>
+		</div>
+
 		<br/>
 
 		<div class="fieldContainer">
@@ -182,46 +184,275 @@
 				Calidad			
 			</div>
 			<div id="qualityField" class="fieldDiv">
-				<div id="qualityFieldDescription" class="fieldDescription" align="center">
-					Elija la calidad de fabricación de sus productos.
-				</div>
-				<?php foreach ($this->products as $product){?>
-				<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
-				
-				<div class="fieldSubHeader" style="color:#F2610D">
-				<br />
-						<?php echo $product['name']?>
-				</div>
-				<div id="calidadFieldDescription" class="fieldDescription">
-				<br />
-				<div class="fieldDiv" style="color:#4169E1" align="center">
-					  <?php 
-						$new_launch=0;
-						//$myproduct=new Model_DbTable_Games_Evolution_Np_NewProducts();
-						//echo($this->game_id."-".$this->company_id."-".$this->round_number."-".$product['product_number']);
-						//$myproduct_aux=$this->myproduct->getActualAvailability($this->game_id, $this->company_id, $this->round_number, $product['product_number']);
-						$new_launch=0;
-						if ($this->new_product[$product['product_number']]==1 && $this->prev_rnd_new_product[$product['product_number']]!=1){
-							$new_launch=1;
-						}
-						foreach ($this->qualityParams as $qualityParam){?>
-							<?php echo $qualityParam['name'] ?> : &nbsp;
-							<select <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[quality_params][product_quality_<?php echo $qualityParam['quality_param_number'];?>][product_<?php echo $product['product_number'];?>]">
-								<?php for ($i=1;$i<=10;$i++){?>
-									<option value="<?php echo $i?>" <?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)? "selected":""?>>
-								<?php echo $i?>
-							</option>
-						<?php }//for?>
-					</select>
-					&nbsp;&nbsp;
-						<?php } ?>
-						</div>
-						</div>
-						<?php } ?>
-					<?php } ?>
-				
-			</div>
+	<div id="qualityFieldDescription" class="fieldDescription" align="center">
+		Elija la calidad de fabricación de sus productos.
+	</div>
+	<?php $id=1;?>
+	<?php foreach ($this->products as $product){?>
+	<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+	
+	<div class="fieldSubHeader" style="color:#F2610D">
+	<br />
+			<?php echo $product['name']?>
+	</div>
+	<div id="calidadFieldDescription" class="fieldDescription">
+	<br />
+	<div class="fieldDiv" style="color:#4169E1" align="center">
+		  <?php 
+			$new_launch=0;
+			//$myproduct=new Model_DbTable_Games_Evolution_Np_NewProducts();
+			//echo($this->game_id."-".$this->company_id."-".$this->round_number."-".$product['product_number']);
+			//$myproduct_aux=$this->myproduct->getActualAvailability($this->game_id, $this->company_id, $this->round_number, $product['product_number']);
+			$new_launch=0;
+			if ($this->new_product[$product['product_number']]==1 && $this->prev_rnd_new_product[$product['product_number']]!=1){
+				$new_launch=1;
+			}
+			foreach ($this->qualityParams as $qualityParam){?>
+		  		<?php if ($qualityParam['product_number']==$product['product_number']){?>
+				<?php echo $qualityParam['name'] ?> : &nbsp;
+				<select <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[quality_params][product_quality_<?php echo $qualityParam['quality_param_number'];?>][product_<?php echo $product['product_number'];?>]">
+					<?php for ($i=1;$i<=10;$i++){?>
+						<option value="<?php echo $i?>" <?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)? "selected":""?>>
+					<?php echo $i?>
+				</option>
+			<?php }//for?>
+		</select>
+		&nbsp;&nbsp;
+ 
+		<?php } ?>
+		<?php } ?>
 		</div>
+			
+		<!-- VERO-->
+		<div class="multiSelectDiv" style="color:#4169E1;" align="center">
+		Funcionalidades:&nbsp;<br />
+		<?php 
+			$new_launch=0;
+			if ($this->new_product[$product['product_number']]==1 && $this->prev_rnd_new_product[$product['product_number']]!=1){
+				$new_launch=1;
+			}
+		?>
+		<select multiple="multiple"  style="overflow: hidden;"  class="multiSelect" display="block" <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[functionality_params][product_number_<?php echo $product['product_number'];?>][]]"  id="funcionalities_param_<?php echo $id?>" >	
+			<?php foreach ($this->functionalities as $functionalities){?> 
+					<option value="<?php echo $functionalities['value']?>" <?php for($i=0; $i<count($this->functionalities); $i++){?> <?php echo  (isset($this->FunctionalitiesDecision) && $this->FunctionalitiesDecision['product_number_'.$product['product_number']][$i]==$functionalities['value'])? "selected":""?><?php }//for?>>
+					<?php echo $functionalities['descriptor']?>
+					</option>
+			<?php } ?>
+		</select>
+		&nbsp;&nbsp;
+
+		</div>
+		
+		<?php } ?>
+		</div>
+		<?php $id++;?>
+	<?php }//for product ?>	
+	<div id="nProduct"><input type ="hidden" value="<?php echo $id;?>"></div>
+</div>
+			<script>
+				$(function(){
+					$("#popupForm").hide();
+					$("#popupForm").dialog({
+			            bigframe    :   true,
+			            modal       :   true,
+			            autoOpen    :   false,
+			            width       :   500,
+			            heigth      :   100
+			        });
+					
+				});
+
+				
+				
+				
+				$(document).ready(function(){
+					var nProduct;
+					nProduct=document.getElementById("nProduct").getElementsByTagName("input");
+
+					for(i=1;i<=(nProduct[0].value-1); i++){
+						SizeOptions('#funcionalities_param_'+i);
+					}
+				});
+
+				$( "#formProduction" ).submit(function( event ) {
+				  var nProduct;
+					nProduct=document.getElementById("nProduct").getElementsByTagName("input");
+
+					for(i=1;i<=nProduct[0].value; i++){
+						$('#funcionalities_param_'+i).removeAttr("disabled");			
+					}
+				  
+				});
+				
+
+				function OpenPopup(data){
+					$("#popupForm").show();
+					//$("#popupForm").dialog();
+					$("#popupForm").dialog("open");
+					initializeValuesPopup(data);	
+					dataOrigin=document.getElementById("data");
+
+					dataOrigin.value=data;
+							
+				}
+
+				function SizeOptions(tag){
+					var select = $(tag);
+					select.attr('size', select[0].options.length);
+				
+				}
+
+				function initializeValuesPopup(data){
+					product = data.substring(0, 1);
+					regionO = data.substring(1, 2);
+					channelO = data.substring(2, 3);
+					n_regions = data.substring(3, 4);
+					n_channels = data.substring(4, 5);
+
+					contador=0;
+					distributionInformation=document.getElementById("distribution_stock_information");
+					distributionPopup=document.getElementById("unitsStockDistributionField").getElementsByTagName("input");
+					distribution=distributionInformation.value.split(";");
+					//if(distribution.length==1){
+						for(i=1;i<=(n_channels*n_regions);i++){
+							distributionPopup[i].value="0";
+						}		
+					//}
+
+					for(channel=1; channel<=n_channels; channel++){
+						for (region=1; region<=n_regions; region++){
+							index = n_regions*(parseInt(channel)-1)+parseInt(region);
+							for(i=0; i<(distribution.length-1);i++){
+								if (distribution[i].charAt(0)==product & distribution[i].charAt(2)==channelO & distribution[i].charAt(1)==regionO & distribution[i].charAt(4)==channel & distribution[i].charAt(3)==region & distribution[i].substr(5)!=distributionPopup[index].value){
+									distributionPopup[index].value=distribution[i].substr(5);
+									contador+=(parseInt(distribution[i].substr(5)));
+								}else if(distributionPopup[index].value==null || distributionPopup[index].value==""){
+									distributionPopup[index].value="0";
+								}
+						}
+						}
+					}
+
+					stocks_units=document.getElementById("stocks_units");
+					unitsInputsCache=document.getElementById("unitsStockCacheField").getElementsByTagName("input");
+					min = n_regions*n_channels*(parseInt(product)-1)+parseInt(product)-1;
+					index = n_regions*(parseInt(channelO)-1)+parseInt(regionO)-1;
+					index_stockcache=min+index;
+					index2=index+1;
+					if(contador!=unitsInputsCache[index_stockcache].value){	
+						distributionPopup[index2].value=unitsInputsCache[index_stockcache].value-contador;
+						document.getElementById("units").value=unitsInputsCache[index_stockcache].value-contador;
+					}else{
+						document.getElementById("units").value=0;
+					}
+					stocks_units.value=unitsInputsCache[index_stockcache].value;
+				}
+
+				function validatePopupForm(origin){
+					var  unitsInputs, unitsInputsRight, distribution="", regionN="", channelN="", regionD="", channelD="", indice=0, i, j, product, min=0, iLeft=0, boolean, contador, regionO, channelO;
+					boolean= true;	
+					origin=origin.toString();
+					contador= 0;	
+					unitsInputs=document.getElementById("unitsStockDistributionField").getElementsByTagName("input");
+					stocks_units=document.getElementById("stocks_units");
+					dataOrigin=document.getElementById("data").value;
+					
+					regionN = origin.substring(3, 4);
+					channelN = origin.substring(4, 5);
+					product =  dataOrigin.substring(0, 1);
+					regionO =dataOrigin.substring(1, 2); 
+					channelO = dataOrigin.substring(2, 3);	
+
+					
+					
+					for (i=1; i<unitsInputs.length;i++){
+						contador+= parseInt(unitsInputs[i].value);
+
+						if(unitsInputs[i].value <0){
+							alert("No se aceptan número negativos. Por favor, distribuya correctamente el stock");
+							boolean= false;
+						}
+						else{
+
+							if (unitsInputs[i].type=='text'){
+								channelD = Math.ceil(i/regionN);
+								for(j=(channelD-1)*regionN; j<=channelD*regionN; j++){
+									if (((parseInt(unitsInputs[i].value)!=0)&(parseInt(unitsInputs[i].value)!=null))&(i==j)){
+										channelD=channelD.toString();
+										regionD= indice.toString();
+										if((channelO!=channelD)|(regionO!=regionD)){
+											
+											distribution +=(product+regionO+channelO+regionD+channelD+unitsInputs[i].value+";");
+										}
+									}	
+									indice++;
+								}
+								indice=0;
+							 }
+						}
+					}
+
+					if (contador!=stocks_units.value & boolean){
+						alert("No ha distribuido correctamente el stock.");
+						boolean= false;
+					}
+
+					if(boolean){
+						min =parseInt(regionN)*parseInt(channelN)*(parseInt(product)-1)+parseInt(product)-1;
+
+						channelO = parseInt(channelO);
+						regionO = parseInt(regionO);
+						iLeft = min+regionN*(channelO-1)+regionO-1;
+
+						document.getElementById('unitsStockLeftField').getElementsByTagName("input")[iLeft].value=0;
+						distributionInformation=document.getElementById("distribution_stock_information").value.split(";");
+						/**for(k=0; k<(distribution.length-1); k++){*/
+							previousStock=0;
+							contador=0;
+							for (j=1, i = (regionN*channelN*(parseInt(product)-1)==0) ? 0 : min ; j<unitsInputs.length;j++, i++){
+								index=1;
+								
+								if (document.getElementById('unitsStockRightField').getElementsByTagName("input")[i].type =='text'){
+									channelDinformation = Math.ceil(j/regionN);
+									
+									for(l=(channelDinformation-1)*regionN+1; l<=channelDinformation*regionN+1; l++){
+											regionDInformation=index;
+										for(k=0; k<(distributionInformation.length-1); k++){
+											if  ((parseInt(distributionInformation[k].charAt(0))==parseInt(product)) & (parseInt(distributionInformation[k].charAt(1))==parseInt(regionO)) & (parseInt(distributionInformation[k].charAt(2))==parseInt(channelO)) & (parseInt(distributionInformation[k].charAt(3))==parseInt(regionDInformation)) & (parseInt(distributionInformation[k].charAt(4))==parseInt(channelDinformation)) & (l==j)){
+
+												previousStock=distributionInformation[k].substr(5);
+												document.getElementById('distribution_stock_information').value=document.getElementById('distribution_stock_information').value.replace((distributionInformation[k]+';'),'');
+											}										
+										}
+										if(l==j){
+												//contador += previousStock;
+												if (iLeft!=i){
+													document.getElementById('unitsStockRightField').getElementsByTagName("input")[i].value=parseInt(document.getElementById('unitsStockRightField').getElementsByTagName("input")[i].value)+parseInt(unitsInputs[j].value)-previousStock;
+												}
+										}
+										index++;
+										previousStock=0;
+									}
+									
+								}
+							}
+							min = regionN*channelN*(parseInt(product)-1)+parseInt(product)-1;
+							index = regionN*(parseInt(channelO)-1)+parseInt(regionO)-1;
+							index_stockcache=min+index;
+							index2=index+1;
+							stocks_units=document.getElementById("stocks_units");
+							document.getElementById('unitsStockRightField').getElementsByTagName("input")[iLeft].value=parseInt(document.getElementById('unitsStockRightField').getElementsByTagName("input")[iLeft].value)+parseInt(unitsInputs[index2].value)-parseInt(document.getElementById("units").value);
+						//}	
+						document.getElementById('distribution_stock_information').value += distribution;		
+						$("#popupForm").dialog('close');
+						$("#popupForm").hide();
+					}
+				}
+			</script>
+			<!-- VERO-->
+		
+		
+		
 		<br/>
 
 		<div class="fieldContainer">
@@ -336,6 +567,281 @@
 			</div>
 		</div>
 		<br/>
+		<!-- VERO-->
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="unitsStockField")=>
+				Distribución del stock		
+			</div>
+			<div id="unitsStockField" class="fieldDiv">
+
+				<div id="unitsStockFieldDescription" class="fieldDescription" align="center">
+					Determine la cantidad de unidades de stock a distribuir en cada canal y para cada región.
+				</div>
+
+			<div id="unitsStockField" class="content">
+
+				<div id = "unitsStockLeftField" class='left'>
+				<?php $id=1; $regionN=1; $channelN=1; ?>
+					<div id="unitsStockLeftFieldDescription" align="center">
+						Distribución original
+					</div>
+					<div id="unitsStockLeftFieldsErrors" class="fieldErrors">
+					</div>
+					<?php foreach ($this->products as $product){?>
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+					<div class="fieldSubHeader" style="color:#F2610D">
+					<br />
+						<?php echo $product['name']?>
+					</div>
+					<div class="fieldDiv">
+						<table align="center">
+							<thead>
+								<th class="small"></th>
+								<?php foreach ($this->regions as $region){?>
+								<th class="small"><?php echo $region['name']?></th>
+								<?php } //for region?>
+							</thead>
+							<?php $channelN=1; ?>
+							<?php foreach ($this->channels as $channel){ ?>	
+							<tr>
+							<td><?php echo $channel['name']?></td>
+							<?php $regionN=1; ?>
+							<?php  foreach ($this->regions as $region){?>
+							<td><input type="text" name="stock[unitsStockLeft][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]"  href="popup" target="_blank" onclick="OpenPopup('<?php echo $id;  echo $regionN; echo $channelN; echo $this->n_regions; echo $this->n_channels;?>')"  class="small" <?php if ($this->round_number<2){?>disabled="disabled"<?php }?>
+									<?php echo isset($this->unitsStockLeftDecision)? 
+										'value = "'.$this->unitsStockLeftDecision['product_'.$product['product_number']]
+												['channel_'.$channel['channel_number']]
+												['region_'.$region['region_number']]
+										.'"':'value ="0"'?></input>
+							</td>
+							<?php $regionN=$regionN+1; ?>
+							<?php } //for region?>
+							
+							</tr>
+							<?php $channelN=$channelN+1; ?>
+							<?php } //for channel?>
+						</table>
+					</div>
+					<div class="buttonsDiv">
+						<input type="button" id="copy_button" class="button" value="Mantener distribución original" onclick="save_stock('<?php echo $id;  echo $regionN; echo $channelN;?>')" />
+					</div>
+					<?php } ?>
+					<?php $id=$id+1; ?>
+					<?php } // product?>
+
+				</div>
+
+				<div id="unitsStockRightField" class="right">
+				<?php $id=1; ?>
+					<div id="unitsStockRightFieldDescription" align="center">
+						Distribución final
+					</div>
+					<div id="unitsStockRightFieldsErrors" class="fieldErrors">
+					</div>
+					<?php foreach ($this->products as $product){?>
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+					<div class="fieldSubHeader" style="color:#F2610D">
+					<br />
+						<?php echo $product['name']?>
+					</div>
+					<div class="fieldDiv">
+						<table align="center">
+							<thead>
+								<th class="small"></th>
+								<?php foreach ($this->regions as $region){?>
+								<th class="small"><?php echo $region['name']?></th>
+								<?php } //for region?>
+							</thead>
+							<?php $channelN=1; ?>
+							<?php foreach ($this->channels as $channel){ ?>	
+							<tr>
+							<td><?php echo $channel['name']?></td>
+							<?php $regionN=1; ?>
+							<?php  foreach ($this->regions as $region){?>
+							<td><input type="text" name="stock[unitsStockRight][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]"  class="small"  readonly
+											<?php echo isset($this->unitsStockRightDecision)? 
+												  'value = "'.$this->unitsStockRightDecision['product_'.$product['product_number']]
+														['channel_'.$channel['channel_number']]
+														['region_'.$region['region_number']]
+														 .'"':'value ="0"'?></input>				 
+							</td>
+							<?php $regionN=$regionN+1; ?>
+							<?php } //for region?>
+							</tr>
+							<?php $channelN=$channelN+1; ?>
+							<?php } //for channel?>
+						</table>
+					</div>
+					<div class="buttonsDiv">
+						<input type="button" id="reset_button"  class="button" value="Resetear cambios" onclick="reset_stock('<?php echo $id;  echo $regionN; echo $channelN;?>')" />
+					</div>
+					<?php } ?>
+					<?php $id=$id+1; ?>
+					<?php } // product?>
+				</div>
+
+				
+			</div>	
+
+			<div id="unitsStockCacheField" class="small" style="display: none;">
+				<?php $id=1; ?>
+					<div id="unitsStockCacheFieldDescription" align="center">
+						Distribución final
+					</div>
+					<?php foreach ($this->products as $product){?>
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+					<div class="small" style="color:#F2610D">
+					<br />
+						<?php echo $product['name']?>
+					</div>
+					<div class="small">
+						<table align="center">
+							<thead>
+								<th class="small"></th>
+								<?php foreach ($this->regions as $region){?>
+								<th class="small"><?php echo $region['name']?></th>
+								<?php } //for region?>
+							</thead>
+							<?php foreach ($this->channels as $channel){ ?>	
+							<tr>
+							<td><?php echo $channel['name']?></td>
+							<?php  foreach ($this->regions as $region){?>
+							<td><input type="text" name="unitsStockCache[product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]"  class="small" 
+											<?php echo isset($this->unitsStockCacheDecision)? 
+												  'value = "'.$this->unitsStockCacheDecision['product_'.$product['product_number']]
+														['channel_'.$channel['channel_number']]
+														['region_'.$region['region_number']]
+														 .'"':'value ="0"'?></input>				 
+							</td>
+							<?php } //for region?>
+							</tr>
+							<?php } //for channel?>
+						</table>
+					</div>
+					
+					<input type="button" class="button" id="reset_button"  value="Mantener cambios" />
+					<?php $id=$id+1; ?>
+					<?php } ?>
+					
+					<?php } // product?>
+				</div>
+			</div>
+
+
+				
+			
+
+		<script type="text/javascript">
+
+			function reset_stock (position){
+				var  unitsInputs, i, unitsInputsCache, unitsInputsLeft, nproduct, nregion, nchannel, distribution, resultado="", unitsInputsResult; 
+				unitsInputs=document.getElementById("unitsStockRightField").getElementsByTagName("input");
+				unitsInputsLeft=document.getElementById("unitsStockLeftField").getElementsByTagName("input");
+				unitsInputsCache=document.getElementById("unitsStockCacheField").getElementsByTagName("input");
+				
+
+				nproduct = position.substring(0, 1);
+				nregion = parseInt(position.substring(1, 2))-1;
+				nchannel = parseInt(position.substring(2, 3))-1;
+
+				for (i=(nchannel*nregion+1)*(nproduct-1); i<((nchannel*nregion+1)*nproduct-1); i++){
+					if(unitsInputs[i].type=='text'){
+						unitsInputs[i].value=unitsInputsCache[i].value;
+						unitsInputsLeft[i].value=unitsInputsCache[i].value;
+					}
+				}
+
+				distribution=document.getElementById("distribution_stock_information").value.split(";");
+				for (i=0; i<distribution.length; i++){
+					if (distribution[i].charAt(0)!=nproduct & distribution[i].charAt(0)!=null & distribution[i].charAt(0)!=""){
+						resultado +=(distribution[i]+";");
+					}
+				}
+				document.getElementById("distribution_stock_information").value=resultado;
+				
+			}
+
+			function save_stock (position){
+				var unitsInputsLeft, unitsInputsRight,  unitsInputsCache, i, nproduct, nregion, nchannel, distribution, resultado="";
+				unitsInputsRight=document.getElementById("unitsStockRightField").getElementsByTagName("input");
+				unitsInputsLeft=document.getElementById("unitsStockLeftField").getElementsByTagName("input");
+				unitsInputsCache=document.getElementById("unitsStockCacheField").getElementsByTagName("input");
+
+				nproduct = position.substring(0, 1);
+				nregion = parseInt(position.substring(1, 2))-1;
+				nchannel = parseInt(position.substring(2, 3))-1;
+
+				for (i=(nchannel*nregion+1)*(nproduct-1); i<((nchannel*nregion+1)*nproduct-1); i++){
+					if(unitsInputsLeft[i].type=='text'){
+						unitsInputsRight[i].value=unitsInputsCache[i].value;
+						unitsInputsLeft[i].value=0;
+					}
+				}	
+
+				distribution=document.getElementById("distribution_stock_information").value.split(";");
+				for (i=0; i<distribution.length; i++){
+					if (distribution[i].charAt(0)!=nproduct & distribution[i].charAt(0)!=null & distribution[i].charAt(0)!=""){
+						resultado +=(distribution[i]+";");
+					}
+				}
+				document.getElementById("distribution_stock_information").value=resultado;
+			}
+		</script>
+		<div style="visibility: hidden;">
+		<input type="text"  id="distribution_stock_information"  name="stock[distributionInformation]" <?php echo isset($this->unitsStockDistributiontDecision)? 
+												  'value = "'.$this->unitsStockDistributiontDecision.'"':'value =""'?> /></div>
+
+
+			<!--VERO-->
+		</div>
+		<div id="popupForm" style="position:relative;border: 0px;">
+	<div name="stockDistribution" onload="" style="width: auto;"/>
+		<div class="fieldHeader">
+			Distribución del stock	
+		</div>
+		<div id="unitsStockDistributionField" class="fieldDiv" style="width: auto;">
+					<td><label >Cantidad de productos a distribuir&nbsp</label>
+					<input type="text" id="stocks_units" name="stocks_units"  display="block" disabled="disabled"
+						<?php echo isset($this->stocks_units)? 
+							'value = "'.$this->stocks_units
+							.'"':'value = "0"'?>>
+					</td>
+					<table align="center">
+						<thead>
+							<th class="small"></th>
+							<?php foreach ($this->regions as $region){?>
+							<th class="small"><?php echo $region['name']?></th>
+							<?php } //for region?>
+						</thead>
+						<?php $channelN=1; ?>
+						<?php foreach ($this->channels as $channel){ ?>	
+						<tr>
+						<td><?php echo $channel['name']?></td>
+						<?php $regionN=1; ?>
+						<?php  foreach ($this->regions as $region){?>
+						<td><input type="text" name="unitsStockDistribution[channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]"  class="small" id="unitsStockPopup"
+										<?php echo isset($this->unitsStockDistributionDecision)? 
+											  'value = "'.$this->unitsStockDistributionDecision['channel_'.$channel['channel_number']]
+													['region_'.$region['region_number']]
+													 .'"':'value ="0"'?>>				 
+						</td>
+						<?php $regionN=$regionN+1; ?>
+						<?php } //for region?>
+						</tr>
+						<?php $channelN=$channelN+1; ?>
+						<?php } //for channel?>
+					</table>
+		</div>
+		<div class="buttonsDiv">
+			<input class=button type="button" value="Guardar" onclick="validatePopupForm(<?php echo $id;  echo $regionN; echo $channelN; echo $this->n_regions; echo $this->n_channels?>);">
+		</div>
+		<div style="display:none;"><input type="text" id="units" name="units"></div>
+		<div id="data"><input type ="hidden"></div>	
+			<!--VERO-->
+		<br/>
+		</div>
+		</div>
+		<br>
 		<div class="buttonsDiv">
 			<input class="button" type="submit" value="Guardar">
 		</div>
@@ -356,7 +862,10 @@
 		$( "#suppliersFieldButton" ).click(function() {
 			$( "#suppliersField" ).toggle( "easeInElastic" );
 		});
-		
+		$( "#unitsStockFieldButton" ).click(function() {
+			$( "#unitsStockField" ).toggle( "easeInElastic" );
+		});
+
 		//Slider número de proveedores
 		var suppliersNumber = $('#suppliersNumber');
 		var slider = $('#suppliersNumberslider').slider({
@@ -403,3 +912,4 @@
 		});
 	</script>
 </div>
+

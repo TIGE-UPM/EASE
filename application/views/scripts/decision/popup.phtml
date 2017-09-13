@@ -1,0 +1,109 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/display.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/factoryProduction.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/display.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/interestRate.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/marketing.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/production.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/initiatives.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/edit-decisions.js', $type = 'text/javascript')?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.progressbar.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.progressbar.minjs', $type = 'text/javascript')?>
+
+	
+<div id="popup">
+	<form name="stockDistribution" method="post"/>
+		<div class="fieldHeader">
+			Distribución del stock<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"unitsStockDistributionField")))?>
+			<a href="<?php echo $this->baseUrl().'/game/view?game_id='.$this->game['id']?>"> ( volver a resumen de juego ) </a>			
+		</div>
+		<div id="unitsStockDistributionField" class="fieldDiv">
+					<td><label >Cantidad de productos a distribuir&nbsp</label>
+					<input type="text" id="stocks_units" name="stocks_units"  display="block" disabled="disabled"
+						<?php echo isset($this->stocks_units)? 
+							'value = "'.$this->stocks_units
+							.'"':'value = "0"'?> </input>
+					</td>
+					<table align="center">
+						<thead>
+							<th class="small"></th>
+							<?php foreach ($this->regions as $region){?>
+							<th class="small"><?php echo $region['name']?></th>
+							<?php } //for region?>
+						</thead>
+						<?php $channelN=1; ?>
+						<?php foreach ($this->channels as $channel){ ?>	
+						<tr>
+						<td><?php echo $channel['name']?></td>
+						<?php $regionN=1; ?>
+						<?php  foreach ($this->regions as $region){?>
+						<td><input type="text" name="unitsStockDistribution[channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]"  class="small" 
+										<?php echo isset($this->unitsStockDistributionDecision)? 
+											  'value = "'.$this->unitsStockDistributionDecision['channel_'.$channel['channel_number']]
+													['region_'.$region['region_number']]
+													 .'"':'value ="0"'?></input>				 
+						</td>
+						<?php $regionN=$regionN+1; ?>
+						<?php } //for region?>
+						</tr>
+						<?php $channelN=$channelN+1; ?>
+						<?php } //for channel?>
+					</table>
+		</div>
+		<div class="buttonsDiv">
+			<input class="button" type="submit" value="Guardar"  >
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+	function validatePopupForm(origin){
+		alert("HE entrado");
+		var  unitsInputs, unitsInputsRight, distribution="", regionN, channelN, regionD="", channelD="", indice=0, i, j, product, min=0, iLeft=0;
+		unitsInputs=document.getElementById("unitsStockDistributionField").getElementsByTagName("input");
+		regionN = parseInt(origin.substring(3, 4))-1;
+		channelN = parseInt(origin.substring(4, 5))-1;
+		product = origin.substring(0, 1);
+		regionO = origin.substring(1, 2);
+		channelO = origin.substring(2, 3);
+		for (i=1; i<unitsInputs.length;i++){
+			if (unitsInputs[i].type=='text'){
+				channelD = Math.ceil(i/regionN);
+				for(j=(channelD-1)*regionN; j<=channelD*regionN; j++){
+					if (((parseInt(unitsInputs[i].value)!=0)&(parseInt(unitsInputs[i].value)!=null))&(i==j)){
+						channelD=channelD.toString();
+						regionD= indice.toString();
+						if((channelO!=channelD)|(regionO!=regionD)){
+							distribution +=(product+regionO+channelO+regionD+channelD+unitsInputs[i].value+";");
+						}
+					}	
+					indice++;
+				}
+				indice=0;
+			}
+		}
+		window.opener.document.getElementById('distribution_stock_information').value += distribution;
+		min =regionN*channelN*(parseInt(product)-1)+parseInt(product)-1;
+		channelO = parseInt(channelO);
+		regionO = parseInt(regionO);
+		iLeft = min+regionN*(channelO-1)+regionO-1;
+
+		window.opener.document.getElementById('unitsStockLeftField').getElementsByTagName("input")[iLeft].value=0;
+		for (j=1, i = (regionN*channelN*(parseInt(product)-1)==0) ? 0 : min ; j<unitsInputs.length;j++, i++){
+			if (window.opener.document.getElementById('unitsStockRightField').getElementsByTagName("input")[i].type =='text'){
+				window.opener.document.getElementById('unitsStockRightField').getElementsByTagName("input")[i].value=parseInt(window.opener.document.getElementById('unitsStockRightField').getElementsByTagName("input")[i].value)+parseInt(unitsInputs[j].value);
+				window.opener.document.getElementById('unitsStockResultField').getElementsByTagName("input")[i].value=parseInt(window.opener.document.getElementById('unitsStockResultField').getElementsByTagName("input")[i].value)+parseInt(unitsInputs[j].value);
+			}
+		}			
+		this.close();			
+	
+	}
+</script>

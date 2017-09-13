@@ -336,10 +336,11 @@
 							?>					
 							<tr>
 								<td class="<?php echo $hor_class?>">
-									Producto:
 								</td>
 								<td class="<?php echo $hor_class?>">
-									<?php echo ($product['name']); ?>
+									<?php if ($channel['channel_number']==1){
+										echo ('Producto: '.$product['name']);
+									}?>
 								</td>
 							<?php 	$newVGroup=true;?>						
 							<?php
@@ -355,7 +356,7 @@
 									<?php echo number_format($total_sales['product_'.$product['product_number']]['region_'.$region['region_number']],0, '.', ',')?>
 								</td>
 								<td class="<?php echo $hor_class.' '.$vertical_class?>" style="color:#808080">
-									<?php echo number_format($this->outcomes_market_sizes['product_'.$product['product_number']]['region_'.$region['region_number']],0, '.', ',')?>
+									<?php echo ($this->outcomes_market_sizes['product_'.$product['product_number']]['region_'.$region['region_number']])?>
 								</td>
 							<?php }//for region?>			
 						</tr>
@@ -1021,16 +1022,39 @@
 							$fi_costs[$company['id']]+=$this->outcomes_costs[$company['id']]['fi_debt_costs_lt']?>
 						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($this->outcomes_costs[$company['id']]['fi_debt_costs_lt'],2, '.', ',').' €'?></td>
 					<?php } ?>
-				</tr>				
+				</tr>
+				<tr>
+					<td class="hor_group_even categories"></td>
+					<td class="hor_group_even categories">Intereses ganados por inversiones financieras</td>
+					<?php foreach ($this->companies as $company){				
+							$fi_investment_earnings[$company['id']]+=$this->outcomes_investments[$company['id']]['fi_investment_earnings']?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($this->outcomes_investments[$company['id']]['fi_investment_earnings'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+				<tr>
+					<td class="hor_group_even categories"></td>
+					<td class="hor_group_even categories">Intereses perdidos por inversiones financieras</td>
+					<?php foreach ($this->companies as $company){				
+							$fi_investment_losses[$company['id']]+=$this->outcomes_investments[$company['id']]['fi_investment_losses']?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($this->outcomes_investments[$company['id']]['fi_investment_losses'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>					
 				<thead>
 					<th class='invisible categories' style="background-color:#FAFAD2"></th>
 					<th class='invisible categories' style="background-color:#FAFAD2">
 						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Total Financieros</h3>
 					</th>
 					<?php foreach ($this->companies as $company){?>
-							<th  class="vertical_group_open"nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($fi_costs[$company['id']],2, '.', ',').' €'?></th>
+						<?php $total_fi_cost[$company['id']]=
+														$fi_costs[$company['id']]+
+														$fi_investment_losses[$company['id']]-
+														$fi_investment_earnings[$company['id']];?>
+						<th  class="vertical_group_open"nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($total_fi_cost[$company['id']],2, '.', ',').' €'?></th>
 				    <?php }//for company ?>
 				</thead>
+
+
+				</td>
 				<tr></tr>
 					<th></th>
 					<th></th>
@@ -1042,7 +1066,7 @@
 						<h2 style="color:#A52A2A;margin-bottom:12px;margin-left:5px">EBT</h2>
 					</th>
 					<?php foreach ($this->companies as $company){
-						 	$ebt[$company['id']]=$ebitda[$company['id']]-$amortization[$company['id']]-$fi_costs[$company['id']]?>
+						 	$ebt[$company['id']]=$ebitda[$company['id']]-$amortization[$company['id']]-$total_fi_cost[$company['id']]?>
 							<th nowrap style="color:#A52A2A"><strong><?php echo number_format($ebt[$company['id']],2, '.', ',').' €'?></strong></th>
 				    <?php }//for company ?>
 				</thead>
@@ -1177,7 +1201,7 @@
 					</tr>
 					<tr>	
 						<td class="hor_group_even categories"></td>
-						<td class="hor_group_even categories">Rentabilidad financiera&nbsp;&nbsp;</td>
+						<td class="hor_group_even categories">Rentabilidad para el accionista&nbsp;&nbsp;</td>
 						<?php foreach ($this->companies as $company){?>
 						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($this->outcomes_performance[$company['id']]['roe'],2, '.', ',')?>&nbsp;%</td>
 						<?php } ?>
@@ -1241,13 +1265,14 @@
 						      $asset_no_current_sum[$company['id']]=0;?>
 							<th></th>
 							<?php $asset_no_current_sum[$company['id']]+=$this->outcomes_balance_sheet[$company['id']]['tied_up'];
-								  $asset_no_current_sum[$company['id']]-=$this->outcomes_balance_sheet[$company['id']]['amortization'];?>
+								  $asset_no_current_sum[$company['id']]-=$this->outcomes_balance_sheet[$company['id']]['amortization'];
+								  $asset_no_current_sum[$company['id']]+=$this->outcomes_balance_sheet[$company['id']]['investment_assets'];?>
 				    	<?php }//for company ?>
 					</thead>
 					<thead>
 						<th class='invisible categories' style="background-color:#FAFAD2"></th>
 						<th class='invisible categories' style="background-color:#FAFAD2">
-							<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">A) Activo no corriente (I+II)&nbsp;&nbsp;</h3>
+							<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">A) Activo no corriente (I+II+III)&nbsp;&nbsp;</h3>
 						</th>
 						<?php foreach ($this->companies as $company){?>	
 							<th  class="vertical_group_open"nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($asset_no_current_sum[$company['id']], 2, '.', ',').' €'?></strong></th>
@@ -1267,6 +1292,14 @@
 						<?php foreach ($this->companies as $company){
 							$asset_sum[$company['id']]-=$this->outcomes_balance_sheet[$company['id']]['amortization']?>
 							<td class="hor_group_odd vertical_group_open"nowrap>-<?php echo number_format($this->outcomes_balance_sheet[$company['id']]['amortization'],2, '.', ',').' €'?></td>
+						<?php } ?>
+				</tr>
+				<tr>
+					<td class="hor_group_odd categories"></td>
+					<td class="hor_group_odd categories">&nbsp;&nbsp;III. Otras inversiones financieras</td>
+						<?php foreach ($this->companies as $company){
+							$asset_sum[$company['id']]+=$this->outcomes_balance_sheet[$company['id']]['investment_assets']?>
+							<td class="hor_group_odd vertical_group_open"nowrap><?php echo number_format($this->outcomes_balance_sheet[$company['id']]['investment_assets'],2, '.', ',').' €'?></td>
 						<?php } ?>
 				</tr>
 					<tr></tr>
@@ -1329,7 +1362,7 @@
 				</thead>
 				<thead>
 						<th colspan='2'class='invisible categories'>
-							<h2 style="color:#800000">PASIVO Y PATRIMONIO NETO</h2>
+							<h2 style="color:#800000">PASIVO</h2>
 						</th>
 							<?php foreach ($this->companies as $company){
 							$shareholders_funds[$company['id']]=0;?>
@@ -1358,7 +1391,7 @@
 				</tr>
 				<tr>
 					<td class="hor_group_even categories"></td>
-					<td class="hor_group_even categories">&nbsp;&nbsp;II. Resultados ejercicios anteriores</td>
+					<td class="hor_group_even categories">&nbsp;&nbsp;II. Reservas</td>
 						<?php foreach ($this->companies as $company){
 							$liabilities_total[$company['id']]+=$this->outcomes_balance_sheet[$company['id']]['reserves']?>
 							<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($this->outcomes_balance_sheet[$company['id']]['reserves'],2, '.', ',').' €'?></td>
@@ -1440,7 +1473,7 @@
 				<thead>
 					<th class='invisible categories' style="background-color:#FAFAD2"></th>
 					<th class='invisible categories' style="background-color:#FAFAD2">
-						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Total PASIVO Y PATRIMONIO NETO (A+B+C)&nbsp;&nbsp;</h3>
+						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Total PASIVO (A+B+C)&nbsp;&nbsp;</h3>
 					</th>
 					<?php foreach ($this->companies as $company){?>				
 						<th  class="vertical_group_open"nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($liabilities_total[$company['id']],2, '.', ',').' €'?></strong></th>
