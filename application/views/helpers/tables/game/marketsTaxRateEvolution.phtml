@@ -1,0 +1,47 @@
+<div id="taxRateFieldDescription" class="fieldDescription" style="background-color:white">
+	Configure porcentualmente (%) las tasas de imposici&oacute;n de las regiones que van a ser simuladas en cada ronda:
+</div>
+<?php $n_rounds=$view->games->getNumberOfRounds($view->game_id); 
+	if ($n_rounds>1) {
+		for ($round_number=2;$round_number<=$n_rounds;$round_number++){ ?>
+			<div style="float: left; margin-right: 15px;">
+				Ronda <?php echo $round_number?>
+				<table>
+					<theader>
+						<th class="small"></th>
+					<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+					<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+						<th class="small">Regi&oacute;n <?php echo $region_number?></th>
+					<?php } //for region?>
+					</theader>
+					<tr>
+						<td></td>
+						<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+						<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+							
+						<?php } //for region?>
+					</tr>
+				
+					<tr>
+						<td>Tasa de imposici&oacute;n </td>
+						<!-- Cambiar este codigo para que saque de la base de dato los valores de evolución-->
+						<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+						<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+						<?php $marketTaxRateEvolution=$view->games->getMarketTaxRateEvolution($view->game_id, $round_number, $region_number);?>
+						<td>
+							<input type="text" name="marketTaxRateEvolution[round_<?php echo $round_number?>][region_<?php echo $region_number?>]" 
+								   value="<?php echo $marketTaxRateEvolution?>" class="medium">
+						</td>
+						<?php } //for region?>
+					</tr>
+					
+				</table>
+			</div>
+		
+		<?php }
+	} else {?>
+		<div style="float: left">
+			Sólo se ha configurado una ronda para este juego de simulación
+		</div>
+	<?php }?>
+<div style="clear:both"></div>

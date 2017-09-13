@@ -3,11 +3,11 @@
 		<th class="small"></th>
 		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
 		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
-		<th class="small">Región <?php echo $region_number?></th>
+		<th class="small">Regi&oacute;n <?php echo $region_number?></th>
 		<?php } //for region?>
 	</theader>
 	<tr>
-		<td>Contratación</td>
+		<td>Contrataci&oacute;n</td>
 		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
 		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
 		<td><input type="text" name="hrRegionCosts[round_1][region_<?php echo $region_number?>][hiring]" 
@@ -15,7 +15,7 @@
 		<?php } //for region?>
 	</tr>
 	<tr>
-		<td>Formación</td>
+		<td>Formaci&oacute;n</td>
 		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
 		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
 		<td><input type="text" name="hrRegionCosts[round_1][region_<?php echo $region_number?>][training]" 
@@ -30,4 +30,13 @@
 			value="<?php echo $view->games->getHrStaffCost($view->game_id, 1, $region_number, 'wages_cost');?>" class="small"></td>
 		<?php } //for region?>
 	</tr>
+	<tr>
+		<td>Despidos</td>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<td><input type="text" name="hrRegionCosts[round_1][region_<?php echo $region_number?>][dismissals]" 
+			value="<?php echo $view->games->getHrStaffCost($view->game_id, 1, $region_number, 'dismissals_cost');?>" class="small"></td>
+		<?php } //for region?>
+	</tr>
+
 </table>

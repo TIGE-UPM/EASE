@@ -1,0 +1,23 @@
+<table>
+	<theader>
+		<th class="small"></th>
+	<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+	<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<th class="small">Regi&oacute;n <?php echo $region_number?></th>
+	<?php } //for region?>
+	</theader>
+
+	<tr>
+		<td>Tasa de imposici&oacute;n</td>
+		<!-- modificar este codigo para que saque las tasas de interés-->
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<?php $marketTaxRate=$view->games->getMarketTaxRate($view->game_id, 1, $region_number);?>
+		<td>
+			<input type="text" name="marketTaxRate[round_1][region_<?php echo $region_number?>]" 
+				   value="<?php echo $marketTaxRate?>" class="medium">
+		</td>
+		<?php } //for region?>
+	</tr>
+	
+</table>
