@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 	class GameController extends Zend_Controller_Action {
 		public $_controllerTitle= "Juegos - ";
 		public function preDispatch(){
@@ -46,16 +46,20 @@
 			$amount=$games->getFinanceAmount($_GET['game_id'], $_GET['round'], $_GET['company_id']);
 			$interest_adjustment=($games->getInterestAdjustment($_GET['game_id'], $_GET['round'],$_GET['company_id']));
 			$game_initiatives_chosen=$games->getInitiativeChosen($_GET['game_id'],$_GET['round'],$_GET['company_id']);
-
+			
+ 			
 			
 			$trademedia[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-			$trademedia[1]=array('trademedia_number'=>2, 'name'=>'PromociÃƒÂ³n');
+			$trademedia[1]=array('trademedia_number'=>2, 'name'=>'PromociÃ³n');
 			
 			$channel_payterms[0]=array('value'=>0, 'descriptor'=>'Inmediato');
 			$channel_payterms[1]=array('value'=>1, 'descriptor'=>'Aplazado 1 mes');
 			$channel_payterms[2]=array('value'=>2, 'descriptor'=>'Aplazado 2 meses');
 			$channel_payterms[3]=array('value'=>3, 'descriptor'=>'Aplazado 3 meses');
 			$channel_payterms[4]=array('value'=>4, 'descriptor'=>'Aplazado 4 meses');
+
+		
+
 
 			//VERO
 			$n_product=$games->getNumberOfProductsAvailable($_GET['game_id'],$_GET['round'],$_GET['company_id']);			
@@ -123,8 +127,29 @@
 			$changeidi[3]=array('value'=>-1, 'descriptor'=>'(-1)');
 			$changeidi[4]=array('value'=>-2, 'descriptor'=>'(-2)');
 			$changeidi[5]=array('value'=>-3, 'descriptor'=>'(-3)');
-						
-			//$this->view->factories=$factories;
+			
+			//JESUS
+			$employeeCategory[0]=array('category_number'=>1, 'name'=>'Operario de fabricaci&oacute;n');
+			$employeeCategory[1]=array('category_number'=>2, 'name'=>'Operario de ensamblado');
+			$employeeCategory[2]=array('category_number'=>3, 'name'=>'Supervisor de calidad');
+			$employeeCategory[3]=array('category_number'=>4, 'name'=>'T&eacute;cnico de mantenimiento');
+			//JESUS
+			$shifts[0]=array('value'=>1, 'descriptor'=>'Un turno');
+			$shifts[1]=array('value'=>2, 'descriptor'=>'Dos turnos');
+			$shifts[2]=array('value'=>3, 'descriptor'=>'Tres turnos');
+			$this->view->shifts=$shifts;
+			//JESUS
+			$decisions=new Model_DbTable_Decisions_HumanResources();
+			$games=new Model_DbTable_Games();
+			$factories=$games->getFactories($_GET['game_id'],$_GET['company_id']);
+			$this->view->factories = $factories;
+			//JESUS
+			$marketingCampaign[0]=array('campaign_value'=>1, 'name'=> 'Calidad, estilo y elegancia');
+			$marketingCampaign[1]=array('campaign_value'=>2, 'name'=> 'La calidad no es cara');
+			$marketingCampaign[2]=array('campaign_value'=>3, 'name'=> 'Un m&oacute;vil para todos');
+
+			$this->view->marketingCampaign = $marketingCampaign;
+
 			//VERO
 			$gameInvestmentParams = new Model_DbTable_Games_Param_Markets_InvestmentsParams();
 			$investmentsType=$gameInvestmentParams->getinvestmentParamsName($_GET['game_id']);
@@ -172,75 +197,7 @@
 			$this->view->channelsD=$game_channels;
 			$this->view->regionsO=$regions;
 			$this->view->regionsD=$regions;
-			//VERO
-
-
-			$game_id=205;
-			$round=3;
-			var_dump($round);
-			$company_id=113;
-			$decision_investment=new Model_DbTable_Decisions_Fi_Investment();
-			$game=new Model_DbTable_Games();
-			$n_investment = $game->getNumberOfInvestments($game_id);
-			$outcomes=new Model_DbTable_Outcomes_In_InvestmentUnitary();
-			$investment_param=new Model_DbTable_Games_Param_Markets_InvestmentsParams();
-			$evolution=new Model_DbTable_Games_Evolution_Fi_Investment();
-			for($investment_number=1; $investment_number<=$n_investment; $investment_number++){
-				var_dump("InversiÃ³n".$investment_number);
-				$result=0;
-				$result_final=0;
-				for ($round_number=1; $round_number<=$round; $round_number++){
-
-					$investments=$decision_investment->getDecision($game_id, $company_id, $round_number);
-					$term_aux = $round-$round_number;
-					$term= $investments['investment_number_'.$investment_number]['term'];
-					$amount= $investments['investment_number_'.$investment_number]['amount'];
-
-					/**$amount= $investments['investment_number_'.$investment_number]['amount'];
-					$term= $investments['investment_number_'.$investment_number]['term'];*/
-					
-					if($term_aux < $term ){
-						$result=$outcomes->getInvestment($game_id, $company_id, $round_number, $investment_number);
-						if($term == 1){
-							var_dump("Entro en 1");
-							$liquid_assets +=$result;
-						}elseif($term_aux==0){
-							var_dump("Entro en 2");
-							$liquid_assets +=(-$amount);
-							$activeInvestment+=$result+$amount+$result_final;
-						}elseif($term_aux==$term-1){
-							$outcomes=new Model_DbTable_Outcomes_In_InvestmentUnitary();
-							var_dump("Entro en 3");
-							for($round_number_aux=$round_number;$round_number_aux<=$round;$round_number_aux++){
-								var_dump($round_number_aux);
-								var_dump($investment_number);
-								
-								$result_final+=$outcomes->getInvestment($game_id, $company_id, $round_number_aux, $investment_number);
-								var_dump($result_final);
-							}
-							//$result=$this->getAllResultsByInvestment($round, $round_number, $investment_number);
-							$liquid_assets +=($amount+$result_final);
-						}else{
-							$outcomes=new Model_DbTable_Outcomes_In_InvestmentUnitary();
-							var_dump("Entro en 4");
-							for($round_number_aux=$round_number;$round_number_aux<=$round;$round_number_aux++){
-								
-								$result_final+=$outcomes->getInvestment($game_id, $company_id, $round_number_aux, $investment_number);
-								var_dump($result_final);
-							}
-							//$result=$this->getAllResultsByInvestment($round, $round_number, $investment_number);
-							$activeInvestment+=($result_final+$amount);
-						}
-					}
-				}
-			}
-			var_dump("TesorerÃ­a");
-			var_dump($liquid_assets);
-			var_dump("Activo");
-			var_dump($activeInvestment);
-			
-			array('liquid_assets'=>$liquid_assets, 'activeInvestment'=>$activeInvestment);
-			
+			//VERO			
 			
 			$region_count= new Model_DbTable_Decisions_Pr_Region();
 			$factories=$games->getFactories($_GET['game_id'],$_GET['company_id']);
@@ -277,6 +234,16 @@
 			//VERO
 
 
+//JESUS
+			
+ 			$this->view->companyHQs = $pr_decisions->getCompanyHQ($_GET['game_id'],$_GET['company_id']);
+			$this->view->employeeCategory=$employeeCategory;
+			$this->view->campaignDecision=$mk_decisions->getAdvertisingCampaign($_GET['game_id'],$_GET['company_id'], $_GET['round']);
+
+
+				
+
+
 
 			if ($this->getRequest()->isPost()){	
 				$postData=$this->getRequest()->getPost();		
@@ -306,7 +273,7 @@
 				}
 				if($error == true){
 					print '<script language="JavaScript">'; 
-					print 'alert("La distribuciÃ³n del stock realizada es incorrecta");'; 
+					print 'alert("La distribución del stock realizada es incorrecta");'; 
 					print '</script>'; 
 				}else{
 					if (isset ($postData['stock'])){
@@ -400,8 +367,11 @@
 									
 								}
 							}
+
 							$pr_decisionData['functionality_params']=$functionalityInformation;		
 							//VERO
+							//JESUS
+							
 							$pr_decisions->processDecision($pr_decisionData, $_GET['game_id'], $_GET['company_id'], $_GET['round']);
 						}
 						if (isset ($postData['marketing'])){
@@ -454,10 +424,19 @@
 				$this->view->game_factories=$factories;
 				$this->view->booleanCreate=0;
 				
+				
+
 			//human resources
 				$hr_lastDecision=$hr_decisions->getDecisionArray($_GET['game_id'], $_GET['company_id'], $_GET['round']);
 				$this->view->formationDecision=$hr_lastDecision['formation'];
 				$this->view->addCapacityDecision=$pr_lastDecision['capacity'];
+				//JESUS
+				$this->view->shiftsDecision=$hr_lastDecision['shifts'];
+				//$this->view->$eDecision=$hr_lastDecision['employees'];
+				
+				
+			
+				
 
 				
 				$round_actual=$_GET['round'];
@@ -469,6 +448,7 @@
 					//VERO
 					$mk_lastDecision_prev=$mk_decisions->getDecisionArray($_GET['game_id'], $_GET['company_id'], $round_previous);
 					$pr_lastDecision_prev=$pr_decisions->getDecisionArray($_GET['game_id'], $_GET['company_id'], $round_previous);
+					$hr_lastDecision_prev=$hr_decisions->getDecisionArray($_GET['game_id'], $_GET['company_id'], $round_previous);
 
 					
 					$sup_lastDecision_prev=$su_decisions->getDecisionArray($_GET['game_id'], $_GET['company_id'], $round_previous);
@@ -482,8 +462,12 @@
 					$this->view->advertisingbudgetProductsDecision=$mk_lastDecision_prev['advertising_budget_distribution'];
 					$this->view->trademktbudgetProductsDecision=$mk_lastDecision_prev['trademkt_budget_distribution'];
 					$this->view->advertisingpercentageDecision=$mk_lastDecision_prev['advertising_percentage'];
+					//JESUS
+					$this->view->trademktBudgetRegionDecision=$mk_lastDecision_prev['trademkt_budget_region'];
 					$this->view->trademktbudgetDecision=$mk_lastDecision_prev['trademkt_budget'];
 					$this->view->trademktpercentageDecision=$mk_lastDecision_prev['trademkt_percentage'];
+					$this->view->shiftsDecision=$hr_lastDecision_prev['shifts'];
+
 				}
 				
 			if ($pr_decisions->existsPrevious($_GET['game_id'], $_GET['company_id'], $_GET['round'])){
@@ -504,7 +488,12 @@
 				//var_dump($this->view->trademktbudgetProductsDecision);die();
 				$this->view->advertisingpercentageDecision=$mk_lastDecision['advertising_percentage'];
 				$this->view->trademktbudgetDecision=$mk_lastDecision['trademkt_budget'];
+				//JESUS
+				$this->view->trademktBudgetRegionDecision=$mk_lastDecision['trademkt_budget_region'];
 				$this->view->trademktpercentageDecision=$mk_lastDecision['trademkt_percentage'];
+				//JESUS
+				$this->view->campaignDecision=$mk_lastDecision['campaign'];
+
 			}
 			if ($su_decisions->existsPrevious($_GET['game_id'], $_GET['company_id'], $_GET['round'])){
 				$su_lastDecision=$su_decisions->getDecisionArray($_GET['game_id'], $_GET['company_id'], $_GET['round']);
@@ -566,6 +555,8 @@
 				//VERO
 				$this->view->investmentDecision=$fi_lastDecision['investment'];
 				//VERO
+			}else{
+				$this->view->investmentDecision=0;
 			}
 			if ($in_decisions->existsPrevious($_GET['game_id'], $_GET['company_id'], $_GET['round'])){
 				$in_lastDecision=$in_decisions->getDecisionArray($_GET['game_id'], $_GET['company_id'], $_GET['round']);
@@ -586,7 +577,7 @@
 				$this->view->changeIdiDecision=$idi_lastDecision['changeIdi'];
 				$this->view->newIdiDecision=$idi_lastDecision['newIdi'];
 			}
-/* PRUEBA DE FINANCIACIÃ“N
+/* PRUEBA DE FINANCIACIÓN
 			$round_actual=$_GET['round'];
 			$game_id= $_GET['game_id'];
 			$company_id = $_GET['company_id'];
@@ -687,9 +678,9 @@
 				$this->view->media=$game_media;
 				//Trademedia
 				$trademedia[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-				$trademedia[1]=array('trademedia_number'=>2, 'name'=>'PromociÃƒÂ³n');
+				$trademedia[1]=array('trademedia_number'=>2, 'name'=>'PromociÃ³n');
 				$this->view->trademedia=$trademedia;
-				//Iniciativas. De momento no se usa, para el futuro se podrâ€™a desglosar el coste por cada iniciativa de cada area
+				//Iniciativas. De momento no se usa, para el futuro se podr’a desglosar el coste por cada iniciativa de cada area
 				$game_initiatives=$games->getInitiatives($_GET['game_id']);	
 				$game_initiatives_prod=$games->getInitiativesProd($_GET['game_id']);
 				$game_initiatives_hr=$games->getInitiativesHR($_GET['game_id']);
@@ -707,7 +698,15 @@
 					$companies_atmosphere[$company['id']]=$games->getWorkAtmosphere($_GET['game_id'],$_GET['round_number'],$company['id']);
 					$companies_qualification[$company['id']]=$games->getQualificationLevel($_GET['game_id'],$_GET['round_number'],$company['id']);
 					$companies_success[$company['id']]=$games->getSuccessProbabilityOutcomes($_GET['game_id'],$_GET['round_number'],$company['id']);
+					//JESUS
+					$pr_decision = new Model_DbTable_Decisions_Production();
+					$headquarters = $pr_decision->getCompanyHQ($_GET['game_id'], $company['id']);
+					$rate_decision = new Model_DbTable_Games_Param_Markets_TaxRates();
+					$taxRate[$company['id']]=$rate_decision->getTaxRatebyRegionAndRound($_GET['game_id'], $_GET['round_number'], $headquarters)/100;
+
 				}
+				//JESUS
+				$this->view->taxRate=$taxRate;
 				$this->view->game_factories=$companies_factories;
 				$this->view->deterioration=$companies_deterioration;
 				$this->view->atmosphere=$companies_atmosphere;
@@ -733,7 +732,7 @@
 					$factories=$games->getFactories($_GET['game_id'],$_GET['round_number'],$_GET['id']);
 				}
 				
-				//generacioÃ³n del array de cuotas de mercado
+				//generacioón del array de cuotas de mercado
 				$this->view->array_cuotas_mercado = prepare_array_cuotas_mercado($this->view);
 
 				
@@ -815,6 +814,9 @@
 				$this->view->costs=prepareArrayChart($costs);*/	
 			}
 		}
+
+	
+
 		function viewAction($params=null){
 			$this->view->title .= " Ver.";
 			$games = new Model_DbTable_Games();
@@ -932,6 +934,9 @@
 				//regiones
 				$game_regions=$games->getRegions($game_id);
 				$this->view->game_regions=$game_regions;
+				//JESUS
+				$game_regions_dist=$games->getRegionDistribution($game_id);
+				$this->view->region_weight=$game_regions_dist;
 				//canales
 				$game_channels=$games->getChannels($game_id);
 				$this->view->game_channels=$game_channels;
@@ -1027,7 +1032,7 @@
 		}
 		
 		function addcompanyAction(){
-			$this->view->title .= " Editar - AÃƒÂ±adir Empresa ";
+			$this->view->title .= " Editar - AÃ±adir Empresa ";
 			$this->view->headTitle($this->view->title, 'PREPEND');
 			$this->view->controllerName='game';
 			$this->view->actionName="addcompany";
@@ -1045,7 +1050,7 @@
 				else {					
 					$companies = new Model_DbTable_Companies();					
 					if (! $companies->exists(array('game_id'=>$game_id, 'name'=>$formData['name']))){	
-					//Ojo: daba un error si el nombre del equipo era un nÃƒÂºmero (p.ej. "1"), dado que el fetchRow de exists en Companies.php [DbTable_Companies] encontraba coincidencias aunque no existiera el equipo (!!!)
+					//Ojo: daba un error si el nombre del equipo era un nÃºmero (p.ej. "1"), dado que el fetchRow de exists en Companies.php [DbTable_Companies] encontraba coincidencias aunque no existiera el equipo (!!!)
 					//TODO: Ahora no parece detectar nombres duplicados de equipos en un juego, por lo que no entra nunca en el "else" posterior.
 						$companyData=array('name'=>$formData['name'], 'game_id'=>$game_id, 'registration_password'=>$formData['registration_password']);
 						$companies -> addCompany($companyData);
@@ -1076,23 +1081,23 @@
 			$round_number=$_GET['round_number'];
 			$companies=$games->getCompaniesInGame($game_id);
 								
-			//PRODUCCIÃ“N
-			/*Se crea el objeto de tipo PHPExcel para componer la hoja excel a travÃ©s de las consultas a MySQL*/
+			//PRODUCCIÓN
+			/*Se crea el objeto de tipo PHPExcel para componer la hoja excel a través de las consultas a MySQL*/
 			$objPHPExcel = new PHPExcel();
 			$objPHPExcel->setActiveSheetIndex(0);
 			$worksheet = $objPHPExcel->getActiveSheet();
-			$worksheet->setTitle(utf8_encode('ProducciÃ³n')); 
-			$worksheet->getCell('A1')->setValue(utf8_encode('PRODUCCIÃ“N'));
+			$worksheet->setTitle(utf8_encode('Producción')); 
+			$worksheet->getCell('A1')->setValue(utf8_encode('PRODUCCIÓN'));
 			$worksheet->mergeCells('A1:B1'); //Combinamos las celdas
 			
-			//Contamos el nÃºmero de regiones en juego			
+			//Contamos el número de regiones en juego			
 			$regions=$games->getRegions($game_id);
 			$numRegions=count($regions);
 			
 			//Estilo negrita
 			$bold = array ('font' => array('bold' => true));
 
-			//Escribimos el encabezado y combinamos celdas en funciÃ³n del nÃºmero de regiones				
+			//Escribimos el encabezado y combinamos celdas en función del número de regiones				
 			$offset=0;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow(2+$offset, 1, $company['name']);
@@ -1108,14 +1113,14 @@
 					$region[]=$aux['name'];
 				}
 			}
-			$regCompanies=count($region);//Producto numero de regiones por nÃºmero de compaÃ±ias			
+			$regCompanies=count($region);//Producto numero de regiones por número de compañias			
 			$worksheet->fromArray($region, null, 'C2');
 			//Aplica negrita a las regiones	
 			$starting_pos=ord('C');
 			$final_pos=chr($starting_pos+$regCompanies-1);		
 			$worksheet->getStyleByColumnAndRow('C2:' .$final_pos .'2')->applyFromArray($bold);			
 			
-			//ObtenciÃ³n de los canales y productos y contamos el nÃºmero de ellos presentes en el juego
+			//Obtención de los canales y productos y contamos el número de ellos presentes en el juego
 			$channels=$games->getChannels($game_id);
 			$numChannels=count($channels);			
 			$products=$games->getProducts($game_id);
@@ -1159,7 +1164,7 @@
 					$offset++;
 				}					
 			}
-			//Fin escritura pestaÃ±a producciÃ³n
+			//Fin escritura pestaña producción
 		
 			
 			//VENTAS
@@ -1169,7 +1174,7 @@
 			$worksheet->getCell('A1')->setValue(utf8_encode('VENTAS'));
 			$worksheet->mergeCells('A1:B1'); //Combinamos las celdas
 				
-			//Escribimos el encabezado y combinamos celdas en funciÃ³n del nÃºmero de regiones
+			//Escribimos el encabezado y combinamos celdas en función del número de regiones
 			
 			$offset=0;
 			foreach ($companies as $company){
@@ -1281,7 +1286,7 @@
 			$worksheet->getCell('A1')->setValue(utf8_encode('STOCKS'));
 			$worksheet->mergeCells('A1:B1'); //Combinamos las celdas
 			
-			//Escribimos el encabezado y combinamos celdas en funciÃ³n del nÃºmero de regiones
+			//Escribimos el encabezado y combinamos celdas en función del número de regiones
 			$offset=0;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow(2+$offset, 1, $company['name']);
@@ -1332,7 +1337,7 @@
 					$offset++;
 				}
 			}
-			//Fin escritura pestaÃ±a stocks
+			//Fin escritura pestaña stocks
 			
 			//CTAS.RESULTADOS --> INGRESOS
 			$worksheet = new PHPExcel_Worksheet($objPHPExcel, utf8_encode('Cuentas Resultados'));
@@ -1344,7 +1349,7 @@
 			$worksheet->getStyle('A1')->applyFromArray($bold);
 			$worksheet->getStyle('B1')->applyFromArray($bold);
 			
-			//Escribimos el encabezado y combinamos celdas en funciÃ³n del nÃºmero de regiones
+			//Escribimos el encabezado y combinamos celdas en función del número de regiones
 			$offset=0;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow(1+$offset, 1, $company['name']);
@@ -1397,9 +1402,9 @@
 			$outcomes_costs=$outcomes->getCosts($game_id, $round_number);
 			$worksheet->setCellValueByColumnAndRow(0, $offset, 'GASTOS');
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('ProducciÃ³n & LogÃ­stica'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Producción & Logística'));
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Mantenimiento de FÃ¡bricas y Maquinaria'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Mantenimiento de Fábricas y Maquinaria'));
 			$col=1;
 			$total = array();
 			foreach ($companies as $company){
@@ -1408,7 +1413,7 @@
 				$col++;
 			}			
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('FabricaciÃ³n de productos'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Fabricación de productos'));
 			$col=1;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_costs[$company['id']]['pr_var_costs']);
@@ -1428,9 +1433,9 @@
 				}
 				$offset++;
 			}			
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('DistribuciÃ³n'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Distribución'));
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Gastos de DistribuciÃ³n'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Gastos de Distribución'));
 			$col=1;
 			foreach($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_costs[$company['id']]['pr_distrib_costs']);				
@@ -1438,7 +1443,7 @@
 				$col++;				
 			}
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Total ProducciÃ³n & LogÃ­stica'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Total Producción & Logística'));
 			$col=1;
 			foreach($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $total[$col]);
@@ -1463,7 +1468,7 @@
 			}
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Trade MKT'));
 			$offset++;
-			$trade_media=array(utf8_encode('Patrocinio'), utf8_encode('PromociÃ³n'));
+			$trade_media=array(utf8_encode('Patrocinio'), utf8_encode('Promoción'));
 			for ($i=0; $i<2; $i++){
 				$col=1;
 				$worksheet->setCellValueByColumnAndRow(0, $offset, $trade_media[$i]);
@@ -1488,7 +1493,7 @@
 				}
 				$offset++;
 			}
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Gasto fijo por canales de distribuciÃ³n'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Gasto fijo por canales de distribución'));
 			$offset++;
 			
 			foreach ($channels as $channel){
@@ -1514,7 +1519,7 @@
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Recursos Humanos'));
 			$offset++;
 			
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('ContrataciÃ³n'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Contratación'));
 			$col=1;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_costs[$company['id']]['hr_hiring_costs']);
@@ -1524,7 +1529,7 @@
 			}
 			$offset++;
 			
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('FormaciÃ³n'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Formación'));
 			$col=1;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_costs[$company['id']]['hr_training_costs']);
@@ -1556,7 +1561,7 @@
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Iniciativas'));
 			$offset++;
 			
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Iniciativas de ProducciÃ³n'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Iniciativas de Producción'));
 			$col=1;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_costs[$company['id']]['initiatives_pr_costs']);
@@ -1617,7 +1622,7 @@
 			//I+D+i
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('I+D+i'));
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('ModificaciÃ³n de Productos'));			
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Modificación de Productos'));			
 			$col=1;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_costs[$company['id']]['idi_changes_costs']);
@@ -1652,8 +1657,8 @@
 			}
 			$offset++;
 			
-			//VariaciÃ³n existencias
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('VariaciÃ³n de Existencias'));
+			//Variación existencias
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Variación de Existencias'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
 			$outcomes_balance_sheet=$outcomes->getBalanceSheet($game_id, $round_number);
 			$prev_outcomes_balance_sheet=0;
@@ -1663,7 +1668,7 @@
 			$col=1;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_balance_sheet[$company['id']]['stock']
-													-$prev_outcomes_balance_sheet[$company['id']]['stock']); //VariaciÃ³n existencias				
+													-$prev_outcomes_balance_sheet[$company['id']]['stock']); //Variación existencias				
 				$worksheet->getStyleByColumnAndRow($col, $offset)->applyFromArray($bold);
 				$inventories[$col]=$outcomes_balance_sheet[$company['id']]['stock']-$prev_outcomes_balance_sheet[$company['id']]['stock'];
 				$col++;
@@ -1694,14 +1699,14 @@
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Financieros'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses FinanciaciÃ³n a C.P.'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses Financiación a C.P.'));
 			$col=1;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_costs[$company['id']]['fi_debt_costs_st']); 
 				$col++;
 			}
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses FinanciaciÃ³n a L.P.'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses Financiación a L.P.'));
 			$col=1;
 			foreach ($companies as $company){
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_costs[$company['id']]['fi_debt_costs_lt']);
@@ -1779,17 +1784,19 @@
 			$offset++;			
 			$worksheet->getCell('A2')->setValue(utf8_encode('ACTIVO'));
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('A) Activo no corriente (I+II)'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('A) Activo no corriente (I+II+III)'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
 			$col=1;
 			foreach($companies as $company){
-				$asset_no_current_sum[$col]=$outcomes_balance_sheet[$company['id']]['tied_up']-$outcomes_balance_sheet[$company['id']]['amortization'];
+				$asset_no_current_sum[$col]=$outcomes_balance_sheet[$company['id']]['tied_up']-$outcomes_balance_sheet[$company['id']]['amortization']+$outcomes_balance_sheet[$company['id']]['investment_assets'];
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $asset_no_current_sum[$col]);//Activo no corriente
 				$worksheet->getStyleByColumnAndRow($col, $offset)->applyFromArray($bold);
 				$offset++;
 				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_balance_sheet[$company['id']]['tied_up']); //Inmovilizado
 				$offset++;
 				$worksheet->setCellValueByColumnAndRow($col, $offset, -$outcomes_balance_sheet[$company['id']]['amortization']);
+				$worksheet->setCellValueByColumnAndRow($col, $offset, -$outcomes_balance_sheet[$company['id']]['investment_assets']);
+				$offset++;
 				$offset++;
 				$asset_current_sum[$col]=$outcomes_balance_sheet[$company['id']]['stock']
 										+$outcomes_balance_sheet[$company['id']]['trade_debtors']
@@ -1839,7 +1846,7 @@
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('I. Inmovilizado'));
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('II. AmortizaciÃ³n de inmovilizado'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('II. Amortización de inmovilizado'));
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('B) Activo corriente (I+II+III)'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
@@ -1848,7 +1855,7 @@
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('II. Deudores comerciales'));
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('III. TesorerÃ­a'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('III. Tesorería'));
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Total ACTIVO (A+B)'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
@@ -1898,7 +1905,7 @@
 			ob_end_clean();			
 			$objWriter->save('php://output');
 			
-			//LiberaciÃ³n de memoria
+			//Liberación de memoria
 			$objPHPExcel->disconnectWorksheets();
 			unset($objPHPExcel);
 		
@@ -1908,7 +1915,7 @@
 	
 	function prepare_array_cuotas_mercado ($thisview) {
 		
-		//generaciÃ³n del array de cuotas de mercado
+		//generación del array de cuotas de mercado
 		$array_cuotas_mercado = null;
 		$array_cuotas_mercado = "[['Producto', 'Pais', 'Canal', 'Equipo', 'Unidades vendidas']";
 		foreach ($thisview->products as $product){

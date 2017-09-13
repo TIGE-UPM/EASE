@@ -2,12 +2,12 @@
 	class DecisionController extends Zend_Controller_Action {
 		public $_controllerTitle= "Decisiones";
 
-		public function preDispatch(){//Se ejecuta antes que ninguna acci贸n
+		public function preDispatch(){//Se ejecuta antes que ninguna acci髇
 			$this->view->title = $this->_controllerTitle;
 			$this->_helper->authHelper();
 			
 			$front = Zend_Controller_Front::getInstance();
-			$this->game=$front->getParam('activeGame');//carga el juego actual antes de procesar ninguna acci贸n
+			$this->game=$front->getParam('activeGame');//carga el juego actual antes de procesar ninguna acci髇
 			$this->company=$front->getParam('activeCompany');
 			$this->round=$front->getParam('activeRound');
 	    }
@@ -22,7 +22,7 @@
 			
 			$role[0]=array('role'=>0, 'name'=>'Director General');
 			$role[1]=array('role'=>1, 'name'=>'Director Financiero');
-			$role[2]=array('role'=>2, 'name'=>'Director de Producci贸n');
+			$role[2]=array('role'=>2, 'name'=>'Director de Producci髇');
 			$role[3]=array('role'=>3, 'name'=>'Director de Recursos Humanos');
 			$role[4]=array('role'=>4, 'name'=>'Director de Marketing');
 			$this->view->role_profile=$role;
@@ -99,7 +99,7 @@
 		}
 		
 		function productionAction(){
-			$this->view->title .= " / Direcci贸n de Operaciones.";
+			$this->view->title .= " / Direcci髇 de Operaciones.";
 			$this->view->headTitle($this->view->title, 'PREPEND');
 			$this->view->controllerName='decision';
 			$this->view->actionName="production";
@@ -114,6 +114,14 @@
 			$qualityParams=$games->getQualityParams($this->game['id']);	
 			$game_channels=$games->getChannels($this->game['id']);
 			$game_media=$games->getMedia($this->game['id']);
+			
+			//JESUS
+
+			$ofertaFabrica[1]=array('region_number'=>1, 'oferta'=>100);
+			$ofertaFabrica[2]=array('region_number'=>2, 'oferta'=>200);
+			$this->view->ofertaFabrica=$ofertaFabrica;
+
+
 
 			//VERO
 			$this->view->channelsO=$game_channels;
@@ -193,6 +201,10 @@
 			$st_outcomes=new Model_DbTable_Outcomes_St_Units();
 			//VERO
 
+			//JESUS
+ 			$this->view->companyHQs=$decisions->getCompanyHQ($this->game['id'],$this->company['id']);
+			
+ 			
 
 			$lastDecision=$decisions->getActiveRoundLastDecisionSaved();
 			$this->view->regionDecision=$lastDecision['factories'];
@@ -201,6 +213,8 @@
 			
 			$this->view->lastFactory=$games->getLastFactory($this->game['id'], $this->company['id']);
 			$this->view->roundFactory=$games->getRoundFactoryCreated($this->game['id'], $this->company['id']);
+			//JESUS
+			
 			
 			$round_actual=$this->round['round_number'];
 			if($round_actual>1){
@@ -222,7 +236,7 @@
 			}		
 		
 			
-			//si hay decisi贸n sobre este turno guardada se imprime		
+			//si hay decisi髇 sobre este turno guardada se imprime		
 			if ($this->getRequest()->isPost()){
 				//VERO
 				$postData=$this->getRequest()->getPost();
@@ -250,7 +264,7 @@
 				}
 				if($error){
 					print '<script language="JavaScript">'; 
-					print 'alert("La distribuci贸n del stock realizada es incorrecta");'; 
+					print 'alert("La distribuci髇 del stock realizada es incorrecta");'; 
 					print '</script>'; 
 				}else{
 					if (isset ($postData['stock'])){
@@ -431,7 +445,15 @@
 			$game_media=$games->getMedia($this->game['id']);
 			
 			$trademedia[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-			$trademedia[1]=array('trademedia_number'=>2, 'name'=>'Promoci贸n');
+			$trademedia[1]=array('trademedia_number'=>2, 'name'=>'Promoci髇');
+
+			$marketingCampaign[0]=array('campaign_value'=>1, 'name'=> 'Calidad, estilo y elegancia');
+			$marketingCampaign[1]=array('campaign_value'=>2, 'name'=> 'La calidad no es cara');
+			$marketingCampaign[2]=array('campaign_value'=>3, 'name'=> 'Un m髒il para todos');
+
+			$this->view->marketingCampaign = $marketingCampaign;
+
+
 			
 			$this->view->product_availability=$games->getProductsAvailibility($this->game['id'],$this->round['round_number'],$this->company['id']);
 			
@@ -443,7 +465,7 @@
 			$this->view->n_products=$games->getNumberOfProductsAvailable($this->game['id'],$this->round['round_number'],$this->company['id']);
 			
 			$decisions=new Model_DbTable_Decisions_Marketing();
-			//si hay decisi贸n sobre este turno guardada se imprime	
+			//si hay decisi髇 sobre este turno guardada se imprime	
 				$round_actual=$this->round['round_number'];
 				if($round_actual>1){
 					$round_previous=$round_actual-1;
@@ -455,7 +477,10 @@
 					$this->view->trademktbudgetProductsDecision=$mk_lastDecision_prev['trademkt_budget_distribution'];
 					$this->view->advertisingpercentageDecision=$mk_lastDecision_prev['advertising_percentage'];
 					$this->view->trademktbudgetDecision=$mk_lastDecision_prev['trademkt_budget'];
+					//JESUS
+					$this->view->trademktBudgetRegionDecision=$mk_lastDecision_prev['trademkt_budget_region'];
 					$this->view->trademktpercentageDecision=$mk_lastDecision_prev['trademkt_percentage'];
+					$this->view->campaignDecision=$mk_lastDecision_prev['campaign'];
 				}
 			
 			if ($this->getRequest()->isPost()){				
@@ -475,7 +500,10 @@
 				$this->view->trademktbudgetProductsDecision=$lastDecision['trademkt_budget_distribution'];
 				$this->view->advertisingpercentageDecision=$lastDecision['advertising_percentage'];
 				$this->view->trademktbudgetDecision=$lastDecision['trademkt_budget'];
+				//JESUS
+				$this->view->trademktBudgetRegionDecision=$lastDecision['trademkt_budget_region'];
 				$this->view->trademktpercentageDecision=$lastDecision['trademkt_percentage'];
+				$this->view->campaignDecision=$lastDecision['campaign'];
 			}		
 		}
 
@@ -501,7 +529,7 @@
 			$this->view->channel_payterms=$channel_payterms;
 			
 			$decisions=new Model_DbTable_Decisions_Suppliers();
-			//si hay decisi贸n sobre este turno guardada se imprime		
+			//si hay decisi髇 sobre este turno guardada se imprime		
 			if ($this->getRequest()->isPost()){				
 				$postData=$this->getRequest()->getPost();
 				$decisionData=$postData['suppliers'];
@@ -531,12 +559,38 @@
 			$level[0]=array('value'=>1.02, 'descriptor'=>'Experto');
 			$level[1]=array('value'=>1.00, 'descriptor'=>'Avanzado');
 			$level[2]=array('value'=>0.98, 'descriptor'=>'Basico');
+
+			$employeeCategory[0]=array('category_number'=>1, 'name'=>'Operario de fabricaci髇');
+			$employeeCategory[1]=array('category_number'=>2, 'name'=>'Operario de ensamblado');
+			$employeeCategory[2]=array('category_number'=>3, 'name'=>'Supervisor de calidad');
+			$employeeCategory[3]=array('category_number'=>4, 'name'=>'T閏nico de mantenimiento');
+
+			$shifts[0]=array('value'=>1, 'descriptor'=>'Un turno');
+			$shifts[1]=array('value'=>2, 'descriptor'=>'Dos turnos');
+			$shifts[2]=array('value'=>3, 'descriptor'=>'Tres turnos');
 			
 			$this->view->wages=$wages;
 			$this->view->level=$level;
+			$this->view->employeeCategory=$employeeCategory;
+			$this->view->shifts=$shifts;
 			
 			$decisions=new Model_DbTable_Decisions_HumanResources();
-			//si hay decisi贸n sobre este turno guardada se imprime		
+			$games=new Model_DbTable_Games();
+			$factories=$games->getFactories($this->game['id'],$this->company['id']);
+			$this->view->factories = $factories;
+			
+			$ShiftNumber = $decisions->getShiftNumber($this->game['id'], $this->company['id'], $this->round['round_number']);
+			$this->view->ShiftNumber = $ShiftNumber;
+			$this->view->game_id=$this->game['id'];
+			
+			$round_actual=$this->round['round_number'];
+			if($round_actual>1){
+					$round_previous=$round_actual-1;
+					$shifts_lastDecision_prev = $decisions->getShiftNumber($this->game['id'], $this->company['id'], $round_previous);
+					$this->view->shiftsDecision=$shifts_lastDecision_prev;
+			}
+
+			//si hay decisi髇 sobre este turno guardada se imprime		
 			if ($this->getRequest()->isPost()){				
 				$postData=$this->getRequest()->getPost();
 				$decisionData=$postData['humanResources'];
@@ -547,10 +601,15 @@
 			}
 			$lastDecision=$decisions->getActiveRoundLastDecisionSaved();
 			$this->view->formationDecision=$lastDecision['formation']['formation'];
+
 			if ($decisions->existsPrevious()){
 				//$lastDecision=$decisions->getActiveRoundLastDecisionSaved();
+				
+				$this->view->employeesDecision=$lastDecision['employees'];
 				$this->view->cuartilDecision=$lastDecision['cuartil']['cuartil'];
+				$this->view->shiftsDecision=$lastDecision['shifts']['shift_number'];
 			}
+
 		}
 		
 		function financeAction(){
@@ -600,7 +659,7 @@
 			$this->view->amount=$amount;
 			
 			$decisions=new Model_DbTable_Decisions_Finance();
-			//si hay decisi贸n sobre este turno guardada se imprime		
+			//si hay decisi髇 sobre este turno guardada se imprime		
 			if ($this->getRequest()->isPost()){				
 				$postData=$this->getRequest()->getPost();
 				$decisionData=$postData['finance'];
@@ -655,7 +714,7 @@
 
 			
 			$decisions=new Model_DbTable_Decisions_Initiatives();
-			//si hay decisi贸n sobre este turno guardada se imprime		
+			//si hay decisi髇 sobre este turno guardada se imprime		
 			if ($this->getRequest()->isPost()){				
 				$postData=$this->getRequest()->getPost();
 				$decisionData=$postData['initiatives'];
@@ -691,7 +750,7 @@
 			$this->view->researchcosts=$game_marketResearches_costs;
 			
 			$decisions=new Model_DbTable_Decisions_MarketResearches();
-			//si hay decisi贸n sobre este turno guardada se imprime		
+			//si hay decisi髇 sobre este turno guardada se imprime		
 			if ($this->getRequest()->isPost()){				
 				$postData=$this->getRequest()->getPost();
 				$decisionData=$postData['marketresearch'];
@@ -735,7 +794,7 @@
 			$this->view->product_availability=$games->getProductsAvailibility($this->game['id'],$this->round['round_number'],$this->company['id']);
 			
 			$decisions=new Model_DbTable_Decisions_Idi();
-			//si hay decisi贸n sobre este turno guardada se imprime		
+			//si hay decisi髇 sobre este turno guardada se imprime		
 			if ($this->getRequest()->isPost()){				
 				$postData=$this->getRequest()->getPost();
 				$decisionData=$postData['idi'];
@@ -767,7 +826,7 @@
 			
 			$role[0]=array('role'=>0, 'name'=>'Director General');
 			$role[1]=array('role'=>1, 'name'=>'Director Financiero');
-			$role[2]=array('role'=>2, 'name'=>'Director de Producci贸n');
+			$role[2]=array('role'=>2, 'name'=>'Director de Producci髇');
 			$role[3]=array('role'=>3, 'name'=>'Director de Recursos Humanos');
 			$role[4]=array('role'=>4, 'name'=>'Director de Marketing');
 			$this->view->role_profile=$role;
@@ -776,7 +835,7 @@
 			$this->view->decision_validate=$games->getDecisionValidated($this->game['id'],$this->view->round_number,$this->company['id']);
 			
 			$decisions=new Model_DbTable_Decisions_Validate();
-			//si hay decisi贸n sobre este turno guardada se imprime		
+			//si hay decisi髇 sobre este turno guardada se imprime		
 			if ($this->getRequest()->isPost()){				
 				$postData=$this->getRequest()->getPost();
 				$decisionData=$postData['validated'];
@@ -825,7 +884,7 @@
 
 			
 			$trademedia[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-			$trademedia[1]=array('trademedia_number'=>2, 'name'=>'Promoci贸n');
+			$trademedia[1]=array('trademedia_number'=>2, 'name'=>'Promoci髇');
 			
 			$channel_payterms[0]=array('value'=>0, 'descriptor'=>'Inmediato');
 			$channel_payterms[1]=array('value'=>1, 'descriptor'=>'Aplazado 1 mes');
@@ -1020,6 +1079,8 @@
 				$this->view->trademktbudgetProductsDecision=$mk_lastDecision['trademkt_budget_distribution'];
 				$this->view->advertisingpercentageDecision=$mk_lastDecision['advertising_percentage'];
 				$this->view->trademktbudgetDecision=$mk_lastDecision['trademkt_budget'];
+				//JESUS
+				$this->view->trademktbudgetDecision=$mk_lastDecision['trademkt_budget_region'];
 				$this->view->trademktpercentageDecision=$mk_lastDecision['trademkt_percentage'];
 			}
 

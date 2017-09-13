@@ -23,7 +23,12 @@
 				$outcomes->init($this->game['id'],$round_number);
 				
 				$this->view->games = $games;
-
+				//JESUS
+				$pr_decision = new Model_DbTable_Decisions_Production();
+				$headquarters = $pr_decision->getCompanyHQ($this->game['id'], $this->company['id']);
+				$rate_decision = new Model_DbTable_Games_Param_Markets_TaxRates();
+				$taxRate=$rate_decision->getTaxRatebyRegionAndRound($this->game['id'], $round_number, $headquarters)/100;
+				$this->view->taxRate = $taxRate;
 				//canales
 				$channels=$games->getChannels($this->game['id']);
 				$this->view->channels=$channels;
@@ -760,8 +765,11 @@
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Salarios'));
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_costs[$company['id']]['hr_wages_costs']);
+			$offset++;
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Despidos'));
+			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_costs[$company['id']]['hr_dismissals_costs']);
 			$offset++;			
-			$total[8]=$outcomes_costs[$company['id']]['hr_hiring_costs']+$outcomes_costs[$company['id']]['hr_training_costs']+$outcomes_costs[$company['id']]['hr_wages_costs'];
+			$total[8]=$outcomes_costs[$company['id']]['hr_hiring_costs']+$outcomes_costs[$company['id']]['hr_training_costs']+$outcomes_costs[$company['id']]['hr_wages_costs']+$outcomes_costs[$company['id']]['hr_dismissals_costs'];
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Total Recursos Humanos'));
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $total[8]); //Costes totales RRHH
 			$offset++;
