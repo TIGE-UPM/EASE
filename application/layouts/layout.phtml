@@ -1,0 +1,32 @@
+<?php echo $this->doctype('XHTML1_TRANSITIONAL');?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es" lang="es">
+
+<head>
+	<?php echo $this->headMeta(); ?>
+	<?php echo $this->headTitle(); ?>
+	<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/general.css');?>
+	<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/navBars.css');?>
+	<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/lightbox.css');?>
+	<?php $this->headLink()->headLink(array('rel' => 'favicon', 'href' => 'favicon.ico'), 'PREPEND'); ?>
+	
+</head>
+<body>
+	<div id="header">
+		<?php $this->Header($this, $this->controllerName, $this->actionName);?>
+	</div>
+	<div id="page">
+		<?php if ($this->title!=null){?>
+		<div id="pageTitle">		
+		<?php echo $this->escape($this->title)?>
+		</div>
+		<?php }?>
+		<?php $this->SubBar($this, $this->controllerName, $this->actionName)?>
+		<?php echo ($this->layout()->content); ?>
+	</div>
+	<div style="clear: both"></div>
+	<div id="footer">
+		Entorno Avanzado de Simulación Empresarial (EASE2) - Grupo de Tecnologías de la Información para la Gestión Empresarial (TIGE - UPM)
+<?php /*phpinfo();*/?>
+	</div>
+</body>
+</html>
