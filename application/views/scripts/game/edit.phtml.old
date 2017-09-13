@@ -1,0 +1,507 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui-i18n.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/ui.datepicker-es.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/game_edit.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/game_config.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/editgame.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+
+<div id='content'>
+	<?php if (isset($this->game)) { //si se ha definido un juego concreto?>
+		<h1><?php echo $this->game['name']?> <a href="<?php echo $this->baseUrl()?>/game/">(volver a resumen)</a></h1>		
+		<form name="game_config" onsubmit="return validateForm();" method="post">
+			<div class="fieldHeader">
+				Descripción<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"descriptionField")))?>			
+			</div>
+			<div id="descriptionField" class="fieldDiv">
+				<div id="descriptionFieldDescription" class="fieldDescription">
+					Introduzca una descripción que permita identificar el juego.
+				</div>
+				<textarea name="description" id="description" display="block"><?php echo $this->game['description']?></textarea>
+			</div>
+			<?php if ($this->game['is_template']==0){?>
+			<div class="fieldHeader">
+				Rondas<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"roundsField")))?>
+			</div>			
+			<div id="roundsField" class="fieldDiv">			
+				<div id="roundsFieldDescription" class="fieldDescription">
+					Introduzca la configuración de las rondas del juego.
+				</div>
+				<div id="roundsFieldsErrors" class="fieldErrors">
+				</div>
+				<input type="hidden" value="<?php echo $this->numberOfRounds?>" id="numberOfRounds" />
+				<div id='roundsFieldsDiv'>
+					<?php $roundCount=1;?>
+					<?php foreach ($this->game_rounds as $round){?>
+					<div id="roundField_<?php echo $roundCount?>" class="roundField">				
+							<div class="roundHeader">
+								Ronda <?php echo $roundCount?>.
+							</div>
+							<table>
+								<tr>
+									<td>
+							Apertura
+							 		</td>
+									<td>
+							<input type="text" id="round_<?php echo $roundCount?>_opening" name="round_<?php echo $roundCount?>_opening" class="date" value="<?php echo date('d/m/Y', strtotime($round['opening_date']))?>">
+									</td>
+									<td>
+							<select name="round_<?php echo $roundCount?>_opening_hour" id="round_<?php echo $roundCount?>_opening_hour">
+								<?php for ($h=23;$h>=0;$h--){?>
+									<?php $hour=date('G', strtotime($round['opening_date']))?>
+									<?php if ($h==$hour){?>
+										<option selected value="<?php echo $h?>"><?php echo $h?></option>
+									<?php } else {?>
+										<option value="<?php echo $h?>"><?php echo $h?></option>
+									<?php } ?>
+								<?php } ?>								
+							</select>
+									</td>
+									<td>
+							<select name="round_<?php echo $roundCount?>_opening_minute" id="round_<?php echo $roundCount?>_opening_minute">
+								<?php for ($m=59;$m>=0;$m--){?>
+									<?php $minute=date('i', strtotime($round['opening_date']))?>
+									<?php if ($m==$minute){?>
+										<option selected value="<?php echo $m?>"><?php echo $m?></option>
+									<?php } else {?>
+										<option value="<?php echo $m?>"><?php echo $m?></option>
+									<?php } ?>
+								<?php } ?>								
+							</select>
+									</td>
+									<td>
+							<select name="round_<?php echo $roundCount?>_opening_second" id="round_<?php echo $roundCount?>_opening_second">
+								<?php for ($s=59;$s>=0;$s--){?>
+									<?php $second=date('s', strtotime($round['opening_date']))?>
+									<?php if ($s==$second){?>
+										<option selected value="<?php echo $s?>"><?php echo $s?></option>
+									<?php } else {?>
+										<option value="<?php echo $s?>"><?php echo $s?></option>
+									<?php } ?>
+								<?php } ?>								
+							</select>
+									</td>
+								</tr>
+								<tr>
+									<td>
+							Cierre 
+									</td>
+									<td>
+							<input type="text" id="round_<?php echo $roundCount?>_closing" name="round_<?php echo $roundCount?>_closing" class="date" value="<?php echo date('d/m/Y', strtotime($round['closing_date']))?>">
+									</td>
+									<td>
+							<select name="round_<?php echo $roundCount?>_closing_hour" id="round_<?php echo $roundCount?>_closing_hour">
+								<?php for ($h=23;$h>=0;$h--){?>
+									<?php $hour=date('G', strtotime($round['closing_date']))?>
+									<?php if ($h==$hour){?>
+										<option selected value="<?php echo $h?>"><?php echo $h?></option>
+									<?php } else {?>
+										<option value="<?php echo $h?>"><?php echo $h?></option>
+									<?php } ?>
+								<?php } ?>								
+							</select>
+									</td>
+									<td>
+							<select name="round_<?php echo $roundCount?>_closing_minute" id="round_<?php echo $roundCount?>_closing_minute">
+								<?php for ($m=59;$m>=0;$m--){?>
+									<?php $minute=date('i', strtotime($round['closing_date']))?>
+									<?php if ($m==$minute){?>
+										<option selected value="<?php echo $m?>"><?php echo $m?></option>
+									<?php } else {?>
+										<option value="<?php echo $m?>"><?php echo $m?></option>
+									<?php } ?>
+								<?php } ?>								
+							</select>
+									</td>
+									<td>
+							<select name="round_<?php echo $roundCount?>_closing_second" id="round_<?php echo $roundCount?>_closing_second">
+								<?php for ($s=59;$s>=0;$s--){?>
+									<?php $second=date('s', strtotime($round['closing_date']))?>
+									<?php if ($s==$second){?>
+										<option selected value="<?php echo $s?>"><?php echo $s?></option>
+									<?php } else {?>
+										<option value="<?php echo $s?>"><?php echo $s?></option>
+									<?php } ?>
+								<?php } ?>								
+							</select>
+									</td>
+								</tr>
+							</table>
+							<br>
+							<a href="" OnClick="deleteRound(<?php echo $roundCount?>);return false;">(X) eliminar</a>
+					</div>
+						<?php $roundCount++;?>
+					<?php } ?>
+				</div>
+				<div class="fieldOptions">
+					<a href="" OnClick="addRound();return false;">(+) añadir ronda.</a>
+				</div>
+			</div>
+		<div class="fieldHeader"><!-- Equipos></!-->
+			Empresas.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"companiesField")))?>			
+		</div>
+		<div id="companiesField" class="fieldDiv">
+			<?php if (isset($this->companies) && count($this->companies)){?>
+				<?php $this->gameTables($this, array("companies", $this->companies, $this))?>
+			<?php } // if  
+			else {?>
+				<p>No hay empresas en el juego.</p>
+			<?php }?>
+			<div class="fieldOptions">		
+				<a href='<?php echo $this->url(array('controller'=>'game', 'action'=>'addcompany'))."?game_id=".$this->game['id']?>'>(+) nueva empresa</a>
+			</div>
+		</div>
+		<?php } //end if is_template?>
+		<div class="fieldHeader"><!-- Parámetros></!-->
+			Parámetros.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"parametersFields")))?>			
+		</div>
+		<div id="parametersFields" class="fieldDiv">
+			<div class="fieldSubHeader"><!-- Configuración de Productos></!-->
+				Productos.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"productsParametersFields")))?>			
+			</div>
+			<div id="productsParametersFields">
+				<div id="productsFieldDescription" class="fieldDescription">
+					Configure los productos del juego. 
+				</div>
+				<div id="productsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="productsFields"> 
+				<?php $this->gameTables($this, "productsParameters")?>
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Calidades></!-->
+				Calidad.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"qualitiesParametersFields")))?>			
+			</div>
+			<div id="qualitiesParametersFields"> 
+				<div id="qualitiesFieldDescription" class="fieldDescription">
+					Configure los atributos de calidad y su peso en la calidad total para los productos del juego. 
+				</div>
+				<div id="qualitiesFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="qualitiesFields">
+				<?php $this->gameTables($this, "qualitiesParameters");?>
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Regiones></!-->
+				Regiones.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"regionsParametersFields")))?>			
+			</div>
+			<div id="regionsParametersFields"> 
+				<div id="regionsFieldDescription" class="fieldDescription">
+					Configure las regiones del juego. 
+				</div>
+				<div id="regionsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="regionsFields">
+				<?php $this->gameTables($this, "regionsParameters");?>
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Canales></!-->
+				Canales de distribución.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"channelsParametersFields")))?>			
+			</div>
+			<div id="channelsParametersFields"> 
+				<div id="channelsFieldDescription" class="fieldDescription">
+					Configure los canales de distribución disponibles para el juego y su importancia para el cómputo de Trade MKT. 
+				</div>
+				<div id="channelsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="channelsFields">
+				<?php $this->gameTables($this, "channelsParameters");?>
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Medios></!-->
+				Medios publicitarios.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"mediaParametersFields")))?>			
+			</div>
+			<div id="mediaParametersFields"> 
+				<div id="mediaFieldDescription" class="fieldDescription">
+					Configure los medios disponibles para el juego y su importancia para el cómputo de Publicidad. 
+				</div>
+				<div id="mediaFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="mediaFields">
+				<?php $this->gameTables($this, "mediaParameters");?>
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Iniciativas></!-->
+				Iniciativas.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"qualitiesParametersFields")))?>			
+			</div>
+			<div id="initiativesParametersFields"> 
+				<div id="initiativesFieldDescription" class="fieldDescription">
+					Configure las iniciativas disponibles para el juego y las áreas funcionales de aplicación. 
+				</div>
+				<div id="initiativesFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="initiativesFields">
+				<?php $this->gameTables($this, "initiativesParameters");?>
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Mercados></!-->
+				Mercados.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"marketsParametersFields")))?>			
+			</div>
+			<div id="marketsParametersFields"> 
+				<div class="fieldCategory">
+					1. Tamaño de mercados. <!-- Tamaño de mercados></!-->
+				</div>
+				<div id="marketSizesFieldDescription" class="fieldDescription">
+					Configure el tamaño de los mercados del juego. 
+				</div>
+				<div id="marketSizesFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="marketSizesFields">
+					<?php $this->gameTables($this, "marketsSizes");?>			
+				</div>
+				<div class="fieldCategory">
+					2. Porcentaje de Ventas por Canal. <!-- Porcentaje de Ventas por Canal></!-->
+				</div>
+				<div id="channelWeightsFieldDescription" class="fieldDescription">
+					Introduzca el porcentaje de ventas de cada canal sobre el tamaño del mercado. 
+				</div>
+				<div id="channelWeightsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="channelWeightsFields">
+					<?php $this->gameTables($this, "marketsChannelsWeights");?>						
+				</div>
+				<div class="fieldCategory">
+					3. Precios. <!-- Precios></!-->
+				</div>
+				<div id="pricesFieldDescription" class="fieldDescription">
+					Configure los precios del juego. 
+				</div>
+				<div id="pricesFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="pricesFields">
+					<?php $this->gameTables($this, "marketsPrices");?>	
+				</div>								
+				<div class="fieldCategory">
+					4. Publicidad. <!-- Ponderaciones Publicidad></!-->
+				</div>
+				<div id="advertisingFieldDescription" class="fieldDescription">
+					Introduzca las sensibilidades de cada producto a cada tipo de publicidad del juego. 
+				</div>
+				<div id="advertisingFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="advertisingFields">
+					<?php $this->gameTables($this, "marketsAdvertisingWeights");?>												
+				</div>
+				<div class="fieldCategory">
+					5. Trade MKT. <!-- Ponderaciones Trade MKT></!-->
+				</div>
+				<div id="trademktFieldDescription" class="fieldDescription">
+					Introduzca las sensibilidades de cada producto a cada tipo de trade mkt del juego. 
+				</div>
+				<div id="trademktFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="trademktFields">
+					<?php $this->gameTables($this, "marketsTradeMktWeights");?>												
+				</div>
+			</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Producción></!-->
+				Producción y Logística.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"productionParametersFields")))?>			
+			</div>
+			<div id="productionParametersFields"> 
+				<div class="fieldCategory">
+					1. Tiempos de Producción. <!-- Tiempos de producción></!-->
+				</div>
+				<div id="productionTimesFieldDescription" class="fieldDescription">
+					Configure los tiempos de producción (minutos). 
+				</div>
+				<div id="productionTimesFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="productionTimesFields">
+					<?php $this->gameTables($this, "pr_productionTimes");?>						
+				</div>
+				<div class="fieldCategory">
+					2. Costes de Producción. <!-- Costes de producción></!-->
+				</div>
+				<div id="productionCostsFieldDescription" class="fieldDescription">
+					Configure los costes de producción. 
+				</div>
+				<div id="productionCostsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="productionCostsFields">
+					<?php $this->gameTables($this, "pr_productionCosts");?>									
+				</div>
+				<div class="fieldCategory">
+					3. Costes de Distribución. <!-- Costes de distribución></!-->
+				</div>
+				<div id="distributionCostsFieldDescription" class="fieldDescription">
+					Configure los costes de distribución. 
+				</div>
+				<div id="distributionCostsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="distributionCostsFields">				
+					<?php $this->gameTables($this, "pr_distributionCosts");?>												
+				</div>
+				<div class="fieldCategory">
+					4. Costes de Abastecimiento. <!-- Costes de abastecimiento></!-->
+				</div>	
+				<div id="rawMaterialsFieldDescription" class="fieldDescription">
+					Configure los costes de abastecimiento. 
+				</div>
+				<div id="rawMaterialsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="rawMaterialsFields">				
+					<?php $this->gameTables($this, "pr_rawMaterialsCosts");?>																	
+				</div>
+				<div class="fieldCategory">
+					5. Pago a proveedores. <!-- Configuración de Proveedores></!-->
+				</div>
+				<div id="suppliers" class="fieldDescription">
+					Configure los recargos por aplazamiento del pago (%). 
+				</div>
+				<div id="suppliers" class="fieldErrors">
+				</div>
+				<div id="suppliers">
+					<?php $this->gameTables($this, "pr_suppliers");?>																				
+				</div>
+				<div class="fieldCategory">
+					6. Organización, Infraestructura y Personal. <!-- Configuración de Proveedores></!-->
+				</div>
+				<div id="organizationFieldDescription" class="fieldDescription">
+					Determine la configuración de las plantas de producción. 
+				</div>
+				<div id="organizationFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="organizationFields">				
+					<?php $this->gameTables($this, "pr_productionOrganization");?>																							
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Recursos Humanos></!-->
+				Recursos Humanos.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"human_resourcesParametersFields")))?>			
+			</div>
+			<div id="human_resourcesParametersFields"> 
+				<div class="fieldCategory">
+					1. Costes por empleado y año. <!-- Costes por empleado y año></!-->
+				</div>
+				<div id="hrCostsFieldDescription" class="fieldDescription">
+					Configure los costes de personal. 
+				</div>
+				<div id="hrCostsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="hrCostsFields">				
+					<?php $this->gameTables($this, "hr_staffCosts");?>			
+				</div>
+				<div class="fieldCategory">
+					2. Perfil de las regiones. <!-- Costes por empleado y año></!-->
+				</div>
+				<div id="hrRegionsProfileFieldDescription" class="fieldDescription">
+					Configure el perfil de laboral de las regiones. 
+				</div>
+				<div id="hrRegionsProfileFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="hrRegionsProfileFields">				
+					<?php $this->gameTables($this, "hr_regionsProfiles");?>				
+				</div>		
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Marketing></!-->
+				Marketing.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"marketingParametersFields")))?>			
+			</div>
+			<div id="marketingParametersFields"> 
+				<div class="fieldCategory">
+					1. Costes Canales de distribución. <!-- Costes canales de Distribución></!-->
+				</div>
+				<div id="mkChannelsCostsFieldDescription" class="fieldDescription">
+					Configure costes de los canales de distribución. 
+				</div>
+				<div id="mkChannelsCostsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="mkChannelsCostsFields">
+					<?php $this->gameTables($this, "mk_channelsCosts");?>			
+				</div>
+				<div class="fieldCategory">
+					2. Plazo de cobro a clientes. <!-- Plazos de cobro a clientes></!-->
+				</div>
+				<div id="mkChargeTimesFieldDescription" class="fieldDescription">
+					Fije el periodo de cobro según los canales de distribución. 
+				</div>
+				<div id="mkChargeTimesFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="mkChargeTimesFields">
+					<?php $this->gameTables($this, "mk_channels_incomesTerms");?>						
+				</div>
+				<div class="fieldCategory">
+					3. Costes de Promoción. <!-- Costes de Promoción></!-->
+				</div>
+				<div id="mkPromotionCostsFieldDescription" class="fieldDescription">
+					Configure costes de promoción. 
+				</div>
+				<div id="mkPromotionCostsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="mkPromotionCostsFields">				
+					<?php $this->gameTables($this, "mk_promotionCosts");?>									
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración Financiera></!-->
+				Eco-Fin.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financeParametersFields")))?>			
+			</div>
+			<div id="financeParametersFields"> 
+				<div class="fieldCategory">
+					1. Flujos de caja. <!-- Flujos de Caja></!-->
+				</div>
+				<div id="fiCashflowFieldDescription" class="fieldDescription">
+					Configure parámetros sobre flujos de caja. 
+				</div>
+				<div id="fiCashflowFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="fiCashflowFields">				
+					<?php $this->gameTables($this, "fi_cashflowParameters");?>												
+				</div>
+			</div>
+		<div class="buttonsDiv">
+			<input class=button type="submit" value="Guardar">
+		</div>
+		</form>
+<?php }//if juego definido
+else{ //mostramos todos los juegos?>
+	<h1>Editar plantilla o juego.</h1>		
+	
+	<?php if (isset($this->games) && count($this->games)){?>
+	<form method="get" action="">
+		<div class="fieldHeader">
+			Juego.
+		</div>
+		<p>Seleccione juego a editar.</p>
+		<div id="gamesField" class="fieldDiv">
+			<select name='game_id'>
+			<?php foreach($this->games as $game){?>
+				<option value="<?php echo $this->escape($game->id)?>"><?php echo $this->escape($game->name)?></option>
+			<?php }?>
+			</select>
+			<div class="buttonsDiv">
+				<input class=button type="submit" value="Editar">
+			</div>
+		</div>
+	</form>
+	<?php } // if  
+	else {?>
+		<p>No hay juegos en la plataforma.</p>
+	<?php }?>
+	<?php if (isset($this->templates) && count($this->templates)){?>
+	<form method="get" action="">
+		<div class="fieldHeader">
+			Plantillas.
+		</div>
+		<p>Seleccione plantilla a editar.</p>
+		<div id="gamesField" class="fieldDiv">
+			<select name='game_id'>
+			<?php foreach($this->templates as $template){?>
+				<option value="<?php echo $this->escape($template->id)?>"><?php echo $this->escape($template->name)?></option>
+			<?php }?>
+			</select>
+			<div class="buttonsDiv">
+				<input class=button type="submit" value="Editar">
+			</div>
+		</div>
+	</form>
+	<?php } // if  
+	else {?>
+		<p>Seleccione juego a editar.</p>
+	<?php }?>
+<?php } ?>
+</div>

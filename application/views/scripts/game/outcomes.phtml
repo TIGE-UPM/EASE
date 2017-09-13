@@ -785,6 +785,14 @@
 						<td class="hor_group_odd vertical_group_open"nowrap><?php echo number_format($this->outcomes_costs[$company['id']]['hr_wages_costs'],2, '.', ',').' €'?></td>
 					<?php } ?>
 				</tr>
+				<tr>
+					<td class="hor_group_odd categories"></td>
+					<td class="hor_group_odd categories">Despidos</td>
+					<?php foreach ($this->companies as $company){
+						$hr_costs[$company['id']]+=$this->outcomes_costs[$company['id']]['hr_dismissals_costs']?>
+						<td class="hor_group_odd vertical_group_open"nowrap><?php echo number_format($this->outcomes_costs[$company['id']]['hr_dismissals_costs'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
 					<tr></tr>
 					<th></th>
 					<th></th>
@@ -1079,15 +1087,16 @@
 				<thead>
 				    <th class='invisible categories' style="background-color:#FAFAD2"></th>
 					<th class='invisible categories' style="background-color:#FAFAD2">
-						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Impuestos (25%)</h3>
+						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Impuestos</h3>
 					</th>
 					<?php foreach ($this->companies as $company){
 						if ($ebt[$company['id']]<=0) {
 							$taxes[$company['id']]=0;
 						} 
 						else{
-							$taxes[$company['id']]=($ebitda[$company['id']] - $amortization[$company['id']]-$fi_costs[$company['id']]) *0.25;
-						}?>
+							$taxes[$company['id']]=($ebitda[$company['id']] - $amortization[$company['id']]-$fi_costs[$company['id']]) * $this->taxRate[$company['id']];
+							
+						}?><br>
 					<th class="vertical_group_open"nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($taxes[$company['id']],2, '.', ',').' €'?></strong></th>
 					<?php }//for company ?>
 				</thead>
@@ -1296,7 +1305,7 @@
 				</tr>
 				<tr>
 					<td class="hor_group_odd categories"></td>
-					<td class="hor_group_odd categories">&nbsp;&nbsp;III. Otras inversiones financieras</td>
+					<td class="hor_group_odd categories">&nbsp;&nbsp;III. Instrumentos de inversión</td>
 						<?php foreach ($this->companies as $company){
 							$asset_sum[$company['id']]+=$this->outcomes_balance_sheet[$company['id']]['investment_assets']?>
 							<td class="hor_group_odd vertical_group_open"nowrap><?php echo number_format($this->outcomes_balance_sheet[$company['id']]['investment_assets'],2, '.', ',').' €'?></td>

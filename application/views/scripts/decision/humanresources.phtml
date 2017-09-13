@@ -10,14 +10,14 @@
 		<form name="humanResources" method="post">
 			<div class="fieldContainer">
 				<div class="fieldHeader" id="humanResourcesCuartilFieldButton">
-					Política Salarial			
+					Pol&iacute;tica Salarial			
 				</div>
 				<div id="humanResourcesCuartilField" class="fieldDiv">
 					<div id="cuartilFieldDescription" class="fieldDescription" align="center">
-						Determine la política de retribución salarial que desea aplicar en su compa&ntildeía.
+						Determine la pol&iacute;tica de retribuci&oacute;n salarial que desea aplicar en su compa&ntilde&iacute;a.
 					</div>
 					<br />
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Intervalo de retribución salarial:&nbsp;			
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Intervalo de retribuci&oacute;n salarial:&nbsp;			
 					<select name="humanResources[cuartil]" id="humanResourcesCuartil" display="block" style="margin-left:50px;">	
 						<?php foreach ($this->wages as $wages){?> 
 								<option value="<?php echo $wages['value']?>" <?php echo (isset($this->cuartilDecision) && $this->cuartilDecision==$wages['value'])? "selected":""?>>
@@ -30,14 +30,14 @@
 			<br />
 			<div class="fieldContainer">
 				<div class="fieldHeader" id="humanResourcesFormationFieldButton">
-					Cualificación de la plantilla		
+					Cualificaci&oacute;n de la plantilla		
 				</div>
 				<div id="humanResourcesFormationField" class="fieldDiv">
 					<div id="formationFieldDescription" class="fieldDescription" align="center">
-						Determine el perfil de cualificación deseado para los trabajadores de su compa&ntildeía.
+						Determine el perfil de cualificaci&oacute;n deseado para los trabajadores de su compa&ntilde&iacute;a.
 					</div>
 					<br />
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nivel de cualificación:&nbsp;
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nivel de cualificaci&oacute;n:&nbsp;
 						<select <?php if ($this->round_number>1){?>disabled="disabled"<?php }?> name="humanResources[formation]" id="humanResourcesFormation" display="block" style="margin-left:50px;">
 						<?php foreach ($this->level as $level){?>
 								<option value="<?php echo $level['value']?>" <?php echo (isset($this->formationDecision) && $this->formationDecision==$level['value'])? "selected":""?>>
@@ -47,6 +47,78 @@
 					</select>
 				</div>
 			</div>
+			<br />
+
+<!--JESUS--> 
+
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="humanResourcesEmployeesFieldButton">
+					Elecci&oacute;n de empleados		
+				</div>
+				<div id="humanResourcesEmployeeField" class="fieldDiv">
+					<div id="employeeNumberSelectionField" class="fieldDescription" align="center">
+						Determine el numero de empleados que desea contratar de cada categor&iacute;a:
+						</div>
+						<div id="employeeNumberSelectionFieldsErrors" class="fieldErrors">
+						</div>
+						<br />
+					
+						<?php foreach ($this->factories as $factory){ ?>
+
+						&nbsp;&nbsp;&nbsp;Fabrica 	<?php echo $factory['factory_number'] ?>
+							<table border="3" bordercolor="brown" align="center">
+								<thead>
+								<th>Categor&iacute;a</th>
+								<th>N&uacute;mero</th>
+								</thead>
+
+								<?php foreach ($this->employeeCategory as $employees){ ?>	
+								<tr>
+								<td><?php echo $employees['name']?></td>
+								<td><input type="text" name="humanResources[factories_<?php echo $factory['factory_number']?>][employee_<?php echo $employees['category_number']?>][number_employees]" class="small"
+												<?php echo isset($this->employeesDecision['factory_number_'.$factory['factory_number']]['category_'.$employees['category_number']])?
+													'value = "'.$this->employeesDecision['factory_number_'.$factory['factory_number']]['category_'.$employees['category_number']] 
+															.'"':'value = "0"'?></input>
+										 		
+								</td>
+								</tr>
+
+								
+								<?php } 
+								 //for trademedia?>
+							</table>
+								<?php } ?>
+					</div>
+				</div>
+			
+
+			<br />
+
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="humanResourcesShiftsFieldButton">
+					Elecci&oacute;n de turnos		
+				</div>
+				<div id="humanResourcesShiftsField" class="fieldDiv">
+					<div id="shiftsFieldDescription" class="fieldDescription" align="center">
+						Elija el n&uacute;mero de turnos que desea implantar en sus f&aacute;bricas.
+					</div>
+					<br />
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Turnos:&nbsp; 
+						<select name="humanResources[shifts]" id="humanResourcesShifts" display="block" style="margin-left:50px;">
+						<?php foreach ($this->shifts as $shifts){?>
+
+								<option value="<?php echo $shifts['value']?>" <?php echo (isset($this->shiftsDecision) && $this->shiftsDecision==$shifts['value'])? "selected":""?>>
+								<?php echo $shifts['descriptor']?>
+								</option>
+							<?php } ?>
+					</select>
+
+				
+				</div>
+			</div>
+
+<!--JESUS-->
+	
 			<br />
 			<div class="buttonsDiv">
 				<input class="button" type="submit" value="Guardar">
@@ -58,6 +130,12 @@
 			});
 			$( "#humanResourcesFormationFieldButton" ).click(function() {
 				$( "#humanResourcesFormationField" ).toggle( "easeInElastic" );
+			});
+			$( "#humanResourcesEmployeesFieldButton" ).click(function() {
+				$( "#humanResourcesEmployeeField" ).toggle( "easeInElastic" );
+			});
+			$( "#humanResourcesShiftsFieldButton" ).click(function() {
+				$( "#humanResourcesShiftsField" ).toggle( "easeInElastic" );
 			});
 		</script>
 </div>

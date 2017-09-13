@@ -1370,6 +1370,12 @@
 							<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_wages_costs']?>
 							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_wages_costs'],2, '.', ',').' €'?></td>
 						</tr>
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Despidos</td>
+							<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_dismissals_costs']?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_dismissals_costs'],2, '.', ',').' €'?></td>
+						</tr>
 					</table>
 					
 					<table class="resultados_parcial">
@@ -1625,13 +1631,13 @@
 					<tr class="resultados_total">
 						<td class="col1"></th>
 						<td class="col2">
-							 Impuestos (25%):
+							 Impuestos: <?php echo $this->taxRate*100; ?>%
 						</td>
 							<?php if ($ebt[$this->company['id']]<=0) {
 								$taxes[$this->company['id']]=0;
 							} 
 							else{
-								$taxes[$this->company['id']]=($ebt[$this->company['id']]) *0.25;
+								$taxes[$this->company['id']]=($ebt[$this->company['id']]) * $this->taxRate;
 							}?>
 						<td class="col3"><?php echo number_format($taxes[$this->company['id']],2, '.', ',').' €'?></td>
 					</tr>

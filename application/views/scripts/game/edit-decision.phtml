@@ -32,7 +32,7 @@
 </div>
 <div id="tabs">
 	<ul>
-		<li><a href="#tabs-1">Dirección de Operaciones</a></li>
+		<li><a href="#tabs-1">Direcci&oacute;n de Operaciones</a></li>
 		<li><a href="#tabs-2">Marketing</a></li>
 		<li><a href="#tabs-3">Recursos Humanos</a></li>
 		<li><a href="#tabs-4">Finanzas</a></li>
@@ -40,16 +40,65 @@
 		<li><a href="#tabs-7">Estudios de Mercado</a></li>
 		<li><a href="#tabs-8">I+D+i</a></li>
 	</ul>
-	
+
 	<div id="tabs-1" class="decisions_tab" id="production_decision">
 	<img src="/images/factory.gif" alt="factory" width="85" height="98" style="float:right" />	
 		<form name="production" id="formProduction" onsubmit="return validateProductionForm();" method="post">
+
+
+		<!-- JESUS-->
+
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="suppliersFieldButton">
+				Selecci&oacute;n de la Sede
+			</div>
+			<img src="/images/truck_2.gif" alt="finance" width="120" height="75" style="float:right" />
+			<div id="suppliersField" class="fieldDiv">
+				<div id="SuppliersFieldDescription" class="fieldDescription" align="center">
+						Determine la sede econ&oacute;mica de la empresa
+					</div>
+				
+				<div style="clear: both"></div>
+				
+					
+					<div id="suppliersNumberField" class="fieldDiv" align="center">
+						Regi&oacute;n:&nbsp
+
+							<?php if ($this->round_number == 1) {?>
+							<select name="production_decision[companyHQ]" id="companyHQName" display="block">
+							
+							<?php foreach ($this->regions as $region){?>
+							<option value="<?php echo $region['region_number']?>" <?php echo (isset($this->companyHQs) && ($this->companyHQs==$region['region_number']))? "selected":""?>>
+							<?php echo $region['name']?></option>
+							<?php } ?>
+							<?php } ?>
+							<?php if ($this->round_number != 1) {?>
+							<?php foreach ($this->regions as $region){?>
+							<?php if (isset($this->companyHQs) && ($this->companyHQs==$region['region_number'])){ ?>
+							<?php echo $region['name']; ?>
+
+							<?php } ?>
+							<?php } ?>
+							<?php } ?>
+
+							</select>
+					
+				</div>
+			<div style="clear: both"></div>
+			</div>
+		</div>
+
+
+<br />
+<br />
+
+
 			<div class="fieldHeader">
-				Región de Fabricación<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"regionField")))?>			
+				Regi&oacute;n de Fabricaci&oacute;n<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"regionField")))?>			
 			</div>
 			<div id="regionField" class="fieldDiv">
 				<div id="regionFieldDescription" class="fieldDescription" align="center">
-					Elija la región de fabricación de sus productos.
+					Elija la regi&oacute;n de fabricaci&oacute;n de sus productos.
 				</div >
 				<br />
 				<?php $factory_number=1;?>
@@ -57,7 +106,7 @@
 				<input type="hidden" value="<?php echo $this->numberOfFactories?>" id="numberOfFactories" />			
 				<div id='newFactoryFieldDiv'>
 				
-				   Número de F&aacute;bricas: 
+				   N&uacute;mero de F&aacute;bricas: 
 				<?php 
 					echo ($this->numberOfFactories);
 					$factory_counter=$this->numberOfFactories;?>
@@ -79,7 +128,7 @@
 					<div class="factoryHeader">
 					F&aacute;brica <?php echo $factory['factory_number']?>
 					</div>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Región:&nbsp;
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Regi&oacute;n:&nbsp;
 					<?php $constructed=$this->lastFactory;
 						$round_constructed=$this->roundFactory;
 						if ($factory_number<$constructed && (($this->round_number>$round_constructed['factory_number_'.$factory_number])||($round_constructed['factory_number_'.$factory_number]>$this->round_number))){
@@ -99,7 +148,7 @@
 							if(array_key_exists("factory_number_".$factory_number,$this->addCapacityDecision)) { ?>
 								<br /><br />
 								<div class="factoryCapacityHeader">Ampliar F&aacute;brica <?php echo $factory_number?></div>
-								&nbsp;&nbsp;Número de m&aacute;quinas:&nbsp;
+								&nbsp;&nbsp;N&uacute;mero de m&aacute;quinas:&nbsp;
 								<input type="text" name="production_decision[capacity][factory_number_<?php echo $factory_number?>]" class="small" value="<?php echo($this->addCapacityDecision['factory_number_'.$factory_number]);?>" /><br/>
 						<?php }
 						} else {
@@ -146,12 +195,13 @@
 			</div>					
 				<br />
 				<br />
+
 			<div class="fieldHeader">
 				Calidad<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"qualityField")))?>			
 			</div>
 			<div id="qualityField" class="fieldDiv">
 				<div id="qualityFieldDescription" class="fieldDescription" align="center">
-					Elija la calidad de fabricación de sus productos.
+					Elija la calidad de fabricaci&oacute;n de sus productos.
 				</div>
 				<?php $id=1;?>
 				<?php foreach ($this->products as $product){?>
@@ -324,7 +374,7 @@
 						contador+= parseInt(unitsInputs[i].value);
 
 						if(unitsInputs[i].value <0){
-							alert("No se aceptan número negativos. Por favor, distribuya correctamente el stock");
+							alert("No se aceptan n�mero negativos. Por favor, distribuya correctamente el stock");
 							boolean= false;
 						}
 						else{
@@ -410,7 +460,7 @@
 			</div>
 			<div id="unitsFields" class="fieldDiv">
 				<div id="unitsFieldDescription" class="fieldDescription" align="center">
-					Determine la cantidad de unidades a producir y distribuir en cada canal y para cada región.
+					Determine la cantidad de unidades a producir y distribuir en cada canal y para cada regi&oacute;n.
 				</div>
 				<div id="unitsFieldsErrors" class="fieldErrors">
 				</div>
@@ -466,13 +516,13 @@
 			<img src="/images/truck_2.gif" alt="finance" width="120" height="75" style="float:right" />
 			<div id="suppliersField" class="fieldDiv">
 			<div id="SuppliersFieldDescription" class="fieldDescription" align="center">
-					Determine la política para la gesti&oacute;n de los proveedores.
+					Determine la pol&iacute;tica para la gesti&oacute;n de los proveedores.
 				</div>
 			<div class="fieldHeader">
-				Número de Proveedores<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"suppliersNumberField")))?>			
+				N&uacute;mero de Proveedores<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"suppliersNumberField")))?>			
 			</div>
 			<div id="suppliersNumberField" class="fieldDiv" style="margin-left:150px;">
-				Número:&nbsp
+				N&uacute;mero:&nbsp
 				<select name="suppliers[number]" id="suppliersNumber" display="block">
 					<?php for($i=0;$i<=5;$i++){?>
 						<option value="<?php echo $i?>" <?php echo (isset($this->numberDecision) && $this->numberDecision['number']==$i)? "selected":""?>><?php echo $i?></option>
@@ -498,12 +548,14 @@
 			
 			<!-- VERO-->
 			<div class="fieldHeader">
-				Distribución del stock<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"unitsStockField")))?>			
+				Distribuci&oacute;n del stock<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"unitsStockField")))?>			
 			</div>
+
+			
 			<div id="unitsStockField" class="fieldDiv">
 
 				<div id="unitsStockFieldDescription" class="fieldDescription" align="center">
-					Determine la cantidad de unidades de stock a distribuir en cada canal y para cada región.
+					Determine la cantidad de unidades de stock a distribuir en cada canal y para cada regi&oacute;n.
 				</div>
 
 			<div id="unitsStockField" class="content">
@@ -511,7 +563,7 @@
 				<div id = "unitsStockLeftField" class='left'>
 				<?php $id=1; $regionN=1; $channelN=1; ?>
 					<div id="unitsStockLeftFieldDescription" align="center">
-						Distribución original
+						Distribuci�n original
 					</div>
 					<div id="unitsStockLeftFieldsErrors" class="fieldErrors">
 					</div>
@@ -551,7 +603,7 @@
 						</table>
 					</div>
 					<div class="buttonsDiv">
-						<input type="button" id="copy_button" class="button" value="Mantener distribución original" onclick="save_stock('<?php echo $id;  echo $regionN; echo $channelN;?>')" />
+						<input type="button" id="copy_button" class="button" value="Mantener distribuci&oacute;n original" onclick="save_stock('<?php echo $id;  echo $regionN; echo $channelN;?>')" />
 					</div>
 					<?php } ?>
 					<?php $id=$id+1; ?>
@@ -562,7 +614,7 @@
 				<div id="unitsStockRightField" class="right">
 				<?php $id=1; ?>
 					<div id="unitsStockRightFieldDescription" align="center">
-						Distribución final
+						Distribuci�n final
 					</div>
 					<div id="unitsStockRightFieldsErrors" class="fieldErrors">
 					</div>
@@ -614,7 +666,7 @@
 			<div id="unitsStockCacheField" class="small" style="display: none;">
 				<?php $id=1; ?>
 					<div id="unitsStockCacheFieldDescription" align="center">
-						Distribución final
+						Distribuci�n final
 					</div>
 					<?php foreach ($this->products as $product){?>
 					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
@@ -711,6 +763,7 @@
 				document.getElementById("distribution_stock_information").value=resultado;
 			}
 		</script>
+
 		<div style="visibility: hidden;">
 		<input type="text"  id="distribution_stock_information"  name="stock[distributionInformation]" <?php echo isset($this->unitsStockDistributiontDecision)? 
 												  'value = "'.$this->unitsStockDistributiontDecision.'"':'value =""'?> /></div>
@@ -720,6 +773,8 @@
 			<div class="buttonsDiv">
 				<input class="button" type="submit"  value="Guardar">
 			</div>
+
+
 		</form>		
 
 	</div>
@@ -732,7 +787,7 @@
 			</div>
 			<div id="pricesField" class="fieldDiv">
 				<div id="pricesFieldDescription" class="fieldDescription" align="center">
-					Determine la política de precios de sus productos.
+					Determine la pol&iacute;tica de precios de sus productos.
 				</div>
 				<div id="pricesFieldsErrors" class="fieldErrors">
 				</div>
@@ -818,7 +873,7 @@
 				</div>
 				<div id="mediaField" class="fieldDiv">
 					<div id="mediaFieldDescription" class="fieldDescription" align="center">
-						Determine la política de publicidad para cada uno de sus productos (%).
+						Determine la pol&iacute;tica de publicidad para cada uno de sus productos (%).
 					</div>
 						<div id="mediaFieldsErrors" class="fieldErrors">
 						</div>
@@ -859,6 +914,24 @@
 						<?php } ?>
 						</div>
 						<?php } // product?>
+
+			<!-- JESUS -- Selector de campa�ade publicidad-->
+
+
+				<div id="marketingCampaignField" class="fieldDiv">
+					<div id="campaignFieldDescription" class="fieldDescription" align="center">
+						Elija campa&ntildea de Publicidad que quiere elegir para su empresa.
+					</div>
+					<br />
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Campa&ntildea:&nbsp;
+						<select name="marketing[campaign]" id="marketingCampaign" display="block" align="center">
+						<?php foreach ($this->marketingCampaign as $marketingCampaign){?>
+								<option value="<?php echo $marketingCampaign['campaign_value']?>" <?php echo (isset($this->campaignDecision) && $this->campaignDecision==$marketingCampaign['strategy_value'])? "selected":""?>>
+								<?php echo $marketingCampaign['name']?>
+								</option>
+							<?php } ?>
+					</select>
+				</div>
 					</div>
 				<br />
 			
@@ -880,6 +953,36 @@
 				</td>
 				</table>
 				</div>
+
+<!--JESUS-> Codigo para meter una tabla al estilo de las antiguas, con divisi�n por regi�n-->
+
+				<div id="advertisingbudgetDistributionFieldDescription" class="fieldDescription" align="center">
+					Determine la distriuci&oacute;n del presupuesto de Trade Marketing por regi&oacute;n (%):
+					</div>
+					<div id="trademktMediaBudgetDistributionFieldsErrors" class="fieldErrors">
+					</div>
+					<br />
+					<table border="3" bordercolor="brown" align="center">
+						<thead>
+							<th>Regi&oacute;n</th>
+							<th>(%)</th>
+						</thead>
+							<?php foreach ($this->regions as $region){ ?>	
+							<tr>
+							<td><?php echo $region['name']?></td>
+							<td><input type="text" name="marketing[trademkt_budget_region][region_<?php echo $region['region_number']?>]" class="small"
+											<?php echo isset($this->trademktBudgetRegionDecision)?
+												'value = "'.$this->trademktBudgetRegionDecision['region_'.$region['region_number']] 
+														.'"':'value = "0"'?></input>
+									 		
+							</td>
+							</tr>
+							<?php 
+							} //for trademedia?>
+						</table>
+				
+
+
 				<div id="trademktbudgetDistributionField" class="fieldDiv">
 				<br />
 					<div id="trademktbudgetDistributionFieldDescription" class="fieldDescription" align="center">
@@ -910,7 +1013,7 @@
 				</div>
 			<div id="trademediaField" class="fieldDiv">
 				<div id="trademediaFieldDescription" class="fieldDescription" align="center">
-					Determine la política de Trade MKT para cada uno de sus productos (%).
+					Determine la pol&iacute;tica de Trade MKT para cada uno de sus productos (%).
 				</div>
 				<div id="trademediaFieldsErrors" class="fieldErrors">
 				</div>
@@ -952,6 +1055,11 @@
 					</div>
 					<?php } // product?>
 					</div>				
+
+	
+
+
+					
 			<div class="buttonsDiv">
 				<input class="button" type="submit" value="Guardar">
 			</div>
@@ -962,14 +1070,14 @@
 		<img src="/images/people_1.gif" alt="people" width="90" height="85" style="float:right" />
 		<form name="humanResources" method="post">
 			<div class="fieldHeader">
-				Política Salarial<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"humanResourcesCuartilField")))?>			
+				Pol&iacute;tica Salarial<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"humanResourcesCuartilField")))?>			
 			</div>
 			<div id="humanResourcesCuartilField" class="fieldDiv">
 				<div id="cuartilFieldDescription" class="fieldDescription" align="center">
-					Determine la política de retribución salarial que desea aplicar en su compa&ntildeía.
+					Determine la pol&iacute;tica de retribuci&oacute;n salarial que desea aplicar en su compa&ntilde&iacute;a.
 				</div>
 				<br />
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Intervalo de retribución salarial:&nbsp;			
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Intervalo de retribuci&oacute;n salarial:&nbsp;			
 				<select name="humanResources[cuartil]" id="humanResourcesCuartil" display="block" style="margin-left:50px;">	
 					<?php foreach ($this->wages as $wages){?> 
 							<option value="<?php echo $wages['value']?>" <?php echo (isset($this->cuartilDecision) && $this->cuartilDecision==$wages['value'])? "selected":""?>>
@@ -980,14 +1088,14 @@
 			</div>
 			<br />
 			<div class="fieldHeader">
-				Cualificación de la plantilla<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"humanResourcesFormationField")))?>			
+				Cualificaci&oacute;n de la plantilla<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"humanResourcesFormationField")))?>			
 			</div>
 			<div id="humanResourcesFormationField" class="fieldDiv">
 				<div id="formationFieldDescription" class="fieldDescription" align="center">
-					Determine el perfil de cualificación deseado para los trabajadores de su compa&ntildeía.
+					Determine el perfil de cualificaci&oacute;n deseado para los trabajadores de su compa&ntilde&iacute;a.
 				</div>
 				<br />
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nivel de cualificación:&nbsp;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nivel de cualificaci&oacute;n:&nbsp;
 					<select <?php if ($this->round_number>1){?>disabled="disabled"<?php }?> name="humanResources[formation]" id="humanResourcesFormation" display="block" style="margin-left:50px;">
 					<?php foreach ($this->level as $level){?>
 							<option value="<?php echo $level['value']?>" <?php echo (isset($this->formationDecision) && $this->formationDecision==$level['value'])? "selected":""?>>
@@ -996,13 +1104,84 @@
 						<?php } ?>
 				</select>
 			</div>
+
+<!--JESUS--> 
+
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="humanResourcesEmployeesFieldButton">
+					Elecci&oacute;n de empleados		
+				</div>
+				<div id="humanResourcesEmployeeField" class="fieldDiv">
+					<div id="employeeNumberSelection" class="fieldDescription" align="center">
+						Determine el numero de empleados que desea contratar de cada categor&iacute;a:
+					</div>
+					<div id="employeeNumberSelectionFieldsErrors" class="fieldErrors">
+					</div>
+						<br />
+						
+					<?php foreach ($this->factories as $factory){ ?>
+
+					Fabrica 	<?php echo $factory['factory_number'] ?>
+						<table border="3" bordercolor="brown" align="center">
+							<thead>
+								<th>Categor&iacute;a</th>
+								<th>N&uacute;mero</th>
+							</thead>
+
+								<?php foreach ($this->employeeCategory as $employees){ ?>	
+								<tr>
+								<td><?php echo $employees['name']?></td>
+								<td><input type="text" name="humanResources[factories_<?php echo $factory['factory_number']?>][employee_<?php echo $employees['category_number']?>][number_employees]" class="small"
+												<?php echo isset($this->employeesDecision['factory_number_'.$factory['factory_number']]['category_'.$employees['category_number']])?
+													'value = "'.$this->employeesDecision['factory_number_'.$factory['factory_number']]['category_'.$employees['category_number']]
+															.'"':'value = "0"'?></input>
+															</td>
+								</tr>
+
+								
+								<?php } 
+								 //for trademedia?>
+							</table>
+								<?php } ?>
+					
+
+				</div>
+			</div>
+		
+
+			<br />
+
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="humanResourcesShiftsFieldButton">
+					Elecci&oacuten de turnos		
+				</div>
+				<div id="humanResourcesShiftsField" class="fieldDiv">
+					<div id="shiftsFieldDescription" class="fieldDescription" align="center">
+						Elija el n&uacutemero de turnos que desea implantar en sus f&aacutebricas.
+					</div>
+					<br />
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Turnos:&nbsp;
+						<select name="humanResources[shifts]" id="humanResourcesShifts" display="block" style="margin-left:50px;">
+						<?php foreach ($this->shifts as $shifts){?>
+								<option value="<?php echo $shifts['value']?>" <?php echo (isset($this->shiftsDecision) && $this->shiftsDecision==$shifts['value'])? "selected":""?>>
+								<?php echo $shifts['descriptor']?>
+								</option>
+							<?php } ?>
+					</select>
+				</div>
+			</div>
+
+
+
+
 			<br />
 			<div class="buttonsDiv">
 				<input class="button" type="submit" value="Guardar">
 			</div>
 		</form>
+
 	</div>
-	
+
 	<div id="tabs-4" class="decisions_tab" id="finance_decision">
 	<img src="/images/finance.gif" alt="finance" width="75" height="85" style="float:right" />
 		<form name="finance" method="post">
@@ -1013,8 +1192,8 @@
 			</div>
 			<div id="financePatrimonyField" class="fieldDiv" align="center">
 				<div id="patrimonyFieldDescription" class="fieldDescription" align="center">
-					Indique la cuantía porcentual sobre beneficios que desea retribuir a los accionistas en concepto de dividendos tras el ejercicio de su compa&ntildeía en la &uacute;litima ronda.
-					Tenga en cuenta que es necesario un resultado positivo para llevar a cabo esta acción.
+					Indique la cuant&iacute;a porcentual sobre beneficios que desea retribuir a los accionistas en concepto de dividendos tras el ejercicio de su compa&ntilde�a en la &uacute;litima ronda.
+					Tenga en cuenta que es necesario un resultado positivo para llevar a cabo esta acci&oacute;n.
 				</div>
 				<br />
 				<table align="center">
@@ -1037,15 +1216,15 @@
 			</div>
 			<div id="investmentsField" class="fieldDiv">
 			<div id="invstmentsFieldDescription" class="fieldDescription" align="center">
-					Determine la cantidad que desea invertir y el plazo de la inversión.
+					Determine la cantidad que desea invertir y el plazo de la inversi&oacute;n.
 			</div>
 			<br />
 			<table align="center">
 			<thead>
-				<th class="small">Inversión</th>
+				<th class="small">Inversi&oacute;n</th>
 				<!--<th class="small">&nbsp;&nbsp;Lanzar&nbsp;&nbsp;</th>-->
-				<th class="small">&nbsp;&nbsp;Cantidad (en €)&nbsp;&nbsp;</th>
-				<th class="small">&nbsp;&nbsp;Plazo (en años)&nbsp;&nbsp;</th>
+				<th class="small">&nbsp;&nbsp;Cantidad (en �)&nbsp;&nbsp;</th>
+				<th class="small">&nbsp;&nbsp;Plazo (en a�os)&nbsp;&nbsp;</th>
 			</thead>
 			<?php $investment=1;?>
 			<?php foreach ($this->investmentsType as $investmentType){?>
@@ -1066,11 +1245,11 @@
 			</div>
 			<br />
 			<div class="fieldHeader">
-				Financiación: Cuantía<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financeAmountField")))?>			
+				Financiaci&oacute;n: Cuant&iacute;a<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financeAmountField")))?>			
 			</div>
 			<div id="financeAmountField" class="fieldDiv" align="center">
 				<div id="amountFieldDescription" class="fieldDescription" align="center">
-					Seleccione la cuantía que desea financiar mediante cr&eacute;dito para su compa&ntildeía.
+					Seleccione la cuant&iacute;a que desea financiar mediante cr&eacute;dito para su compa&ntilde&iacute;a.
 				</div>
 				<br />
 				<table align="center">
@@ -1099,11 +1278,11 @@
 				</table>
 			</div>
 			<div class="fieldHeader">
-				Financiación: Plazo de amortización<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financeTermField")))?>			
+				Financiaci&oacute;n: Plazo de amortizaci&oacute;n<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financeTermField")))?>			
 			</div>
 			<div id="financeTermField" class="fieldDiv" align="center">
 				<div id="termFieldDescription" class="fieldDescription" align="center">
-					Seleccione el plazo de amortización para el cr&eacute;dito que solicita su compa&ntildeía.
+					Seleccione el plazo de amortizaci&oacute;n para el cr&eacute;dito que solicita su compa&ntilde&iacute;a.
 				</div>
 				<br />
 				Opciones: <br />				
@@ -1154,17 +1333,17 @@
 		<?php if($this->round_number==1){?><br /><br /><h3 style="color:grey;text-align:center">Esta secci&oacute;n no est&aacute; disponible para esta ronda</h3><br /><br /><?php } ?>
 			<?php if($this->round_number>1){?>
 			<div id="initiativesFieldDescription" class="fieldDescription" align="center">
-				Determine aquellas iniciativas que desea llevar a cabo para mejorar el rendimiento de su compa&ntildeía.
+				Determine aquellas iniciativas que desea llevar a cabo para mejorar el rendimiento de su compa&ntilde&iacute;a.
 			</div>
 			<br />
 			<div class="fieldHeader">
-				Iniciativas de Producción y Distribución<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"initiativesproductionField")))?>			
+				Iniciativas de Producci&oacute;n y Distribuci&oacute;n<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"initiativesproductionField")))?>			
 			</div>
 			<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">No existen iniciativas disponibles para esta ronda</h3><?php }?>
 			<div id="initiativesproductionField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>					
 				<table align="center">
 					<thead>
-						<th class="small">Acción de la iniciativa</th>
+						<th class="small">Acci&oacute;n de la iniciativa</th>
 						<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
 						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
 					</thead>
@@ -1192,7 +1371,7 @@
 								<?php } ?>
 							</select>
 						</td>
-						<td><?php echo number_format($initiativesprod['cost'], 2, '.', ',').' €'?></td>
+						<td><?php echo number_format($initiativesprod['cost'], 2, '.', ',').' �'?></td>
 						<?php $numberp++;?>
 						<?php } ?>	
 					</tr>
@@ -1210,7 +1389,7 @@
 								<?php } ?>
 							</select>
 						</td>
-						<td><?php echo number_format($initiativesdet['cost'], 2, '.', ',').' €'?></td>
+						<td><?php echo number_format($initiativesdet['cost'], 2, '.', ',').' �'?></td>
 						<?php $factory_number_deterioration++;?>
 						<?php } ?>
 						<?php } ?>
@@ -1226,7 +1405,7 @@
 			<div id="initiativesmarketingField" class="fieldDiv" <?php if ($this->round_number<4){?> style="visibility:hidden"<?php }?>>
 				<table align="center">
 					<thead>
-						<th class="small">Acción de la iniciativa</th>
+						<th class="small">Acci&oacute;n de la iniciativa</th>
 						<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
 						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
 					</thead>
@@ -1255,7 +1434,7 @@
 							<?php } ?>
 						</select>
 						</td>
-						<td><?php echo number_format($initiativesmkt['cost'], 2, '.', ',').' €'?></td>
+						<td><?php echo number_format($initiativesmkt['cost'], 2, '.', ',').' �'?></td>
 						<?php $numberm++;?>
 						<?php } ?>
 					</tr>
@@ -1268,7 +1447,7 @@
 			<div id="initiativeshumanresourcesField" class="fieldDiv" <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
 				<table align="center">
 					<thead>
-						<th class="small">Acción de la iniciativa</th>
+						<th class="small">Acci&oacute;n de la iniciativa</th>
 						<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
 						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
 					</thead>
@@ -1284,7 +1463,7 @@
 								<?php } ?>
 							</select>
 						</td>
-						<td><?php echo number_format($initiativeshr['cost'], 2, '.', ',').' €'?></td>
+						<td><?php echo number_format($initiativeshr['cost'], 2, '.', ',').' �'?></td>
 						<?php $numberh++;?>
 						<?php } ?>
 					</tr>
@@ -1303,7 +1482,7 @@
 			<div class="fieldDiv">		
 			</div>
 			<div id="marketresearchFieldDescription" class="fieldDescription" align="center">
-				Determine aquellos estudios de mercado que desea contratar para su compa&ntildeía.<br/>La información estar&aacute; disponible para el siguiente periodo de simulación.
+				Determine aquellos estudios de mercado que desea contratar para su compa&ntilde&iacute;a.<br/>La informaci&oacute;n estar&aacute; disponible para el siguiente periodo de simulaci&oacute;n.
 			</div>
 			<br />
 			<div class="fieldHeader">
@@ -1311,7 +1490,7 @@
 			</div>
 			<div id="channelResearchField" class="fieldDiv">
 				<div id="channelResearchFieldDescription" class="fieldDescription" align="center">
-					Este estudio le ofrece un pronóstico del crecimiento esperado de los distintos canales de distribución.
+					Este estudio le ofrece un pron&oacute;stico del crecimiento esperado de los distintos canales de distribuci&oacute;n.
 				</div>
 				<br />
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
@@ -1322,14 +1501,14 @@
 						</option>
 					<?php } ?>
 				</select>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[0]['cost'], 2, '.', ',').' €'?>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[0]['cost'], 2, '.', ',').' �'?>
 			</div>
 			<div class="fieldHeader">
 				Comparativa de precios<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"pricesResearchField")))?>			
 			</div>
 			<div id="pricesResearchField" class="fieldDiv">
 				<div id="pricesResearchFieldDescription" class="fieldDescription" align="center">
-					Este estudio le presenta una comparativa de precios entre los productos de las diferentes compa&ntildeías del mercado.
+					Este estudio le presenta una comparativa de precios entre los productos de las diferentes compa&ntilde&iacute;as del mercado.
 				</div>
 				<br />
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
@@ -1340,7 +1519,7 @@
 						</option>
 					<?php } ?>
 				</select>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[1]['cost'], 2, '.', ',').' €'?>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[1]['cost'], 2, '.', ',').' �'?>
 			</div>
 			<div class="fieldHeader">
 				Comparativa de MKT<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"mktResearchField")))?>			
@@ -1348,7 +1527,7 @@
 			<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">Estudio no disponible para esta ronda</h3><?php }?>
 			<div id="mktResearchField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>
 				<div id="mktResearchFieldDescription" class="fieldDescription" align="center">
-					Este estudio le ofrece una relación de las acciones de marketing de su compa&ntildeía en comparación con la competencia.
+					Este estudio le ofrece una relaci&oacute;n de las acciones de marketing de su compa&ntilde&iacute;a en comparaci&oacute;n con la competencia.
 				</div>
 				<br />
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
@@ -1359,7 +1538,7 @@
 						</option>
 					<?php } ?>
 				</select>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[2]['cost'], 2, '.', ',').' €'?>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[2]['cost'], 2, '.', ',').' �'?>
 			</div>
 			<div class="fieldHeader">
 				Lanzamientos esperados<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"spectedResearchField")))?>			
@@ -1367,7 +1546,7 @@
 			<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">Estudio no disponible para esta ronda</h3><?php }?>
 			<div id="spectedResearchField" class="fieldDiv" <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
 				<div id="spectedResearchFieldDescription" class="fieldDescription" align="center">
-					Este estudio trata de hacer una prospección de los mercados recogiendo información de los nuevos productos que próximamente van a incurrir en ellos.
+					Este estudio trata de hacer una prospecci&oacute;n de los mercados recogiendo informaci&oacute;n de los nuevos productos que pr&oacute;ximamente van a incurrir en ellos.
 				</div>
 				<br />
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
@@ -1378,14 +1557,14 @@
 						</option>
 					<?php } ?>
 				</select>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[3]['cost'], 2, '.', ',').' €'?>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[3]['cost'], 2, '.', ',').' �'?>
 			</div>
 			<div class="fieldHeader">
 				Cuentas anuales<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"accountResearchField")))?>			
 			</div>
 			<div id="accountResearchField" class="fieldDiv">
 				<div id="accountResearchFieldDescription" class="fieldDescription" align="center">
-					Este estudio presenta una comparación del rendimiento contable de su empresa y de su competencia.
+					Este estudio presenta una comparaci&oacute;n del rendimiento contable de su empresa y de su competencia.
 				</div>
 				<br />
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
@@ -1396,7 +1575,7 @@
 						</option>
 					<?php } ?>
 				</select>
-				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[4]['cost'], 2, '.', ',').' €'?>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo number_format($this->researchcosts[4]['cost'], 2, '.', ',').' �'?>
 			</div>
 			<div class="buttonsDiv">
 				<input class="button" type="submit" value="Solicitar">
@@ -1412,12 +1591,12 @@
 			<div class="fieldDiv">		
 			</div>
 			<div class="fieldHeader">
-				Modificación de productos <?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"modificationIdiField")))?>			
+				Modificaci�&oacute;n de productos <?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"modificationIdiField")))?>			
 			</div>
 			<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">No disponible para esta ronda</h3><?php }?>
 			<div id="modificationIdiField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>
 				<div id="modificationIdiFieldDescription" class="fieldDescription" align="center">
-					Esta acción le permite modificar las características con las que est&aacute;n siendo fabricados sus productos.
+					Esta acci&oacute;n le permite modificar las caracter&iacute;sticas con las que est&aacute;n siendo fabricados sus productos.
 				</div>
 				<?php foreach ($this->products as $product){?>
 					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
@@ -1463,7 +1642,7 @@
 			?>
 					<div id="newIdiField" class="fieldDiv"  <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
 					<div id="newIdiFieldDescription" class="fieldDescription" align="center">
-							Determine el nuevo producto que desea desarrollar y el presupuesto que destina al proyecto de investigación y desarrollo asociado.
+							Determine el nuevo producto que desea desarrollar y el presupuesto que destina al proyecto de investigaci&oacute;n y desarrollo asociado.
 					</div>
 					<br />
 					<table align="center">
@@ -1506,7 +1685,7 @@
 <div id="popupForm" style="position:relative;border: 0px;">
 	<form name="stockDistribution" onload="" style="width: auto;"/>
 		<div class="fieldHeader">
-			Distribución del stock	
+			Distribuci&oacute;n del stock	
 		</div>
 		<div id="unitsStockDistributionField" class="fieldDiv" style="width: auto;">
 					<td><label >Cantidad de productos a distribuir&nbsp</label>
@@ -1546,6 +1725,7 @@
 		</div>
 		<div style="display:none;"><input type="text" id="units" name="units"  display="block"></div>
 	</form>
+</div>
 </div>
 <div id="data"><input type ="hidden"></div>	
 <!--VERO-->
