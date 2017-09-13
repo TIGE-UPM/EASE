@@ -15,6 +15,11 @@
 		
 		protected $_qualities;
 		protected $_qualities_weight;
+		//VERO
+		protected $_functionalities;
+		protected $_functionality_parameters;
+		protected $_functionalities_weight;
+		//VERO
 		
 		//MK variables
 		protected $_prices;
@@ -79,7 +84,7 @@
 			$this->_company_id=$company_id;
 			$this->_round_number=$round_number;
 			$this->init();
-		}
+		} 
 		
 		//inicializar decisiones.
 		//Sacamos de DB las decisiones guardadas
@@ -94,10 +99,11 @@
 			$this->initMarketResearches();
 		}
 		
-		//Iniciamos producción... solo una factoría
+		//Iniciamos producciÃ³n... solo una factorÃ­a
 		function initProduction(){
 			$this->_production=new Model_DbTable_Decisions_Production();
 			$this->_quality_parameters=new Model_DbTable_Games_Param_Markets_QualityParams();
+			$this->_functionality_parameters=new Model_DbTable_Games_Param_Markets_FunctionalityParams();
 			$this->_factory=$this->_production->getFactoriesObjects($this->_game_id,$this->_company_id,$this->_round_number);
 			$factory_number=1;
 			foreach ($this->_factory as $counterfactories){
@@ -112,7 +118,12 @@
 			//funcionando correctamente. Atributos de calidad selecionados para cada producto																   																   
 			$this->_qualities=$this->_production->getQualitiesArray($this->_game_id, $this->_company_id);
 			//Cargamos pesos
-			$this->_qualities_weight=$this->_quality_parameters->getWeightsArray($this->_game_id);
+			//VERO
+			//$this->_qualities_weight=$this->_quality_parameters->getWeightsArray($this->_game_id);
+			$this->_functionalities=$this->_production->getFunctionalitiesArray($this->_game_id, $this->_company_id);
+			$this->_functionalities_weight=$this->_functionality_parameters->getFunctionalityParamsWeight($this->_game_id);
+			$this->_qualities_weight=$this->_quality_parameters->getQualityParamsWeight($this->_game_id);
+			//VERO
 			$this->_production_messages=array();
 		}
 		
@@ -121,7 +132,7 @@
 			$this->_marketing=new Model_DbTable_Decisions_Marketing();
 			//funcionando correctamente. Precios seleccionados para cada canal-region de cada producto
 			$this->_prices=$this->_marketing->getPrices($this->_game_id, $this->_company_id, $this->_round_number);
-			//Faltaría añadir el presupuesto completo de marketing
+			//FaltarÃ­a aÃ±adir el presupuesto completo de marketing
 			
 			//funcionando correctamente. Presupuesto asignado a Publicidad
 			$this->_advertisingsbudget=$this->_marketing->getAdvertisingsBudget($this->_game_id, $this->_company_id, $this->_round_number);
@@ -136,17 +147,18 @@
 			//funcionando correctamente. Reparto del presupuesto de trade MKT por producto-canal-region
 			$this->_tradesmktpercentage=$this->_marketing->getTradesMktPercentage($this->_game_id, $this->_company_id, $this->_round_number);
 		}
+
 		
 		//Iniciamos proveedores... todo OK
 		function initSuppliers(){
 			$this->_suppliers=new Model_DbTable_Decisions_Suppliers();			
 			//funcionando correctamente. Numero de proveedores seleccionado.
 			$this->_suppliers_number=$this->_suppliers->getNumber($this->_game_id, $this->_company_id, $this->_round_number);
-			//funcionando correctamente. Plazos de pago a proveedores por canal de distribución.
+			//funcionando correctamente. Plazos de pago a proveedores por canal de distribuciÃ³n.
 			$this->_suppliers_payterms=$this->_suppliers->getPayterms($this->_game_id, $this->_company_id, $this->_round_number);
 		}
 		
-		//Iniciamos finanazas... falta el interés del crédito
+		//Iniciamos finanazas... falta el interÃ©s del crÃ©dito
 		function initFinance(){
 			$this->_finance=new Model_DbTable_Decisions_Finance();
 			$this->_balance_sheet=new Model_DbTable_Outcomes_Bs_BalanceSheet();
@@ -161,18 +173,18 @@
 			$this->_finance_payout=$this->_finance->getDividends($this->_game_id, $this->_company_id, $this->_round_number);
 			//funcionando correctamente. Cantidad solicitada
 			$this->_finance_amount=$this->_finance->getAmount($this->_game_id, $this->_company_id, $this->_round_number);
-			//funcionando correctamente. Plazo de amortización
+			//funcionando correctamente. Plazo de amortizaciÃ³n
 			$this->_finance_term=$this->_finance->getTerm($this->_game_id, $this->_company_id, $this->_round_number);
 			
-			//faltaría el interés que se le va a cobrar por la solicitud del crédito
+			//faltarÃ­a el interÃ©s que se le va a cobrar por la solicitud del crÃ©dito
 		}
 		
-		//Inicializaci—n de RRHH... todo OK
+		//Inicializaciâ€”n de RRHH... todo OK
 		function initHumanResources(){
 			$this->_humanResources=new Model_DbTable_Decisions_HumanResources();			
 			//funcionando correctamente. Politica salarial seleccionada.
 			$this->_humanResources_cuartil=$this->_humanResources->getCuartiles($this->_game_id, $this->_company_id, $this->_round_number);
-			//funcionando correctamente. Cualificación del staff seleccionada.
+			//funcionando correctamente. CualificaciÃ³n del staff seleccionada.
 			$this->_humanResources_formation=$this->_humanResources->getFormations($this->_game_id, $this->_company_id);
 			//var_dump($this->_region[$factory_number]);//die();
 			foreach ($this->_factory as $factory){
@@ -184,13 +196,13 @@
 		//Inicializacion de iniciativas... todo OK
 		function initInitiatives(){
 			$this->_initiatives=new Model_DbTable_Decisions_Initiatives();			
-			//funcionando correctamente. Decisión sobre iniciativas de producción
+			//funcionando correctamente. DecisiÃ³n sobre iniciativas de producciÃ³n
 			$this->_initiatives_production=$this->_initiatives->getInitiativesProduction($this->_game_id, $this->_company_id, $this->_round_number);
-			//funcionando correctamente. Decisión sobre iniciativas de MKT
+			//funcionando correctamente. DecisiÃ³n sobre iniciativas de MKT
 			$this->_initiatives_marketing=$this->_initiatives->getInitiativesMarketing($this->_game_id, $this->_company_id, $this->_round_number);
-			//funcionando correctamente. Decisión sobre iniciativas de HHRR
+			//funcionando correctamente. DecisiÃ³n sobre iniciativas de HHRR
 			$this->_initiatives_humanresources=$this->_initiatives->getInitiativesHumanresources($this->_game_id, $this->_company_id, $this->_round_number);
-			//funcionando correctamente. Decisión sobre iniciativas de deterioro
+			//funcionando correctamente. DecisiÃ³n sobre iniciativas de deterioro
 			$this->_initiatives_deterioration=$this->_initiatives->getInitiativesDeterioration($this->_game_id, $this->_company_id, $this->_round_number);
 			//funcionando correctamente. Traemos los pesos (weight) y los costs (cost) de las iniciativas
 			$this->_param_initiatives=new Model_DbTable_Games_Param_Markets_Initiatives();
@@ -213,7 +225,7 @@
 			$this->_marketresearches_costs=$this->_param_marketresearches->getMarketResearchesCosts($this->_game_id);
 		}
 		
-		//Iniciamos I+D+i... Falta incluir la parte de costes en modificación de productos existentes.
+		//Iniciamos I+D+i... Falta incluir la parte de costes en modificaciÃ³n de productos existentes.
 		function initIdi(){
 			$this->_idi=new Model_DbTable_Decisions_Idi();
 			//funcionando correctamente. I+D de nuevos productos solicitados
@@ -254,7 +266,7 @@
 			}
 			return $this->_time_available;
 		}
-		//Preparada la programaci—n de la capacidad de cada compa–’a en funcion del modelo. Funcionando todo correctamente
+		//Preparada la programaciâ€”n de la capacidad de cada compaâ€“â€™a en funcion del modelo. Funcionando todo correctamente
 		function getProductionCapacity($factory_number){
 			if (! isset($this->_capacity)){
 			$nominal_time=$this->_core->_games->getNominalTime($this->_game_id, $this->_round_number, $this->_company_id);
@@ -328,21 +340,95 @@
 			//incluye cambios de calidad de los productos realizados en I+D+i
 			while(isset($this->_qualities['product_'.$product_number]['quality_param_'.$quality_counter])){
 				$quality_actual=$this->_qualities['product_'.$product_number]['quality_param_'.$quality_counter];
-				$quality_changes=$this->_idi_product_changes['product_'.$product_number]['product_quality_'.$quality_counter];
+				$quality_changes=$this->_idi_product_changes['product_'.$product_number]['quality_param_'.$quality_counter];
 				$quality_param_final=$quality_actual+$quality_changes;
-				if($quality_param_final<0){
-					$quality_param_final=0;
+				if($quality_param_final<1){
+					$quality_param_final=1;
 				}
 				if($quality_param_final>10){
 					$quality_param_final=10;
 				}
 				$quality_table->setQualityParam($this->_game_id, $this->_company_id, $quality_param_final, $product_number, $quality_counter);
-				$average+=($quality_param_final)*($this->_qualities_weight['quality_param_'.$quality_counter]);
+				//VERO
+				//$average+=($quality_param_final)*($this->_qualities_weight['quality_param_'.$quality_counter]);
+				$average+=($quality_param_final)*($this->_qualities_weight['quality_param_number_'.$quality_counter]['product_number_'.$product_number]);
+				//VERO
 				$quality_counter++;
 			}
+			var_dump($average);
 			$quality_average=round($average*0.01);
 			return $quality_average;
+			
 		}
+		//VERO
+		function getProductQualityFunctionality($product_number){
+			$quality_counter=1;
+			$functionality_counter=1;
+			$average_quality=0;
+			$functionality_average=0;
+			$quality_table=new Model_DbTable_Decisions_Pr_ProductsQuality();
+			$functionality_table=new Model_DbTable_Decisions_Pr_ProductsFunctionality();
+
+			while(isset($this->_qualities['product_'.$product_number]['quality_param_'.$quality_counter])){
+				$quality_actual=$this->_qualities['product_'.$product_number]['quality_param_'.$quality_counter];
+				$quality_changes=$this->_idi_product_changes['product_'.$product_number]['quality_param_'.$quality_counter];
+				$quality_param_final=$quality_actual+$quality_changes;
+				if($quality_param_final<1){
+					$quality_param_final=1;
+				}
+				if($quality_param_final>10){
+					$quality_param_final=10;
+				}
+				$quality_table->setQualityParam($this->_game_id, $this->_company_id, $quality_param_final, $product_number, $quality_counter);
+				//VERO
+				//$average+=($quality_param_final)*($this->_qualities_weight['quality_param_'.$quality_counter]);
+				$average_quality+=($quality_param_final)*($this->_qualities_weight['quality_param_number_'.$quality_counter]['product_number_'.$product_number]);
+				//VERO
+				$quality_counter++;
+			}
+
+			while(isset($this->_functionalities['product_'.$product_number]['functionality_param_'.$functionality_counter])){
+				$functionality_param=$this->_functionalities['product_'.$product_number]['functionality_param_'.$functionality_counter];
+
+				$average_functionality+=($functionality_param)*($this->_functionalities_weight['functionality_param_number_'.$functionality_counter]['product_number_'.$product_number]);
+				$functionality_counter++;
+			}
+			$functionality_average=round($average_functionality*0.1);
+			$quality_average=round($average_quality*0.01);
+			$total_average=$functionality_average+$quality_average;
+			var_dump("Calidad y funcionalidad");
+			var_dump($functionality_average);
+			var_dump($quality_average);
+			var_dump($total_average);
+			return $total_average;
+			
+		}
+
+
+		function getProductFunctionality($product_number){
+			$functionality_counter=1;
+			$average=0;
+			$functionality_table=new Model_DbTable_Decisions_Pr_ProductsFunctionality();
+			var_dump("Product Functionality");
+			//incluye cambios de calidad de los productos realizados en I+D+i
+			while(isset($this->_functionalities['product_'.$product_number]['functionality_param_'.$functionality_counter])){
+				var_dump("Functionality: ");
+				var_dump($functionality_counter);
+				$functionality_param=$this->_functionalities['product_'.$product_number]['functionality_param_'.$functionality_counter];
+				var_dump($functionality_param);
+
+				$average+=($functionality_param)*($this->_functionalities_weight['functionality_param_number_'.$functionality_counter]['product_number_'.$product_number]);
+				var_dump($average);
+				$functionality_counter++;
+			}
+			$functionality_average=round($average*0.1);
+			var_dump($functionality_average);
+			return $functionality_average;
+
+			
+		}
+		//VERO
+
 		function getTimeNeeded(){
 			//$games=new Model_DbTable_Games();
 			if (! isset($this->_time_needed)){
@@ -376,7 +462,7 @@
 			$time=$this->_time_available*$percentage;
 			$unit_time=$this->_core->_games->getProductionTime($this->_game_id, 
 																  $product_number, 
-																  ($this->getProductQuality($product_number))-1); /* ESTO ES LO CORRECTO. PASAMOS -1 POR LOS ÍNDICES DEL ARRAY DE CORE->GAMES */
+																  ($this->getProductQuality($product_number))-1); /* ESTO ES LO CORRECTO. PASAMOS -1 POR LOS ÃNDICES DEL ARRAY DE CORE->GAMES */
 			/*$unit_time=$this->_core->_games->getProductionTime($this->_game_id, 
 																$product_number, 
 																$this->getProductQuality($product_number));*/
@@ -404,7 +490,7 @@
 							  ['region_'.$region_number]
 							  ['channel_'.$channel_number];
 			}			
-			if (isset($region_number)){//sÃ³lo regiÃ³n
+			if (isset($region_number)){//sÃƒÂ³lo regiÃƒÂ³n
 				foreach ($this->_factory as $factory){
 					$created=$created_aux['factory_number_'.$factory['factory_number']];
 					if($this->_round_number>$created || $created==1){
@@ -423,7 +509,7 @@
 				return $total;
 
 			}
-			if (isset($channel_number)){//sÃ³lo canal
+			if (isset($channel_number)){//sÃƒÂ³lo canal
 				foreach ($this->_factory as $factory){
 					$created=$created_aux['factory_number_'.$factory['factory_number']];
 					if($this->_round_number>$created || $created==1){
@@ -488,7 +574,10 @@
 		}
 		
 		function setUnitsAvailable($product_number, $channel_number, $region_number, $units){
-			$stock=new Model_DbTable_Outcomes_St_Units();
+			//VERO
+			//$stock=new Model_DbTable_Outcomes_St_Units();
+			$stock=new Model_DbTable_Decisions_St_StockFinal();
+			//VERO
 			if($this->_round_number>1){
 				$round_previous=($this->_round_number)-1;
 				$stock_units=$stock->getStockByMarket($this->_game_id, $round_previous, $this->_company_id, $product_number, $region_number, $channel_number);
@@ -604,7 +693,7 @@
 					$factoryProductivity=(0.01*$this->_productivityPercentage[$factory['factory_number']]);
 					$factoryRecruitment=(0.01*$this->_recruitmentPercentage[$factory['factory_number']]);
 					$factoryTimeAvailable+=$nominal_time['factory_number_'.$factory['factory_number']]*$factoryProductivity*$factoryRecruitment;
-					echo("<br/> Nominal Time Fábrica ".$factory['factory_number'].": ".$nominal_time['factory_number_'.$factory['factory_number']]);
+					echo("<br/> Nominal Time FÃ¡brica ".$factory['factory_number'].": ".$nominal_time['factory_number_'.$factory['factory_number']]);
 					echo("<br/> Total factory time available adjusted :".$factoryTimeAvailable);
 				}
 			}
@@ -648,7 +737,7 @@
 		/////////////////////////
 		// INICIATIVAS
 		
-		//Recoge las iniciativas de Producción. Funcionando correctamente
+		//Recoge las iniciativas de ProducciÃ³n. Funcionando correctamente
 		function getInitiativesProduction(){
 			$initiative_number=1;
 			$value=1;
@@ -661,7 +750,7 @@
 			return $value;
 		}
 		
-		//Recoge las iniciativas de Producción. Funcionando correctamente
+		//Recoge las iniciativas de ProducciÃ³n. Funcionando correctamente
 		function getInitiativesDistribution(){
 			$initiative_number=1;
 			$value=1;
@@ -720,25 +809,25 @@
 		}
 			
 		// COSTS
-			// producciÃ³n
+			// producciÃƒÂ³n
 		function getPrFixedCost(){
 			$result = 0;
-			//Precios fijos de las fábricas
+			//Precios fijos de las fÃ¡bricas
 			foreach ($this->_factory as $factory) { 
 				//$aux_created=$this->_core->_games->getRoundFactoryCreated($this->_game_id, $this->_company_id);
 				//$round_created=$aux_created['factory_number_'.$factory['factory_number']];
-				$result+=0.2*($this->_core->_games->getProductionCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'fixed')); //20% del precio de la fábrica actualizado
+				$result+=0.2*($this->_core->_games->getProductionCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'fixed')); //20% del precio de la fÃ¡brica actualizado
 			}
 			// Precios fijos derivados de las extensiones
-			$extension_cost=$this->getExtensionCost(); 	//devuelve un Array(Array) con los costes de la ampliación para cada fábrica y ronda
+			$extension_cost=$this->getExtensionCost(); 	//devuelve un Array(Array) con los costes de la ampliaciÃ³n para cada fÃ¡brica y ronda
 			if(is_null($extension_cost)){
-				return $result;				//Si no hay nada más que hacer porque no hay extensiones, salimos.
+				return $result;				//Si no hay nada mÃ¡s que hacer porque no hay extensiones, salimos.
 			}
-			foreach ($extension_cost as $extcost) { //Si hay extensiones, sumamos todos los costes de ampliación para cada fábrica
+			foreach ($extension_cost as $extcost) { //Si hay extensiones, sumamos todos los costes de ampliaciÃ³n para cada fÃ¡brica
 				$factory_total_extensions_cost+=array_sum($extcost);
 				$result+=0.2*$factory_total_extensions_cost;
 			}
-															//$extension_cost = Fábrica1[CosteExtRonda2,CosteExtRonda3,...]],Fábrica2[CosteExtRonda2,CosteExtRonda3,...],...
+															//$extension_cost = FÃ¡brica1[CosteExtRonda2,CosteExtRonda3,...]],FÃ¡brica2[CosteExtRonda2,CosteExtRonda3,...],...
 				// if(($this->_round_number==$round_created)){
 					// $result+=0.2*($this->_core->_games->getProductionCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'fixed'));
 				// }
@@ -779,13 +868,33 @@
 			}
 			$unit_cost=$unit_cost_aux/$counter;
 			echo("<br/> EQUIPO ".$this->_company_id." UNIT COST ".$unit_cost);
+			//VERO
+			$functionality_decision=new Model_DbTable_Decisions_Pr_ProductsFunctionality();
+			$nfuncionalities=$this->_core->_games->getNumberOfFunctionalities($this->_game_id);
+			$aditional_unit_cost=0;
+			for ($functionality_param_number=1; $functionality_param_number<=$nfuncionalities; $functionality_param_number++ ){
+				var_dump($this->_game_id);
+				var_dump($this->_company_id);
+				var_dump($product_number);
+				var_dump($functionality_param_number);
+				var_dump($functionality_decision->getFunctionalityByProductAndParamNumber($this->_game_id, $this->_company_id, $product_number, $functionality_param_number));
+				if($functionality_decision->getFunctionalityByProductAndParamNumber($this->_game_id, $this->_company_id, $product_number, $functionality_param_number)==1){
+					$aditional_unit_cost+=$this->_functionality_parameters->getFunctionalityCost($this->_game_id, $functionality_param_number);
+				}
+			}
+			echo("<br/> EQUIPO ".$this->_company_id." ADITIONAL UNIT COST ".$aditional_unit_cost);
+			//VERO
 			//$units_available=$this->getUnitsAvailable($product_number, $channel_number, $region_number);
 			$units=$this->getProductionUnits($product_number, $channel_number, $region_number);
 			echo("<br/> EQUIPO ".$this->_company_id." UNITS ".$units);
 			$discount=$this->getInitiativesProduction($round_number);
 			//echo("En getPrVarCost<br/>");
-			//$stock=$this->getStockValue($product_number, $region_number, $channel_number);		
-			$result+=($unit_cost*$units*$discount);//+$stock;
+			//$stock=$this->getStockValue($product_number, $region_number, $channel_number);
+			//VERO		
+			//$result+=($unit_cost*$units*$discount);//+$stock;
+			$result+=(($unit_cost+$aditional_unit_cost)*$units*$discount);
+			echo("<br/> EQUIPO ".$this->_company_id." TOTAL VARIABLE COST ".$result);
+			//VERO
 			return $result;
 		}
 		function getPrRawMaterialsCost($channel_number, $region_number,$product_number){ //A INCORPORAR EN EASE2 20120329
@@ -809,6 +918,19 @@
 			}
 			return $result;
 		}
+
+		//VERO
+		function getStDistribCost($channelO, $channelD, $regionO, $regionD, $product){
+			$st_distribution=new Model_DbTable_Decisions_St_Distribution();
+
+			$unit_cost=intval($st_distribution->getCostStockDistribution($this->_game_id, $this->_round_number, $this->_company_id, $product, $channelO, $regionO, $channelD, $regionD));
+			$units=intval($st_distribution->getUnitsDistribution($this->_game_id, $this->_round_number, $this->_company_id, $product, $channelO, $regionO, $channelD, $regionD));
+			$discount=$this->getInitiativesDistribution($round_number);
+			$result+=$unit_cost*$units*$discount;
+
+			return $result;
+		}
+		//VERO
 			// marketing
 		function getMkAdvertCost($media_number, $region_number, $product_number){
 			$percentage=$this->_advertisingspercentage['product_'.$product_number]['media_'.$media_number]['region_'.$region_number];
@@ -921,7 +1043,7 @@
 			return $totalCost;
 		}
 		
-		//costes en modificación de productos I+D+i
+		//costes en modificaciÃ³n de productos I+D+i
 		function getIdiChangesCosts(){
 			$totalCost=0;
 			$product_number=1;
@@ -931,14 +1053,17 @@
 				$average_change=0;
 				$changeCost=0;
 				while (isset($product_changes['product_quality_'.$param])){
-					$average_change+=($product_changes['product_quality_'.$param])*($this->_qualities_weight['quality_param_'.$param])*0.01;
+					//VERO
+					//$average_change+=($product_changes['product_quality_'.$param])*($this->_qualities_weight['quality_param_'.$param])*0.01;
+					$average_change+=($product_changes['product_quality_'.$param])*($this->_qualities_weight['quality_param_number_'.$param]['product_number_'.$product_number])*0.01;
+					//VERO
 					$param++;
 				}
 				if ($average_change>0){
 					$changeCost=$average_change*0.1*$this->getPrFixedCost()*$this->getIdiParabolicValue($product_number, $average_change);
 				} else {
 					$changeCost=$average_change*0.1*(-0.8)*$this->getPrFixedCost();
-					//ver posibilidad de parametrizar 0.1 (fracción de costes fijos de producción)
+					//ver posibilidad de parametrizar 0.1 (fracciÃ³n de costes fijos de producciÃ³n)
 					//0.8 ya que no cuesta lo mismo disminuir la calidad que aumentarla
 				}
 				$totalCost+=$changeCost;
@@ -951,7 +1076,7 @@
 			return ($totalCost/$product_number);
 		}
 		
-		//factor parabólico de coste de cambios de I+D+i. aplica en cambios a la alza
+		//factor parabÃ³lico de coste de cambios de I+D+i. aplica en cambios a la alza
 		function getIdiParabolicValue($product_number, $idiChange){
 			$initQuality=($this->getProductQuality($product_number))-$idiChange;
 			$parabolicVaulue=1+(0.05*abs(5-$initQuality));
@@ -980,7 +1105,7 @@
 			$result=0;
 			foreach ($this->_factory as $factory){
 				$employee_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'hiring_cost');
-//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
+//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÃ“N EN LA PRIMERA FÃBRICA, PONÃA ESE NÃšMERO DE EMPLEADOS EN TODAS (NO VOLVÃA A ENTRAR EN EL BUCLE): Â¿POR QUÃ‰ SE PUSO ESA CONDICIÃ“N? 
 //				if (! isset ($staff)){
 					$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
@@ -1000,7 +1125,7 @@
 			$result=0;
 			foreach ($this->_factory as $factory){
 				$employee_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'training_cost');
-//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
+//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÃ“N EN LA PRIMERA FÃBRICA, PONÃA ESE NÃšMERO DE EMPLEADOS EN TODAS (NO VOLVÃA A ENTRAR EN EL BUCLE): Â¿POR QUÃ‰ SE PUSO ESA CONDICIÃ“N? 
 //				if (! isset ($staff)){
 					$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
@@ -1023,7 +1148,7 @@
 				echo("<br>Pass ".$i."<br/>");
 				$i++;
 				$employee_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'wages_cost');
-//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
+//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÃ“N EN LA PRIMERA FÃBRICA, PONÃA ESE NÃšMERO DE EMPLEADOS EN TODAS (NO VOLVÃA A ENTRAR EN EL BUCLE): Â¿POR QUÃ‰ SE PUSO ESA CONDICIÃ“N? 
 //				if (! isset ($staff)){
 					$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
@@ -1072,9 +1197,21 @@
 				$interest_aux=$decision_interest->getDecision($this->_game_id, $this->_company_id, $round_number);
 				echo("<br>EXTRACTION: GAMEID=".$this->_game_id."/COMPANYID=".$this->_company_id."/RDNO=".$round_number."<br>");
 				$interest=$interest_aux['interest'];
-				if (($this->_round_number-$round_number)<$term['term']){
-					$costs=($amount['amount']/$term['term'])*($interest*0.01);
+				//VERO
+				$term_aux = $this->_round_number-$round_number;
+				//if (($this->_round_number-$round_number)<$term['term']){
+				if ($term_aux<$term['term']){
+					$annual_quota= ($amount['amount']*($interest*0.01))/(1-pow((1+$interest*0.01),(-$term['term'])));
+					//$costs=($amount['amount']/$term['term'])*($interest*0.01);
+					$principal_quota = 0;
+					$paid_quota=0;
+					for ($round_number_aux = 0; $round_number_aux<=$term_aux; $round_number_aux++){
+						$costs= $interest*0.01*($amount['amount']-$paid_quota);
+						$principal_quota= $annual_quota-$costs;
+						$paid_quota+=$principal_quota;
+					}
 				}
+				//VERO
 				else{
 					$costs=0;
 				}
@@ -1083,15 +1220,27 @@
 			}
 			return $lt_costs;
 		}
-		
+		//VERO
 		function getCreditPayment(){
 			$decision_amount=new Model_DbTable_Decisions_Fi_Amount();
 			$decision_term=new Model_DbTable_Decisions_Fi_Term();
+			$decision_interest=new Model_DbTable_Decisions_Fi_Interest();
 			for ($round_number=1; $round_number<=$this->_round_number; $round_number++){
 				$amount=$decision_amount->getDecision($this->_game_id, $this->_company_id, $round_number);
 				$term=$decision_term->getDecision($this->_game_id, $this->_company_id, $round_number);
-				if (($this->_round_number-$round_number)<$term['term']){
-					$payment=($amount['amount']/$term['term']);
+				$interest_aux=$decision_interest->getDecision($this->_game_id, $this->_company_id, $round_number);
+				$interest=$interest_aux['interest'];
+				$term_aux = $this->_round_number-$round_number;
+				if ($term_aux<$term['term']){
+					//$payment=($amount['amount']/$term['term']);
+					$annual_quota= ($amount['amount']*($interest*0.01))/(1-pow((1+$interest*0.01),(-$term['term'])));
+					$principal_quota = 0;
+					$paid_quota=0;
+					for ($round_number_aux = 0; $round_number_aux<=$term_aux; $round_number_aux++){
+						$costs= $interest*0.01*($amount['amount']-$paid_quota);
+						$payment= $annual_quota-$costs;
+						$paid_quota+=$payment;
+					}
 				}
 				else{
 					$payment=0;
@@ -1100,6 +1249,98 @@
 			}
 			return $cr_payment;
 		}
+		//Devuelve el valor ganado o perdido en las inversiones (totales) y guarda en la tabla games_evolution_fi_investment los intereses producidos en la ronda actual por cada inversiÃ³n
+		function getInvestmentInterest(){
+			$decision_investment=new Model_DbTable_Decisions_Fi_Investment();
+			$game=new Model_DbTable_Games();
+			$n_investment = $game->getNumberOfInvestments($this->_game_id);
+			$outcomesPrevious=new Model_DbTable_Outcomes_In_InvestmentUnitary();
+			$investment_param=new Model_DbTable_Games_Param_Markets_InvestmentsParams();
+			$evolution=new Model_DbTable_Games_Evolution_Fi_Investment();
+			$result_positive=0;
+			$result_negative=0;
+			for($investment_number=1; $investment_number<=$n_investment; $investment_number++){
+				$result_final=0;
+				$evolutionInterest=0;
+				for ($round_number=2; $round_number<=$this->_round_number; $round_number++){
+					$investments=$decision_investment->getDecision($this->_game_id, $this->_company_id, $round_number);
+					$amount= $investments['investment_number_'.$investment_number]['amount'];
+					$term= $investments['investment_number_'.$investment_number]['term'];
+					echo("<br>EXTRACTION INVESTMENT: GAMEID=".$this->_game_id."/COMPANYID=".$this->_company_id."/RDNO=".$round_number."/CNT=".$amount."/PLAZO=".$term."<br>");
+					$term_aux = $this->_round_number-$round_number;
+					if($term_aux < $term ){
+						for ($round_number_aux = 0; $round_number_aux<=$term_aux; $round_number_aux++){
+							$interest=$evolution->getInvestment($this->_game_id, $round_number, $investment_number);
+							if($term == 1 Or ($term_aux==0 And is_null($outcomesPrevious->getInvestment($this->_game_id, $this->_company_id, $round_number, $investment_number))==true)){
+								$amountResult =$interest*$amount;
+								$result_final+=$amountResult;
+							}elseif($round_number_aux==$term_aux){
+								$amountResult =$interest*($evolutionInterest+$amount);
+								$result_final+=$amountResult;
+							}else{
+								$evolutionInterest+=$outcomesPrevious->getInvestment($this->_game_id, $this->_company_id, $round_number_aux+$round_number, $investment_number);
+							}
+						}
+					}
+				}
+				$outcomesPrevious->setInvestment($this->_game_id, $this->_company_id, $this->_round_number, $investment_number, $result_final);
+				echo("<br>Interest: ".$interest.", Result: ".$result_final."<br>");
+				if($result_final>0 ){
+					$result_positive+=$result_final;
+				}else{
+					$result_negative+=$result_final;
+				}
+			}
+
+			return array('fi_investment_losses'=>$result_negative, 'fi_investment_earnings'=>$result_positive);
+		}
+
+		function getInvestmentBalanceSheet(){
+			$decision_investment=new Model_DbTable_Decisions_Fi_Investment();
+			$game=new Model_DbTable_Games();
+			$n_investment = $game->getNumberOfInvestments($this->_game_id);
+			$outcomes=new Model_DbTable_Outcomes_In_InvestmentUnitary();
+			$investment_param=new Model_DbTable_Games_Param_Markets_InvestmentsParams();
+			$evolution=new Model_DbTable_Games_Evolution_Fi_Investment();
+			for($investment_number=1; $investment_number<=$n_investment; $investment_number++){
+				$result=0;
+				$result_final=0;
+				for ($round_number=2; $round_number<=$this->_round_number; $round_number++){
+					$investments=$decision_investment->getDecision($this->_game_id, $this->_company_id, $round_number);
+					$term_aux = $this->_round_number-$round_number;
+					$term= $investments['investment_number_'.$investment_number]['term'];
+					$amount= $investments['investment_number_'.$investment_number]['amount'];
+					if($term_aux < $term ){
+						$result=$outcomes->getInvestment($this->_game_id, $this->_company_id, $round_number, $investment_number);
+						if($term == 1){
+							$liquid_assets +=$result;
+						}elseif($term_aux==0){
+							$liquid_assets +=(-$amount);
+							$activeInvestment+=$result+$amount+$result_final;
+						}elseif($term_aux==$term-1){
+							$result_final=$this->getAllResultsByInvestment($this->_round_number, $round_number, $investment_number);
+							$liquid_assets +=($amount+$result_final);
+						}else{
+							$result_final=$this->getAllResultsByInvestment($this->_round_number, $round_number, $investment_number);
+							$activeInvestment+=($result_final+$amount);
+						}
+					}
+				}
+			}
+			echo("<br>Company: ".$this->_company_id.", +
+				: ".$activeInvestment.", Liquid assets: ".$liquid_assets."<br>");
+			return array('liquid_assets'=>$liquid_assets, 'investment_assets'=>$activeInvestment);
+		}
+
+		function getAllResultsByInvestment($round_number_act, $round_number_decision, $investment_number){
+			$outcomes=new Model_DbTable_Outcomes_In_InvestmentUnitary();
+			for($round_number=$round_number_decision;$round_number<=$round_number_act; $round_number++){
+				$result+=$outcomes->getInvestment($this->_game_id, $this->_company_id, $round_number, $investment_number);
+			}
+			return $result;
+		}
+
+		//VERO
 		
 		function getTotalAmortization(){
 			$amortization=new Model_DbTable_Games_Evolution_Am_Amortization();
@@ -1180,7 +1421,7 @@
 		
 		function getPaidDividends(){
 			//$year_result=$this->_core->_games->getYearResult($this->_game_id, $this->_round_number, $this->_company_id);
-			//20130501: Los dividendos se refieren al año anterior
+			//20130501: Los dividendos se refieren al aÃ±o anterior
 			if ($this->_round_number>1) {
 				$past_year_result=$this->_core->_games->getYearResult($this->_game_id, $this->_round_number-1, $this->_company_id);
 				if ($past_year_result>0) {
@@ -1205,7 +1446,7 @@
 			$total=0;
 			for ($round_number=1; $round_number<=$this->_round_number; $round_number++){
 				$round_payout=$finance_data->getDividends($this->_game_id, $this->_company_id, $round_number);
-				//20130501: Los dividendos se refieren al año anterior
+				//20130501: Los dividendos se refieren al aÃ±o anterior
 				$round_result=$this->_core->_games->getYearResult($this->_game_id, $round_number-1, $this->_company_id);
 				$total_aux=($round_payout*$round_result);
 				$total+=$total_aux;
@@ -1234,7 +1475,13 @@
 			//echo("<br/> ");echo("<br/> "); 
 			$year_result=$this->getYearResult();
 			$year_amortization=$this->getYearAmortization();
-			$year_tiedup_investments=$this->getTiedUpInvestment();			
+			$year_tiedup_investments=$this->getTiedUpInvestment();
+			if($this->_round_number==1){
+				$year_investments=0;
+			}else{
+				$year_investments=$this->getInvestmentBalanceSheet();
+			}	
+					
 			$stock_value=0;
 			foreach ($this->_core->_products as $product){
 				foreach ($this->_core->_regions as $region){
@@ -1255,11 +1502,11 @@
 				$creditors+=$this->getComercialCreditors($channel->getChannelNumber());
 				$debtors+=$this->getTradeDebtors($channel->getChannelNumber());
 			}
-			$liquid_asset=$starting_cash-$credit_payment-$overdraft_payment+$year_result-$variation_stock_value+$year_amortization-$debtors+$creditors-$year_tiedup_investments;//-$stock;
+			$liquid_asset=$starting_cash-$credit_payment-$overdraft_payment+$year_result-$variation_stock_value+$year_amortization-$debtors+$creditors-$year_tiedup_investments+$year_investments['liquid_assets'];//-$stock;
 			echo("<br/><br/> ");
 			echo("Liquid Asset: ".$liquid_asset);
 			echo("<br/><br/>");
-			echo("INPUTS: ".$starting_cash." | ".$credit_payment." | ".$overdraft_payment." | ".$year_result." | ".$year_amortization." | ".$debtors." | ".$creditors." | ".$year_tiedup_investments." | ".$stock);
+			echo("INPUTS: ".$starting_cash." | ".$credit_payment." | ".$overdraft_payment." | ".$year_result." | ".$year_amortization." | ".$debtors." | ".$creditors." | ".$year_tiedup_investments." | ".$stock." | ".$year_investments['liquid_assets']);
 			//var_dump($credit_payment);
 			echo("<br/><br/> "); 
 			if($liquid_asset<0){
@@ -1318,15 +1565,30 @@
 			for ($round_number=1; $round_number<=$this->_round_number; $round_number++){
 				$amount=$decision_amount->getDecision($this->_game_id, $this->_company_id, $round_number);
 				$term=$decision_term->getDecision($this->_game_id, $this->_company_id, $round_number);
-				//$interest_aux=$decision_interest->getDecision($this->_game_id, $this->_company_id, $round_number);
-				//$interest=$interest_aux['interest'];
+				//VERO
+				$interest_aux=$decision_interest->getDecision($this->_game_id, $this->_company_id, $round_number);
+				$interest=$interest_aux['interest'];
 				if (($this->_round_number-$round_number+2)<$term['term']){
-					$debts=($term['term']-($this->_round_number-$round_number+2))*($amount['amount']/$term['term']);
-				}
+					//$debts=($term['term']-($this->_round_number-$round_number+2))*($amount['amount']/$term['term']);
+					$annual_quota= ($amount['amount']*($interest*0.01))/(1-pow((1+$interest*0.01),(-$term['term'])));
+					$principal_quota = 0;
+					$paid_quota=0;
+					$term_aux = $this->_round_number-$round_number;
+					$debts_lt=$amount['amount'];
+					//Ponemos term_aux+1 para tener en cuenta la siguiente ronda (deuda a corto plazo)
+					for ($round_number_aux = 0; $round_number_aux<=($term_aux+1); $round_number_aux++){
+						$costs= $interest*0.01*($amount['amount']-$paid_quota);
+						$principal_quota= $annual_quota-$costs;
+						$paid_quota+=$principal_quota;
+						$debts_lt-=$principal_quota;
+					}
+
+				}		
+				//VERO
 				else{
-					$debts=0;
+					$debts_lt=0;
 				}
-				$long_term_debts+=$debts;
+				$long_term_debts+=$debts_lt;
 			}
 			return $long_term_debts;
 		}
@@ -1339,15 +1601,31 @@
 			for ($round_number=1; $round_number<=$this->_round_number; $round_number++){
 				$amount=$decision_amount->getDecision($this->_game_id, $this->_company_id, $round_number);
 				$term=$decision_term->getDecision($this->_game_id, $this->_company_id, $round_number);
-				//$interest_aux=$decision_interest->getDecision($this->_game_id, $this->_company_id, $round_number);
-				//$interest=$interest_aux['interest'];
+				//VERO
+				$interest_aux=$decision_interest->getDecision($this->_game_id, $this->_company_id, $round_number);
+				$interest=$interest_aux['interest'];
 				if (($this->_round_number-$round_number+1)<$term['term']){
-					$debts=($amount['amount']/$term['term']);
+					//$debts=($amount['amount']/$term['term']);
+					$annual_quota= ($amount['amount']*($interest*0.01))/(1-pow((1+$interest*0.01),(-$term['term'])));
+					$principal_quota = 0;
+					$paid_quota=0;
+					$term_aux = $this->_round_number-$round_number;
+					for ($round_number_aux = 0; $round_number_aux<=($term_aux+1); $round_number_aux++){
+						$costs= $interest*0.01*($amount['amount']-$paid_quota);
+						$principal_quota= $annual_quota-$costs;
+						$paid_quota+=$principal_quota;
+						//La deuda a corto plazo es la que se va a pagar en la siguiente ronda
+						if ($round_number_aux==($term_aux+1)){
+							$debts_st=$principal_quota;
+						}
+					}
 				}
+					
+				//VERO
 				else{
-					$debts=0;
+					$debts_st=0;
 				}
-				$short_term_debts+=$debts;
+				$short_term_debts+=$debts_st;
 			}
 			$overdraft=$bank_overdraft->getOverdraft($this->_game_id, $this->_company_id, $this->_round_number);
 			$short_term_debts+=$overdraft;
@@ -1377,8 +1655,8 @@
 			return $units;	
 		}
 		
-		//Revisar el cálculo del inmovilizado, porque ahora mismo calcula el valor de fábrica y ampliaciones en la ronda actual, no el que se pagó por ella.
-		//Solucionado al hacer referencia a la nueva función getOriginalExtensionCost, que calcula el coste original (getExtensionCost saca el valor actualizado de la fábrica y ampliaciones para el 20% de costes fijos)
+		//Revisar el cÃ¡lculo del inmovilizado, porque ahora mismo calcula el valor de fÃ¡brica y ampliaciones en la ronda actual, no el que se pagÃ³ por ella.
+		//Solucionado al hacer referencia a la nueva funciÃ³n getOriginalExtensionCost, que calcula el coste original (getExtensionCost saca el valor actualizado de la fÃ¡brica y ampliaciones para el 20% de costes fijos)
 		function getTiedUp(){
 			$consCost=$this->getConstructionCost();
 			$extCost=$this->getOriginalExtensionCost();
@@ -1476,12 +1754,12 @@
 				}
 			}
 			echo("<br/> EXTENSION ORIGINAL COST: ");
-			var_dump($cost);
+			//var_dump($cost);
 			echo("<br/>");			
 			return $cost;			
 		}
 		
-		//Devuelve coste de cada ampliacion contemplando las variaciones de precio de la región
+		//Devuelve coste de cada ampliacion contemplando las variaciones de precio de la regiÃ³n
 		function getExtensionCost(){			
 			$capacity=new Model_DbTable_Decisions_Pr_Capacity();
 			foreach ($this->_factory as $factory){
@@ -1496,7 +1774,7 @@
 				}
 			}
 			echo("<br/> EXTENSION UPDATED IPC COST: ");
-			var_dump($cost);
+			//var_dump($cost);
 			echo("<br/>");			
 			return $cost;			
 		}

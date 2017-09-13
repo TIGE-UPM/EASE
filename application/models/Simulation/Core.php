@@ -1,5 +1,5 @@
 <?php
-/*Convendría optimizar minimizando el número de accesos a BD, cacheando en variables inicializadas en los init*/
+/*ConvendrÃ­a optimizar minimizando el nÃºmero de accesos a BD, cacheando en variables inicializadas en los init*/
 	class Model_Simulation_Core{
 		public $code;
 		
@@ -49,11 +49,18 @@
 			//Comprobar existencia de datos completos.
 			//inicializar
 			$this->initSimulation();
-			//producción
+			//producciÃ³n
+			//VERO
+			$this->setDistributionStock();
+			//VERO
 
 			$this->production();
+			
 			$this->demand();
 			$this->production_new_Products();
+			//VERO
+			$this->investment();
+			//VERO
 			$this->stock();
 			$this->costs();
 			$this->balanceSheet();
@@ -67,9 +74,9 @@
 			$this->_games = new Model_DbTable_Games();
 
 			$this->_trademedias[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-			$this->_trademedias[1]=array('trademedia_number'=>2, 'name'=>'Promoción');
+			$this->_trademedias[1]=array('trademedia_number'=>2, 'name'=>'PromociÃ³n');
 			
-			//inicialización objetos de la simulación:
+			//inicializaciÃ³n objetos de la simulaciÃ³n:
 			$this->initProducts();
 			$this->initCompanies();
 			$this->initRegions();
@@ -78,7 +85,7 @@
 			$this->initMedias();
 			$this->initRound();
 			
-			//inicialización resultados
+			//inicializaciÃ³n resultados
 			$this->initOutcomes();
 		}
 		function initProducts(){
@@ -119,7 +126,8 @@
 				$this->_qualities[]=new Model_Simulation_Quality($this, 
 																$this->_game['id'], 
 																$this->_round['round_number'], 
-																$quality['quality_param_number']);												
+																$quality['quality_param_number'],
+																$quality['product_number']);												
 			}
 			//var_dump($this->_qualities);die();
 		}
@@ -139,9 +147,9 @@
 															  $media['media_number']);
 			}
 		}
-		// ojo convendría establecer sistema de registro de forma que:
-		// si existe registro previo, se borra el registro y, hasta que no esté todo grabado, no se introduce uno nuevo.
-		// si no existe registro previo-> por si acaso se borra todo lo que coincida con el juego y la ronda (por si se interrumpió una grabación previa
+		// ojo convendrÃ­a establecer sistema de registro de forma que:
+		// si existe registro previo, se borra el registro y, hasta que no estÃ© todo grabado, no se introduce uno nuevo.
+		// si no existe registro previo-> por si acaso se borra todo lo que coincida con el juego y la ronda (por si se interrumpiÃ³ una grabaciÃ³n previa
 		function initOutcomes(){
 			//die($this->_game['id']." - ".$this->_round['round_number']);
 			$this->_outcomes_registry=new Model_DbTable_Outcomes();
@@ -151,7 +159,7 @@
 			//var_dump($this->_outcomes_registry);die();
 			$this->_outcomes_registry->clean();
 			//var_dump($this->_outcomes_registry);die();
-			// tablas de producción
+			// tablas de producciÃ³n
 			$this->_outcomes_production_units=new Model_DbTable_Outcomes_Pr_Units();
 			$this->_outcomes_production_capacity_data=new Model_DbTable_Outcomes_Pr_CapacityData();
 			$this->_outcomes_production_messages=new Model_DbTable_Outcomes_Pr_Messages();
@@ -228,7 +236,7 @@
 						foreach ($this->_trademedias as $trademedia){
 						$tradeMkt_intensity_actual=$this->_games->getTradeMediaWeight($this->_game['id'], $round_actual, $product->getProductNumber(), $trademedia['trademedia_number'], $channel->getChannelNumber());
 						//$evolution_tradeMkt_intensity_aux=$product->getTradeMktIntensityEvolution($region->getRegionNumber(), $trademedia['trademedia_number'], $next_round);
-						$evolution_tradeMkt_intensity_aux=$this->_games->getTradeMediaWeightEvolution($this->_game['id'], $round_actual+1, $product->getProductNumber(), $trademedia['trademedia_number'], $channel->getChannelNumber()); //�Channel en lugar de Region?
+						$evolution_tradeMkt_intensity_aux=$this->_games->getTradeMediaWeightEvolution($this->_game['id'], $round_actual+1, $product->getProductNumber(), $trademedia['trademedia_number'], $channel->getChannelNumber()); //¿Channel en lugar de Region?
 						//echo ("EVOLUTION TRDMKT. INTENS. AUX : ".$evolution_tradeMkt_intensity_aux."<br/>");
 						$evolution_tradeMkt_intensity=1+($evolution_tradeMkt_intensity_aux*0.01);
 						$tradeMkt_intensity_actual=$tradeMkt_intensity_actual*$evolution_tradeMkt_intensity;
@@ -340,6 +348,53 @@
 				$this->production_save_capacity_data($company);
 			}
 		}
+
+		//VERO
+		//Función que setea en la tabla evolution los cambios en el stock y setea en la tabla distribution_stock los costes de dicha distribución
+		function setDistributionStock(){
+			$stock_distribution_units=new Model_DbTable_Decisions_St_Distribution();
+			$distribution_param=new Model_DbTable_Games_Param_Pr_DistributionCosts();
+			$stocks_evolution=new Model_DbTable_Games_Evolution_St_Stocks();
+			$stock_final_units=new Model_DbTable_Decisions_St_StockFinal();
+			foreach ($this->_companies as $company){
+				foreach($this->_products as $product){
+					foreach($this->_channels as $channelO){
+						foreach($this->_regions as $regionO){
+							for($round=2; $round<intval($this->_round['round_number']); $round++){
+								$changes=false;
+								$stockEvolution=$stocks_evolution->getStockClasified(intval($this->_game['id']), intval($company->getId()), intval($round), intval($product->getProductNumber()), intval($regionO->getRegionNumber()), intval($channelO->getChannelNumber()));
+								$stock_units=$stock_final_units->getStockByMarket(intval($this->_game['id']), intval($this->_round['round_number']), intval($company->getId()),  intval($product->getProductNumber()), intval($regionO->getRegionNumber()), intval($channelO->getChannelNumber()));
+
+								if($stockEvolution!='0' && $stockEvolution!=$stock_units){
+									$changes=true;
+									$round_number = $round;
+								}
+							}
+							foreach($this->_channels as $channelD){
+								foreach($this->_regions as $regionD){
+									if($regionO<>$regionD){
+										$distributionUnitCost=$this->_games->getDistributionCost($this->_game['id'], $this->_round['round_number'], $regionO->getRegionNumber(), $regionD->getRegionNumber());
+										$stock_distribution_units->setCostDistribution($this->_game['id'], $this->_round['round_number'], $company->getId(), $product->getProductNumber(), $channelO->getChannelNumber(), $regionO->getRegionNumber(), $channelD->getChannelNumber(), $regionD->getRegionNumber(), $distributionUnitCost);
+									}else{
+										$stock_distribution_units->setCostDistribution($this->_game['id'], $this->_round['round_number'], $company->getId(), $product->getProductNumber(), $channelO->getChannelNumber(), $regionO->getRegionNumber(), $channelD->getChannelNumber(), $regionD->getRegionNumber(), 0.0);
+									}
+									if($changes){
+										$stock_units=$stock_final_units->getStockByMarket(intval($this->_game['id']), intval($this->_round['round_number']), intval($company->getId()),  intval($product->getProductNumber()), intval($regionD->getRegionNumber()), intval($channelD->getChannelNumber()));
+										$stocks_evolution->update(array('units'=>$stock_units), 'game_id = '.$this->_game['id'].
+											   						 ' AND company_id = '.$company->getId().
+											   						 ' AND round_number = '.$round_number.
+																     ' AND product_number = '.$product->getProductNumber().
+											   						 ' AND region_number = '.$regionD->getRegionNumber().
+										       						 ' AND channel_number = '.$channelD->getChannelNumber());
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		//VERO
 		function production_save_messages($company){
 			if ($this->_outcomes_updating){
 				$this->_outcomes_production_messages->update(array('messages'=>$company->getProductionMessages()), 
@@ -513,20 +568,30 @@
 						$any_availability=0;
 						foreach ($this->_companies as $company){
 							$availability=$this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
+							var_dump("Entro en availabilit==1");
+							var_dump($company->getId());
 							if($availability==1){
+								var_dump("Ya Entro en availabilit==1");
+								var_dump($company->getPrice($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber()));
+								var_dump($company->getUnitsAvailable($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber()));
 								if ($company->getPrice($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber())!=0 &&
 									$company->getUnitsAvailable($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber())!=0){
 										$prices[]=$company->getPrice($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber());
-										$qualities[]=$company->getProductQuality($product->getProductNumber());	
-										$any_availability++;								 								
+										//VERO
+										//$qualities[]=$company->getProductQuality($product->getProductNumber());	
+										$qualities[]=$company->getProductQualityFunctionality($product->getProductNumber());	
+										//VERO
+										$any_availability++;							 								
 								}
 							}
 						}
-						if($any_availability!=0){		
+
+						if($any_availability!=0){	
 							$this->_avg_price=array_sum($prices)/count($prices);
 							$this->_max_price=max($prices);
 							$this->_avg_quality=array_sum($qualities)/count($qualities);
 							$this->_max_quality=max($qualities);
+							echo("<br/> EQUIPO ".$company->getId()." QUALITY MAX (when any_availability!=0) ".$this->_max_quality);
 							$this->_first_approx_shares[$product->getProductNumber()]
 												[$region->getRegionNumber()]
 												[$channel->getChannelNumber()]=$this->demand_first_approx_shares($region, $product, $channel);
@@ -549,7 +614,7 @@
 			$this->demand_save_sales();
 		}
 		
-		//primera aproximación 
+		//primera aproximaciÃ³n 
 		function demand_first_approx_shares($region, $product, $channel){
 			$price_score=array();
 			$ideal_price=$product->getProductIdealPrice($region->getRegionNumber(), $channel->getChannelNumber(),$this->_round['round_number']);			
@@ -558,9 +623,8 @@
 			$k=10*$h;
 			$p=(-$h*$h)/(4*$k);
 			$max_price=$product->getProductMaxPrice($region->getRegionNumber(), $channel->getChannelNumber(),$this->_round['round_number']);
-			$productAvailabilityPrevRound = $this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']-1);
 			foreach ($this->_companies as $company){
-			//precios - valoración parabólica de precios: (x-h)(x-h)=4p(y-k);
+			//precios - valoraciÃ³n parabÃ³lica de precios: (x-h)(x-h)=4p(y-k);
 				$total_score[$company->getId()]=0;
 				$price=$company->getPrice($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber());
 				//metemos el efecto de las iniciativas de marketing, disminuyen el precio percibido
@@ -618,7 +682,7 @@
 				echo("<br/> EQUIPO ".$company->getId()." PRICE DECIDED ".$price_perceived[$company->getId()]);
 				echo("<br/> EQUIPO ".$company->getId()." PRICE SCORE ".$price_score[$company->getId()]);
 				
-				// Publicidad - comparaci�n con el ideal
+				// Publicidad - comparación con el ideal
 				foreach ($this->_medias as $media){
 					$advertising_score=1/($this->_games->getNumberOfMedia($this->_game['id']));
 					$advertPercentage=$company->getAdvertisingPercentage($product->getProductNumber(), $region->getRegionNumber(), $media->getMediaNumber());
@@ -637,7 +701,7 @@
 					echo("<br/> EQUIPO ".$company->getId()." MEDIA NUMBER ".$media->getMediaNumber()." ADVERTISING SCORE ".$advertising_score);	
 					$total_score[$company->getId()]+=$advertising_score*0.01*$product->getMediaWeight();
 				}
-			// Trade Mkt - comparaci�n con el ideal
+			// Trade Mkt - comparación con el ideal
 				foreach ($this->_trademedias as $trademedia){
 					$trademkt_score=0.5;
 					$tradePercentage=$company->getTradeMktPercentage($product->getProductNumber(), $channel->getChannelNumber(), $trademedia['trademedia_number']);
@@ -654,23 +718,23 @@
 					echo("<br/> EQUIPO ".$company->getId()." TRADE NUMBER ".$trademedia['trademedia_number']." TRADE MKT DECIDED ".$trade);
 					echo("<br/> EQUIPO ".$company->getId()." TRADE NUMBER ".$trademedia['trademedia_number']." TRADE MKT IDEAL ".$idealTrade);
 					echo("<br/> EQUIPO ".$company->getId()." TRADE NUMBER ".$trademedia['trademedia_number']." TRADE MKT SCORE ".$trademkt_score);
-					// La condición de más abajo es para que no asigne puntuación por TradeMKT a empresas que no lanzan el producto. De lo contrario, le asigna un valor
-					// y los cálculos de cuota no cuadran.
-					$productLaunched = $this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
-					if ($productLaunched == 0) {
-						$total_score[$company->getId()]+=0;
-					} else {
-						$total_score[$company->getId()]+=$trademkt_score*0.01*$product->getTradeMediaWeight();
-					}
+					
+					$total_score[$company->getId()]+=$trademkt_score*0.01*$product->getTradeMediaWeight();
 				}			
 			// Calidad: recta calidad y=mx+n calidades superiores a la media.
-			// Calidad: par�bola y=a(x^2) calidades inferiores a la media.
+			// Calidad: parábola y=a(x^2) calidades inferiores a la media.
 				$m=0;
 				$n=0;
-				$quality=$company->getProductQuality($product->getProductNumber());
+				//VERO
+				//$quality=$company->getProductQuality($product->getProductNumber());
+				$quality=$company->getProductQualityFunctionality($product->getProductNumber());
+				//VERO
+				var_dump("Maxima y media");
+				var_dump($this->_max_quality);
+				var_dump($this->_avg_quality);
 				if ($quality == $this->_max_quality){
 					$n=1;
-					$qualityScore=$m*$quality+$n;
+					$qualityScore=$m*($quality+$functionalities)+$n;
 				}
 				else{
 					if ($quality >= $this->_avg_quality) {
@@ -685,13 +749,14 @@
 						}
 					}
 				}
+				
 				$total_score[$company->getId()]+=$qualityScore*0.01*$product->getQualityWeight();
 				echo("<br/> EQUIPO ".$company->getId()." QUALITY DECIDED ".$quality);
 				echo("<br/> EQUIPO ".$company->getId()." QUALITY SCORE ".$qualityScore);
+
 				if (($company->getUnitsAvailable($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber()==0))){
 					$total_score[$company->getId()]=0;
 				}
-				
 				echo("<br/> EQUIPO ".$company->getId()." TOTAL SCORE ".$total_score[$company->getId()]);
 			}
 			
@@ -700,8 +765,8 @@
 			//echo ("<br/> ARRAY ".($total_score[$company->getId()]/array_sum($total_score)));
 			//$prod_availability=$this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']);
 			//$prevrnd_prod_availability=$this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']-1);
-			//echo("�Lo tiene alguien?: ");var_dump($prod_availability);echo("<br>");
-			//echo("�Lo ten�a alguien?: ");var_dump($prevrnd_prod_availability);echo("<br>");
+			//echo("¿Lo tiene alguien?: ");var_dump($prod_availability);echo("<br>");
+			//echo("¿Lo tenía alguien?: ");var_dump($prevrnd_prod_availability);echo("<br>");
 
 			foreach($this->_companies as $company){
 				if (array_sum($total_score)>0){
@@ -715,22 +780,19 @@
 				if ($this->_round['round_number'] ==1){
 					$share_total[$company->getId()]=$share[$company->getId()];
 				} else {
-					//OJO: LA SIGUIENTE L�NEA ES V�LIDA S�LO CON M�S DE 4 PRODUCTOS
+					//OJO: LA SIGUIENTE LÍNEA ES VÁLIDA SÓLO CON MÁS DE 4 PRODUCTOS
+					
 					//
+					// ¡HAY QUE SACAR BIEN LA CONDICIÓN!
 					//
-					// �HAY QUE SACAR BIEN LA CONDICI�N!
-					//
-					// UPDATED 26.11.2016: Cambiadas las condiciones de nuevo. Las de R=4,P>=4 no tenía sentido.
-					// Tal y como estaba, no asignaba las cuotas de nuevos productos bien.
-					//if (($this->_round['round_number']==4)&&($product->getProductNumber()>=4)) { //((($this->_games->getProductsAvailibilityBySomeone($this->_game['id'], (REMOVED 26.11.2016)
-					if (($this->_round['round_number']>=4)&&($product->getProductNumber()>=3)&&(($productAvailabilityPrevRound['product_number_'.$product->getProductNumber()])==0)) {
-						echo("<br/>Nadie lo tenía antes.<br/>");
+					
+					//if (($this->_round['round_number']==4)&&($product->getProductNumber()>=4)) { //((($this->_games->getProductsAvailibilityBySomeone($this->_game['id'],
+					if (($this->_round['round_number']==4)&&($product->getProductNumber()==3)) {
 						//$this->_round['round_number']))==1)&&(($this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']-1))==0)) {
 						$share_total[$company->getId()]=$share[$company->getId()];
-					// UPDATED 26.11.2016: ¿Por qué diferenciábamos ronda 4 y ronda 5, encima ligándolo al producto?	
-					//} elseif (($this->_round['round_number']==5)&&($product->getProductNumber()==4)) { (BUCLE REMOVED 26.11.2016)
-						////$this->_round['round_number']))==1)&&(($this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']-1))==0)) {
-						//$share_total[$company->getId()]=$share[$company->getId()];		
+					} elseif (($this->_round['round_number']==5)&&($product->getProductNumber()==4)) {
+						//$this->_round['round_number']))==1)&&(($this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']-1))==0)) {
+						$share_total[$company->getId()]=$share[$company->getId()];		
 					} else {
 						$ms=new Model_DbTable_Outcomes_Rd_MarketShares();
 						$past_share=$ms->getPastShare($this->_game['id'], $company->getId(), $this->_round['round_number'],
@@ -833,7 +895,7 @@
 								}
 							}
 						}
-						// corrección de cuotas de ingresos
+						// correcciÃ³n de cuotas de ingresos
 						$company_percentage[$company->getId()]+=$zero_sum_correction;
 						$new_incomes=array_sum($incomes)*$company_percentage[$company->getId()];
 					
@@ -909,22 +971,19 @@
 					$sales[$company->getId()]=$demanded_units;
 					$units_available-=$sales[$company->getId()];
 					$sobrante[$company->getId()]=0;
-					//$sobrante[$company->getId()]=$demanded_units-$units_available;
-					echo("<br/> EQUIPO ".$company->getId()." EXCEDENTE INICIAL ".$sobrante[$company->getId()]." UNITS AVAILABLE ".$units_available);
 				}
 				else{
 					$sales[$company->getId()]=$units_available;
-					//$sobrante[$company->getId()]=0;
-					//$sobrante[$company->getId()]=$demanded_units-$units_available;//Tamaño Pseudomercado
+					//$sobrante[$company->getId()]=$demanded_units-$units_available;//TamaÃ±o Pseudomercado
 					$sobrante[$company->getId()]=$demanded_units-$units_available;//min(($demanded_units-$units_available),floor($demanded_units * (1-$coef_fidelidad)));
 					echo("<br/> EQUIPO ".$company->getId()." EXCEDENTE INICIAL ".$sobrante[$company->getId()]);
 					$units_available=0;
 					}	
-				$units_disponibles[$company->getId()]=$units_available;
+					$units_disponibles[$company->getId()]=$units_available;
 				}
 				echo("<br/> ");
 				echo("<br/>  VENTAS INICIALES (TOTALES) ".$total_demanded_units);
-				echo("<br/> TAMAñO MERCADO DEL CANAL ".$channel_size);
+				echo("<br/> TAMAÃ±O MERCADO DEL CANAL ".$channel_size);
 				$sobranteTotal=array_sum($sobrante);
 				echo("<br/> ");
 				echo("<br/> EXCEDENTE TOTAL ".$sobranteTotal);
@@ -1078,8 +1137,8 @@
 												 		[$region->getRegionNumber()]
 												 		[$channel->getChannelNumber()]
 														[$company->getId()];
-									if(is_null($units)){	// Comprobación introducida porque $this->_sales es NULL cuando no hay nadie que produzca un producto.
-															// TODO: Probablemente, haya que modificar no aquí sino en la función que crea $this->_sales[]
+									if(is_null($units)){	// ComprobaciÃ³n introducida porque $this->_sales es NULL cuando no hay nadie que produzca un producto.
+															// TODO: Probablemente, haya que modificar no aquÃ­ sino en la funciÃ³n que crea $this->_sales[]
 										$units=0;
 									}
 									$price=$company->getPrice($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber());
@@ -1105,7 +1164,7 @@
 					}
 				}
 			}
-		}		
+		}	
 		
 		//calcular stock
 		function stock(){		
@@ -1116,7 +1175,7 @@
 				foreach ($this->_products as $product){																															// Para cada producto
 					$availability=$this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
 					if($availability==1){
-						foreach ($this->_regions as $region){																													//  Para cada regi�n
+						foreach ($this->_regions as $region){																													//  Para cada región
 							foreach ($this->_channels as $channel){																												//   Para cada canal
 								if ($this->_round['round_number']==1){																												//Si ronda 1
 									$stock=($produced['company_'.$company->getId()]['product_'.$product->getProductNumber()]														//Stock = Producido - Vendido
@@ -1138,15 +1197,15 @@
 									$stock_value+=$company->getStockValue($product->getProductNumber(), $region->getRegionNumber(), $channel->getChannelNumber());
 								} else {																																			//Si rondas sucesivas
 									$stocks=new Model_DbTable_Games_Evolution_St_Stocks();
-									$sales=$sold['company_'.$company->getId()]['product_'.$product->getProductNumber()]																//N�mero de ventas de producto (por canal por regi�n)
+									$sales=$sold['company_'.$company->getId()]['product_'.$product->getProductNumber()]																//Número de ventas de producto (por canal por región)
 												['region_'.$region->getRegionNumber()]['channel_'.$channel->getChannelNumber()];													// (este turno)
-									$new=$produced['company_'.$company->getId()]['product_'.$product->getProductNumber()]															//N�mero de producidas este turno
+									$new=$produced['company_'.$company->getId()]['product_'.$product->getProductNumber()]															//Número de producidas este turno
 												  ['region_'.$region->getRegionNumber()]['channel_'.$channel->getChannelNumber()];													
 									for($round_number=1; $round_number<$this->_round['round_number']; $round_number++){																//Para cada ronda
 										$pr_cost=$company->getProductCostStock($round_number, $product->getProductNumber());														//Saca coste de stock en ronda
 										//var_dump($pr_cost);
 										//echo("<br/> COUNTER: ".$round_number);
-										$units_stocked=$stocks->getStockClasified($this->_game['id'], $company->getId(), $round_number, $product->getProductNumber(), 				//�Cu�nto se stock� esa ronda?
+										$units_stocked=$stocks->getStockClasified($this->_game['id'], $company->getId(), $round_number, $product->getProductNumber(), 				//¿Cuánto se stockó esa ronda?
 																					$region->getRegionNumber(), $channel->getChannelNumber());
 										echo("Unidades vendidas = ".$sales." y unidades en stock ronda ".$round_number." = ".$units_stocked."<br/>");
 										if ($sales > $units_stocked){																												//Si las 
@@ -1173,7 +1232,7 @@
 									//var_dump($pr_cost);
 									//echo("<br/> COUNTER: ".$round_number+1);
 									$pr_cost=$company->getProductCostStock($this->_round['round_number'], $product->getProductNumber());
-									echo("Unidades producidas �ltimo turno = ".$new." y unidades vendidas tras actualizar stock = ".$sales."<br/>");
+									echo("Unidades producidas último turno = ".$new." y unidades vendidas tras actualizar stock = ".$sales."<br/>");
 									$new=$new-$sales;
 									/*if($new<0){
 										$new=0;
@@ -1285,7 +1344,7 @@
 				//todo lo incluido en este foreach funciona debidamente
 				foreach ($this->_channels as $channel){
 					foreach ($this->_regions as $region){
-						foreach ($this->_products as $product){
+						foreach ($this->_products as $product){ 
 							$availability=$this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
 							if($availability==1){
 								if (! isset($this->_costs[$company->getId()]['pr_var_costs'])){
@@ -1304,9 +1363,17 @@
 								if (! isset($this->_costs[$company->getId()]['pr_distrib_costs'])){
 									$this->_costs[$company->getId()]['pr_distrib_costs']=0;
 								}
-								$this->_costs[$company->getId()]['pr_distrib_costs']+=$company->getPrDistribCost($channel->getChannelNumber(),
+								
+								$this->_costs[$company->getId()]['pr_distrib_costs']+=(($company->getPrDistribCost($channel->getChannelNumber(),
 																												$region->getRegionNumber(),
-																												$product->getProductNumber());
+																												$product->getProductNumber())));
+								//VERO
+								foreach($this->_channels as $channelD){
+									foreach ($this->_regions as $regionD){
+										$this->_costs[$company->getId()]['pr_distrib_costs']+=$company->getStDistribCost($channel->getChannelNumber(), $channelD->getChannelNumber(), $region->getRegionNumber(), $regionD->getRegionNumber(), $product->getProductNumber());
+									}
+								}
+								//VERO
 								if (! isset($this->_costs[$company->getId()]['mk_sales_costs'][$channel->getChannelNumber()])){
 									$this->_costs[$company->getId()]['mk_sales_costs'][$channel->getChannelNumber()]=0;
 								}							
@@ -1468,6 +1535,24 @@
 				}				
 			}
 		}
+		//VERO
+		function investment(){
+			$investment= new Model_DbTable_Outcomes_In_Investment();
+			foreach ($this->_companies as $company){
+				$result=$company->getInvestmentInterest();
+				var_dump("Core - función investment");
+				var_dump($result);
+				if($this->_round_number==1){
+					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_losses', 0);
+				$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_earnings', 0);
+				}else{
+					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_losses', $result['fi_investment_losses']);
+					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_earnings', $result['fi_investment_earnings']);
+				}
+				
+			}
+		}
+		//VERO
 		
 		//Generamos balance clasificado por conceptos
 		function balanceSheet(){
@@ -1475,6 +1560,13 @@
 				$stock_value=0;
 				$this->_balance[$company->getId()]['tied_up']=$company->getTiedUp();
 				$this->_balance[$company->getId()]['amortization']=$company->getTotalAmortization();
+				$investmentBalance=$company->getInvestmentBalanceSheet();
+				if($this->_round_number==1){
+					$this->_balance[$company->getId()]['investment_assets']=0;
+				}else{
+					$this->_balance[$company->getId()]['investment_assets']=$investmentBalance['investment_assets'];
+				}
+				
 				/*foreach ($this->_products as $product){
 					$availability=$this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
 					if($availability==1){
@@ -1511,7 +1603,7 @@
 				$passive_validation=($this->_balance[$company->getId()]['capital']+$this->_balance[$company->getId()]['reserves']
 						+$this->_balance[$company->getId()]['year_result']+$this->_balance[$company->getId()]['long_term_debts']
 						+$this->_balance[$company->getId()]['short_term_debts']+$this->_balance[$company->getId()]['creditors']);
-				echo("VALIDACI�N:<br/>&nbsp;ACTIVO = ".$active_validation." Y PASIVO = ".$passive_validation."<br/>");		
+				echo("VALIDACIÓN:<br/>&nbsp;ACTIVO = ".$active_validation." Y PASIVO = ".$passive_validation."<br/>");		
 				if ($active_validation!=$passive_validation){
 					$dif=$passive_validation-$active_validation;
 					if($dif>0){
@@ -1527,11 +1619,11 @@
 		
 		// Guardamos balance
 		function save_balanceSheet(){
-			//echo("�Guardando!");
+			//echo("¡Guardando!");
 			if ($this->_outcomes_updating){
 				foreach ($this->_companies as $company){
 					foreach ($this->_balance[$company->getId()] as $name=>$value){
-						if($name!="stock"){	//Ya lo hemos actualizado en la secci�n de stocks
+						if($name!="stock"){	//Ya lo hemos actualizado en la sección de stocks
 							$this->_outcomes_balance_sheet->update(array('value'=>$value), 
 																	'game_id = '.$this->_game['id'].
 																	' AND company_id = '.$company->getId().
@@ -1544,7 +1636,7 @@
 			else {
 				foreach ($this->_companies as $company){
 					foreach ($this->_balance[$company->getId()] as $name=>$value){
-						if($name!="stock"){	//Ya lo hemos actualizado en la secci�n de stocks
+						if($name!="stock"){	//Ya lo hemos actualizado en la sección de stocks
 							$this->_outcomes_balance_sheet->insert(array('game_id'=>$this->_game['id'],
 																	 'company_id'=>$company->getId(),	  
 																	 'round_number'=>$this->_round['round_number'],																
@@ -1583,6 +1675,7 @@
 				$interests=$interests_long+$interests_short;
 				$active=($this->_balance[$company->getId()]['tied_up']-$this->_balance[$company->getId()]['amortization']
 					   +$this->_balance[$company->getId()]['stock']+$this->_balance[$company->getId()]['trade_debtors']
+					   +$this->_balance[$company->getId()]['activeInvestment']
 					   +$this->_balance[$company->getId()]['liquid_assets']);
 				$reserves=$this->_balance[$company->getId()]['reserves'];
 				foreach ($this->_channels as $channel){
@@ -1663,16 +1756,16 @@
 																[$product->getProductNumber()]
 												 		   		[$region->getRegionNumber()]
 												 		   		[$channel->getChannelNumber()];
-								if(is_null($share_model)){       	// Comprobación introducida porque $this->_sales es NULL cuando no hay nadie que produzca un producto.
-																	// TODO: Probablemente, haya que modificar no aquí sino en la función que crea $this->_sales[]
+								if(is_null($share_model)){       	// ComprobaciÃ³n introducida porque $this->_sales es NULL cuando no hay nadie que produzca un producto.
+																	// TODO: Probablemente, haya que modificar no aquÃ­ sino en la funciÃ³n que crea $this->_sales[]
 									$share_model=0;
 								}
 								$share_real=$this->_share_real[$company->getId()]
 											    			  [$product->getProductNumber()]
 												 		   	  [$region->getRegionNumber()]
 												 		   	  [$channel->getChannelNumber()];
-								if(is_null($share_real)){			// Comprobación introducida porque $this->_sales es NULL cuando no hay nadie que produzca un producto.
-																	// TODO: Probablemente, haya que modificar no aquí sino en la función que crea $this->_sales[]
+								if(is_null($share_real)){			// ComprobaciÃ³n introducida porque $this->_sales es NULL cuando no hay nadie que produzca un producto.
+																	// TODO: Probablemente, haya que modificar no aquÃ­ sino en la funciÃ³n que crea $this->_sales[]
 									$share_real=0;
 								}
 								$this->_outcomes_round_shares->delete('game_id = '.$this->_game['id'].' AND company_id = '.$company->getId().' AND round_number ='.$this->_round['round_number'].
@@ -1822,7 +1915,7 @@
 			$fileName = "/var/www/simu2/public/tmp/" . md5("img_".$game_id_chart."_".$round_number_chart."_".$product_number_chart."_".$region_number_chart) .".png";
 			$graph->img->Stream($fileName);
 		} catch (Exception $e) {
-			echo 'Excepci�n capturada: ',  $e->getMessage(), "\n";
+			echo 'Excepción capturada: ',  $e->getMessage(), "\n";
 		}
 	}
 	
