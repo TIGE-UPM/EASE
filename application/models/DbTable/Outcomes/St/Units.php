@@ -23,5 +23,39 @@
 									 ' AND product_number = '.$product_number.' AND region_number = '.$region_number.' AND channel_number = '.$channel_number);
 			return $result;
 		}
+
+		//VERO
+		function getStockByCompany($game_id, $round_number, $company_id){
+			
+					$results=$this->fetchAll('game_id = '.$game_id.' AND round_number = '.$round_number.' AND company_id = '.$company_id, array("product_number", "region_number", "channel_number"));
+
+
+					foreach ($results as $result){
+						$array['product_'.$result['product_number']]
+						['channel_'.$result['channel_number']]
+						['region_'.$result['region_number']]=$result['units'];
+
+					}
+			return $array;
+			
+
+		}
+
+		function getStockByProduct($game_id, $round_number, $company_id, $product_number){
+			
+					$results=$this->fetchAll('game_id = '.$game_id.' AND round_number = '.$round_number.' AND company_id = '.$company_id.' AND product_number= '.$product_number, array("product_number", "region_number", "channel_number"));
+
+
+					foreach ($results as $result){
+						$array['product_'.$result['product_number']]
+						['channel_'.$result['channel_number']]
+						['region_'.$result['region_number']]=$result['units'];
+
+					}
+			return $array;
+			
+
+		}
+		//VERO
 	}
 ?>

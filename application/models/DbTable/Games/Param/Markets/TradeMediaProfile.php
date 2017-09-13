@@ -15,6 +15,7 @@
 			$this->delete('game_id = '.$game_id);
 			$productCounter=1;
 			$tradeMediaWeight=$data['marketTradeMediaWeight']['round_1'];
+			
 			while (isset($tradeMediaWeight['product_'.$productCounter])){
 				$tradeMediaCounter=1;
 				while (isset($tradeMediaWeight['product_'.$productCounter]['trade_media_'.$tradeMediaCounter])){

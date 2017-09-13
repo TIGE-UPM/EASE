@@ -16,6 +16,10 @@
 			$results=$this->fetchRow('region_id = '.$region_id);
 			return $results['wages_costs'];			
 		}
+			function getDismissalsCostsEvolutionInRegion($region_id){
+			$results=$this->fetchRow('region_id = '.$region_id);
+			return $results['dismissals_costs'];			
+		}
 
 		function add($parameters){		
 			$this->insert($parameters);
@@ -30,7 +34,7 @@
 				while(isset($costsEvolution['region_'.$regionCounter])){
 					$regionCost=$costsEvolution['region_'.$regionCounter];
 					$this->add(array('game_id'=>$game_id, 'round_number'=>$roundCounter, 'region_number'=>$regionCounter, 'hiring_cost_evolution'=>$regionCost['hiring_evolution'], 
-									 'training_cost_evolution'=>$regionCost['training_evolution'],'wages_cost_evolution'=>$regionCost['wages_evolution']));
+									 'training_cost_evolution'=>$regionCost['training_evolution'],'wages_cost_evolution'=>$regionCost['wages_evolution'], 'dismissals_cost_evolution'=>$regionCost['dismissals_evolution']));
 					$regionCounter++;
 				}
 				$roundCounter++;

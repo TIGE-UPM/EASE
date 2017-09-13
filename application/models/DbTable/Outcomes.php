@@ -73,6 +73,12 @@
 			$outcomes_stocks_units=new Model_DbTable_Outcomes_St_Units();
 			return $outcomes_stocks_units->getOutcomes($game_id, $round_number);
 		}
+		//VERO
+		function getStocksByProducts($game_id, $round_number, $company_id, $product_number){
+			$outcomes_stocks_units=new Model_DbTable_Outcomes_St_Units();
+			return $outcomes_stocks_units->getStockByProduct($game_id, $round_number, $company_id, $product_number);
+		}
+		//VERO
 		function getProductionMessages($game_id, $round_number){
 			$outcomes_production_messages=new Model_DbTable_Outcomes_Pr_Messages();
 			return $outcomes_production_messages->getMessages($game_id, $round_number);
@@ -104,6 +110,14 @@
 		function getCosts($game_id, $round_number){
 			$outcomes_costs=new Model_DbTable_Outcomes_Co_Costs();
 			return $outcomes_costs->getCosts($game_id, $round_number);
+		}
+		function getInterestInvestment($game_id, $round_number){
+			$outcomes_investment=new Model_DbTable_Outcomes_In_Investment();
+			return $outcomes_investment->getInvestment($game_id, $round_number);
+		}
+		function getInvestmentByCompany($game_id, $company_id, $round_number){
+			$outcomes_investment=new Model_DbTable_Outcomes_In_Investment();
+			return $outcomes_investment->getInvestmentByCompany($game_id, $company_id, $round_number);
 		}
 		function getStock($game_id, $round_number){
 			$outcomes_stocks_units=new Model_DbTable_Outcomes_St_Units();
@@ -159,7 +173,7 @@
 			$channels=$games->getChannels($_GET['game_id']);
 			$medias=$games->getMedia($_GET['game_id']);
 			$trademedias[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-			$trademedias[1]=array('trademedia_number'=>2, 'name'=>'PromociÃ³n');
+			$trademedias[1]=array('trademedia_number'=>2, 'name'=>'Promoción');
 			$costs=0;
 			$costs+=$outcomes_costs[$company_id]['pr_fixed_cost'];
 			$costs+=$outcomes_costs[$company_id]['pr_var_costs'];
@@ -178,6 +192,10 @@
 			$costs+=$outcomes_costs[$company_id]['hr_hiring_costs'];
 			$costs+=$outcomes_costs[$company_id]['hr_training_costs'];
 			$costs+=$outcomes_costs[$company_id]['hr_wages_costs'];
+			//echo ("<br> ************* COSTE DE SALARIOS EN OUTCOMES ".$outcomes_costs[$company_id]['hr_wages_costs']. "<br>");
+			$costs+=$outcomes_costs[$company_id]['hr_dismissals_costs'];
+			//echo ("<br> ************* COSTE DE DESPIDOS EN OUTCOMES ".$outcomes_costs[$company_id]['hr_dismissals_costs']. "<br>");
+			$costs+=$outcomes_costs[$company_id]['fi_debt_costs_st'];
 			$costs+=$outcomes_costs[$company_id]['fi_debt_costs_st'];
 			$costs+=$outcomes_costs[$company_id]['fi_debt_costs_lt'];
 			$costs+=$outcomes_costs[$company_id]['initiatives_pr_costs'];
