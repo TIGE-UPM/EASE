@@ -105,7 +105,7 @@
 			return array('factories'=>$pr_regions->getActiveRoundLastDecisionSaved(),
 						 'capacity'=>$pr_capacities->getActiveRoundLastDecisionSaved(), 
 						 'qualities'=>$pr_quality->getActiveRoundLastDecisionSaved(),
-						 'functionalities'=>$pr_functionality->getActiveRoundLastDecisionSaved(),
+						 'functionalities'=>$pr_quality->getActiveRoundLastDecisionSaved(),
 						 'units'=>$pr_units->getActiveRoundLastDecisionSaved());
 		}
 		
@@ -147,20 +147,6 @@
 			//var_dump($array); die();
 			return $array;
 		}
-
-		//VERO
-		function getFunctionalitiesArray($game_id, $company_id){
-			$pr_functionality= new Model_DbTable_Decisions_Pr_ProductsFunctionality();
-			$results=$pr_functionality->fetchAll('game_id = '.$game_id.
-							' AND company_id = '.$company_id, array('product_number ASC', 'functionality_param_number ASC'));
-			foreach ($results as $result){
-				$array['product_'.$result['product_number']]
-					  ['functionality_param_'.$result['functionality_param_number']]=$result['functionality_param_value'];
-			}
-			//var_dump($array); die();
-			return $array;
-		}
-		//VERO
 		
 		//En principio no vamos a usar esta función
 		function getQuality($game_id, $company_id, $product_number){

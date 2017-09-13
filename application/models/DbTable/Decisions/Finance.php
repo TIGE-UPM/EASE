@@ -21,6 +21,9 @@
 			$fi_patrimony= new Model_DbTable_Decisions_Fi_Patrimony();
 			$fi_term= new Model_DbTable_Decisions_Fi_Term();
 			$fi_amount= new Model_DbTable_Decisions_Fi_Amount();
+			//VERO
+			$fi_investment= new Model_DbTable_Decisions_Fi_Investment();
+			//VERO
 			// si no existe ya una decisión para esta ronda se crea
 			if ($this->fetchRow('game_id = '.$game_id.
 								' AND company_id = '.$company_id.
@@ -28,6 +31,9 @@
 				$fi_patrimony->add($decisionData, $game_id, $company_id, $round_number);
 				$fi_term->add($decisionData, $game_id, $company_id, $round_number);
 				$fi_amount->add($decisionData, $game_id, $company_id, $round_number);
+				//VERO
+				$fi_investment->add($decisionData, $game_id, $company_id, $round_number);
+				//VERO
 				$this->insert(array('game_id'=>$game_id, 
 									'company_id' => $company_id, 
 									'round_number' => $round_number, 
@@ -37,11 +43,15 @@
 				$fi_patrimony->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$fi_term->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$fi_amount->updateDecision($decisionData, $game_id, $company_id, $round_number);
+				//VERO
+				$fi_investment->updateDecision($decisionData, $game_id, $company_id, $round_number);
+				//VERO
 				$this->update(array('date'=>$date), 
 							  'game_id = '.$game_id.
 							  ' AND company_id = '.$company_id.
 							  ' AND round_number = '.$round_number);
 			}
+			
 		}
 		
 		function existsPrevious($game_id=null, $company_id=null, $round_number=null){
@@ -81,9 +91,13 @@
 			$fi_term= new Model_DbTable_Decisions_Fi_Term();
 			$fi_amount= new Model_DbTable_Decisions_Fi_Amount();
 			$fi_patrimony= new Model_DbTable_Decisions_Fi_Patrimony();
+			//VERO
+			$fi_investment= new Model_DbTable_Decisions_Fi_Investment();
+			//VERO
 			return array('amount'=>$fi_amount->getActiveRoundLastDecisionSaved(),
 			             'term'=>$fi_term->getActiveRoundLastDecisionSaved(),
-						 'patrimony'=>$fi_patrimony->getActiveRoundLastDecisionSaved());
+						 'patrimony'=>$fi_patrimony->getActiveRoundLastDecisionSaved(),
+						 'investment'=>$fi_investment->getActiveRoundLastDecisionSaved());
 		}
 		
 		function getDecision($game_id, $company_id, $round_number){
@@ -96,9 +110,13 @@
 			$fi_term= new Model_DbTable_Decisions_Fi_Term();
 			$fi_amount= new Model_DbTable_Decisions_Fi_Amount();
 			$fi_patrimony= new Model_DbTable_Decisions_Fi_Patrimony();
+			//VERO
+			$fi_investment= new Model_DbTable_Decisions_Fi_Investment();
+			//VERO
 			return array('amount'=>$fi_amount->getDecision($game_id, $company_id, $round_number),
 			             'term'=>$fi_term->getDecision($game_id, $company_id, $round_number),
-						 'patrimony'=>$fi_patrimony->getDecision($game_id, $company_id, $round_number));
+						 'patrimony'=>$fi_patrimony->getDecision($game_id, $company_id, $round_number),
+						 'investment'=>$fi_investment->getDecision($game_id, $company_id, $round_number));
 		}
 		
 		function getDividends($game_id, $company_id, $round_number){
@@ -111,6 +129,12 @@
 			$fi_term= new Model_DbTable_Decisions_Fi_Term();
 			$decision=$fi_term->getDecision($game_id, $company_id, $round_number);
 			return $decision['term'];
+		}
+
+		function getInvestmentsCost($game_id, $company_id, $round_number){
+			$fi_investment = new Model_DbTable_Decisions_Fi_Investment();
+			$decision = $fi_investment->getInvestmentsCost($game_id, $company_id, $round_number);
+			return $decision;
 		}
 		
 		function getAmount($game_id, $company_id, $round_number){
