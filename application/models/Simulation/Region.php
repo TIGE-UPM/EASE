@@ -16,13 +16,17 @@
 			$prod_costs=new Model_DbTable_Games_Param_Pr_ProductionCosts();
 			$prod_costs->setRoundProductionCosts($this->_game_id, $round_number, $cost_type, $this->_region_number, $product_number, $cost);
 		}
-		function setHumanResourcesCosts($round_number, $hiring_cost, $training_cost, $wages_cost){
+		function setHumanResourcesCosts($round_number, $hiring_cost, $training_cost, $wages_cost, $dismissals_cost){
 			$hr_costs=new Model_DbTable_Games_Param_Hr_Costs();
-			$hr_costs->setRoundHumanResourcesCosts($this->_game_id, $round_number, $this->_region_number, $hiring_cost, $training_cost, $wages_cost);
+			$hr_costs->setRoundHumanResourcesCosts($this->_game_id, $round_number, $this->_region_number, $hiring_cost, $training_cost, $wages_cost, $dismissals_cost);
 		}
 		function setChannelsCosts($round_number, $channel_number, $fixed_cost, $fare_cost){
 			$channels_costs=new Model_DbTable_Games_Param_Mk_ChannelsCosts();
 			$channels_costs->setRoundChannelsCosts($this->_game_id, $round_number, $channel_number, $this->_region_number, $fixed_cost, $fare_cost);
+		}
+		function setTaxesRate($round_number, $taxrate){
+			$tax_rate = new Model_DbTable_Games_Param_Markets_TaxRates();
+			$tax_rate->setRoundMarketTaxRates($this->_game_id, $round_number, $this->_region_number, $taxrate);
 		}
 	}
 ?>
