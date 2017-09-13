@@ -23,8 +23,10 @@
 			$mk_advertising_percentage= new Model_DbTable_Decisions_Mk_AdvertisingPercentage();
 			$mk_trademkt_budget= new Model_DbTable_Decisions_Mk_TradeMktBudget();
 			$mk_trademkt_budget_distribution= new Model_DbTable_Decisions_Mk_TradeMktBudgetDistribution();
+			$mk_trademkt_budget_region= new Model_DbTable_Decisions_Mk_TradeMktBudgetRegion();
 			$mk_trademkt_percentage= new Model_DbTable_Decisions_Mk_TradeMktPercentage();
-			// si no existe ya una decisiÃ³n para esta ronda se crea
+			$mk_advertising_campaign = new Model_DbTable_Decisions_Mk_AdvertisingCampaign();
+			// si no existe ya una decisión para esta ronda se crea
 			if ($this->fetchRow('game_id = '.$game_id.
 								' AND company_id = '.$company_id.
 								' AND round_number = '.$round_number)==null){
@@ -34,20 +36,24 @@
 				$mk_advertising_percentage->add($decisionData, $game_id, $company_id, $round_number);
 				$mk_trademkt_budget->add($decisionData, $game_id, $company_id, $round_number);
 				$mk_trademkt_budget_distribution->add($decisionData, $game_id, $company_id, $round_number);
+				$mk_trademkt_budget_region->add($decisionData, $game_id, $company_id, $round_number);
 				$mk_trademkt_percentage->add($decisionData, $game_id, $company_id, $round_number);
+				$mk_advertising_campaign->add($decisionData, $game_id, $company_id, $round_number);
 				$this->insert(array('game_id'=>$game_id, 
 									'company_id' => $company_id, 
 									'round_number' => $round_number, 
 									'date'=>$date));
 			}
-			else{ //si ya se tomÃ³ con anterioridad se sobreescrib
+			else{ //si ya se tomó con anterioridad se sobreescrib
 				$mk_prices->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$mk_advertising_budget->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$mk_advertising_budget_distribution->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$mk_advertising_percentage->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$mk_trademkt_budget->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$mk_trademkt_budget_distribution->updateDecision($decisionData, $game_id, $company_id, $round_number);
+				$mk_trademkt_budget_region->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$mk_trademkt_percentage->updateDecision($decisionData, $game_id, $company_id, $round_number);
+				$mk_advertising_campaign->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$this->update(array('date'=>$date), 
 							  'game_id = '.$game_id.
 							  ' AND company_id = '.$company_id.
@@ -95,14 +101,18 @@
 			$mk_advertising_percentage= new Model_DbTable_Decisions_Mk_AdvertisingPercentage();
 			$mk_trademkt_budget= new Model_DbTable_Decisions_Mk_TradeMktBudget();
 			$mk_trademkt_budget_distribution= new Model_DbTable_Decisions_Mk_TradeMktBudgetDistribution();
+			$mk_trademkt_budget_region= new Model_DbTable_Decisions_Mk_TradeMktBudgetRegion();
 			$mk_trademkt_percentage= new Model_DbTable_Decisions_Mk_TradeMktPercentage();
+			$mk_advertising_campaign = new Model_DbTable_Decisions_Mk_AdvertisingCampaign();
 			return array('prices'=>$mk_prices->getActiveRoundLastDecisionSaved(),
 						 'advertising_budget'=>$mk_advertising_budget->getActiveRoundLastDecisionSaved(),
 						 'advertising_budget_distribution'=>$mk_advertising_budget_distribution->getActiveRoundLastDecisionSaved(), 
 						 'advertising_percentage'=>$mk_advertising_percentage->getActiveRoundLastDecisionSaved(),
 						 'trademkt_budget'=>$mk_trademkt_budget->getActiveRoundLastDecisionSaved(),
 						 'trademkt_budget_distribution'=>$mk_trademkt_budget_distribution->getActiveRoundLastDecisionSaved(),
-						 'trademkt_percentage'=>$mk_trademkt_percentage->getActiveRoundLastDecisionSaved());
+						 'trademkt_budget_region'=>$mk_trademkt_budget_region->getActiveRoundLastDecisionSaved(),
+						 'trademkt_percentage'=>$mk_trademkt_percentage->getActiveRoundLastDecisionSaved(),
+						 'campaign'=>$mk_advertising_campaign->getActiveRoundLastDecisionSaved());
 
 		}
 		function getDecision($game_id, $company_id, $round_number){
@@ -117,14 +127,18 @@
 			$mk_advertising_percentage= new Model_DbTable_Decisions_Mk_AdvertisingPercentage();
 			$mk_trademkt_budget= new Model_DbTable_Decisions_Mk_TradeMktBudget();
 			$mk_trademkt_budget_distribution= new Model_DbTable_Decisions_Mk_TradeMktBudgetDistribution();
+			$mk_trademkt_budget_region= new Model_DbTable_Decisions_Mk_TradeMktBudgetRegion();
 			$mk_trademkt_percentage= new Model_DbTable_Decisions_Mk_TradeMktPercentage();
+			$mk_advertising_campaign = new Model_DbTable_Decisions_Mk_AdvertisingCampaign();
 			return array('prices'=>$mk_prices->getDecision($game_id, $company_id, $round_number), 
 						 'advertising_budget'=>$mk_advertising_budget->getDecision($game_id, $company_id, $round_number),
 						 'advertising_budget_distribution'=>$mk_advertising_budget_distribution->getDecision($game_id, $company_id, $round_number),
 						 'advertising_percentage'=>$mk_advertising_percentage->getDecision($game_id, $company_id, $round_number),
 						 'trademkt_budget'=>$mk_trademkt_budget->getDecision($game_id, $company_id, $round_number),
 					   	 'trademkt_budget_distribution'=>$mk_trademkt_budget_distribution->getDecision($game_id, $company_id, $round_number),
-						 'trademkt_percentage'=>$mk_trademkt_percentage->getDecision($game_id, $company_id, $round_number));
+					   	 'trademkt_budget_region'=>$mk_trademkt_budget_region->getDecisionArray($game_id, $company_id, $round_number),
+						 'trademkt_percentage'=>$mk_trademkt_percentage->getDecision($game_id, $company_id, $round_number),
+						  'campaign'=>$mk_advertising_campaign->getDecision($game_id, $company_id, $round_number));
 		}
 		
 		function getPrices($game_id, $company_id, $round_number){
@@ -156,9 +170,17 @@
 			$mk_tradesmkt_budget_distribution=new Model_DbTable_Decisions_Mk_TradeMktBudgetDistribution();
 			return $mk_tradesmkt_budget_distribution->getDecision($game_id, $company_id, $round_number);
 		}
+		function getTradeMktBudgetRegion($game_id, $company_id, $round_number){
+			$mk_tradesmkt_budget_region=new Model_DbTable_Decisions_Mk_TradeMktBudgetRegion();
+			return $mk_tradesmkt_budget_region->getDecisionArray($game_id, $company_id, $round_number);
+		}
 		function getTradesMktPercentage($game_id, $company_id, $round_number){
 			$mk_tradesmkt_percentage=new Model_DbTable_Decisions_Mk_TradeMktPercentage();
 			return $mk_tradesmkt_percentage->getDecision($game_id, $company_id, $round_number);
+		}
+		function getAdvertisingCampaign($game_id, $company_id, $round_number){
+			$mk_advertising_campaign= new Model_DbTable_Decisions_Mk_AdvertisingCampaign();
+			return $mk_advertising_campaign->getDecision($game_id, $company_id, $round_number);
 		}
 	}
 ?>

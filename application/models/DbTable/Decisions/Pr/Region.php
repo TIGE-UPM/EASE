@@ -108,6 +108,7 @@
 					//self::update(array('region_number'=>$region_number), 'game_id = '.$game_id.' AND company_id = '.$company_id.' AND factory_number = '.$factory_number.' AND round_number_created = '.$round_number);
 				}
 			}
+			
 		}
 		
 		function getActiveRoundLastDecisionSaved(){
