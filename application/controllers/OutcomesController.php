@@ -41,6 +41,7 @@
 				$this->view->outcomes_sales_incomes=$outcomes->getIncomes($this->game['id'], $round_number);
 				$this->view->outcomes_stocks_units=$outcomes->getStocksUnits($this->game['id'], $round_number);
 				$this->view->outcomes_costs=$outcomes->getCosts($this->game['id'], $round_number);
+				$this->view->outcomes_investments=$outcomes->getInterestInvestment($this->game['id'], $round_number);
 				$this->view->outcomes_balance_sheet=$outcomes->getBalanceSheet($this->game['id'], $round_number);
 				$this->view->prev_outcomes_balance_sheet=0;
 				if($round_number>1){
@@ -94,7 +95,7 @@
 				$idiProducts=$games->getIdiProducts($this->game['id']);
 				$this->view->idiProducts=$idiProducts;
 				
-				$this->view->outcomes_market_sizes=$games->getMarketsSizesCurrentRound($this->game['id'],$round_number);
+				$this->view->outcomes_market_sizes=$games->getMarketsSizes($this->game['id']);
 				//var_dump($this->view->outcomes_market_sizes);
 
 				//$array[$this->company['id']]=$games->getYearAmortization($this->game['id'], $round_number, $this->company['id']);
@@ -213,6 +214,7 @@
 				$this->view->products=$products;
 				//regiones
 				$regions=$games->getRegions($this->game['id']);
+				var_dump("1");
 				$this->view->regions=$regions;
 
 				$this->view->outcomes=$outcomes;
@@ -222,6 +224,7 @@
 				$this->view->outcomes_sales_incomes=$outcomes->getIncomes($this->game['id'], $round_number);
 				$this->view->outcomes_stocks_units=$outcomes->getStocksUnits($this->game['id'], $round_number);
 				$this->view->outcomes_costs=$outcomes->getCosts($this->game['id'], $round_number);
+				$this->view->outcomes_investments=$outcomes->getInterestInvestment($this->game['id'], $round_number);
 				$this->view->outcomes_balance_sheet=$outcomes->getBalanceSheet($this->game['id'], $round_number);
 				$this->view->prev_outcomes_balance_sheet=0;
 				if($round_number>1){
@@ -275,7 +278,7 @@
 				$idiProducts=$games->getIdiProducts($this->game['id']);
 				$this->view->idiProducts=$idiProducts;
 				
-				$this->view->outcomes_market_sizes=$games->getMarketsSizesCurrentRound($this->game['id'], $round_number);
+				$this->view->outcomes_market_sizes=$games->getMarketsSizes($this->game['id']);
 				//var_dump($this->view->outcomes_market_sizes);die();
 
 				//$array[$this->company['id']]=$games->getYearAmortization($this->game['id'], $round_number, $this->company['id']);
@@ -846,13 +849,21 @@
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses Financiación a L.P.'));
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_costs[$company['id']]['fi_debt_costs_lt']);
 			$offset++;
+			$outcomes_investments=$outcomes->getInterestInvestment($this->game['id'], $round_number);
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses ganados por inversiones financieras'));
+			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_investments[$company['id']]['fi_investment_earnings']);
+			$offset++;
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses perdidos por inversiones financieras'));
+			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_investments[$company['id']]['fi_investment_losses']);
+			$offset++;
+
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Total Financieros'));
-			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_costs[$company['id']]['fi_debt_costs_lt']+$outcomes_costs[$company['id']]['fi_debt_costs_st']);
+			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_costs[$company['id']]['fi_debt_costs_lt']+$outcomes_costs[$company['id']]['fi_debt_costs_st']+$outcomes_investments[$company['id']]['fi_investment_losses']-$outcomes_investments[$company['id']]['fi_investment_earnings']);
 			$offset++;
 			
 			//CTAS.RESULTADOS --> EBT
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('EBT'));
-			$ebt=$ebitda-$outcomes_costs[$company['id']]['fi_debt_costs_st']-$outcomes_costs[$company['id']]['fi_debt_costs_lt']-$amortization;
+			$ebt=$ebitda-$outcomes_costs[$company['id']]['fi_debt_costs_st']-$outcomes_costs[$company['id']]['fi_debt_costs_lt']+$outcomes_investments[$company['id']]['fi_investment_losses']-$outcomes_investments[$company['id']]['fi_investment_earnings']-$amortization;
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $ebt); //EBT
 			$offset++;
 			
@@ -883,9 +894,9 @@
 			$worksheet->getStyle('B1')->applyFromArray($bold);
 			
 			$offset=3;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('A) Activo no corriente (I+II)'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('A) Activo no corriente (I+II+III)'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
-			$asset_no_current_sum=$outcomes_balance_sheet[$company['id']]['tied_up']-$outcomes_balance_sheet[$company['id']]['amortization'];
+			$asset_no_current_sum=$outcomes_balance_sheet[$company['id']]['tied_up']-$outcomes_balance_sheet[$company['id']]['amortization']+$outcomes_balance_sheet[$company['id']]['investment_assets'];
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $asset_no_current_sum); 
 			$worksheet->getStyleByColumnAndRow(1, $offset)->applyFromArray($bold);
 			$offset++;
@@ -894,6 +905,9 @@
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('II. Amortización de inmovilizado'));
 			$worksheet->setCellValueByColumnAndRow(1, $offset, -$outcomes_balance_sheet[$company['id']]['amortization']);
+			$offset++;
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('III. Instrumentos de inversión'));
+			$worksheet->setCellValueByColumnAndRow(1, $offset, -$outcomes_balance_sheet[$company['id']]['investment_assets']);
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('B) Activo corriente (I+II+III)'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
