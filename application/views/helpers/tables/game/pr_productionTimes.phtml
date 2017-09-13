@@ -1,0 +1,21 @@
+<table>
+	<theader>
+		<th class="small">Calidad</th>
+		<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<th class="small">Producto <?php echo $product_number?></th>
+		<?php } //for product?>
+	</theader>
+	<?php for ($i=0; $i<10; $i++){?>				
+	<tr>
+		<td><?php echo $i+1?></td>
+		<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+			<?php $production_time=$view->games->getProductionTime($view->game_id, $product_number, $i);?>
+			<td>	
+				<input type="text" name="prProductionTimes[product_<?php echo $product_number?>][quality_<?php echo $i?>]" value="<?php echo $production_time?>" class="small">
+			</td>
+		<?php } //for product?>
+	</tr>
+	<?php }//for i ?>				
+</table>

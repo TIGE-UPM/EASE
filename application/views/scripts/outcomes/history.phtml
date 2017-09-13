@@ -1,0 +1,20 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+<div id='content'>
+<?php if (isset($this->outcomes)){?>
+	<h1>Histórico de resultados</h1>
+		<ul>
+	<?php foreach($this->outcomes as $outcome){ 
+			if($outcome['round_number']!=$this->last_round){?>
+			<li>
+				<h2>
+					<a href="<?php echo $this->baseUrl().'/outcomes/view?round_number='.$outcome['round_number']?>">Consultar resultados del turno <?php echo $outcome['round_number']?></a>
+				</h2>							
+			</li>
+	<?php 	}
+		}?>
+		</ul>
+<?php }
+else{?>
+		<h1> No hay ningún resultado.</h1> 
+<?php } ?>
+</div>

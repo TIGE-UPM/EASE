@@ -1,0 +1,49 @@
+<table>
+	<theader>
+		<th class="small">Organización</th>
+		<th class="small"></th>
+	</theader>
+	<tr>
+		<td>Número de Turnos</td>
+		<td><input type="text" name="prOrganization[shifts]" 
+			value="<?php echo $view->games->getOrganizationParam($view->game_id, 'work_shifts');?>" class="small"></td>
+	</tr>
+	<tr>
+		<td>Jornada Laboral (h/semana)</td>
+		<td><input type="text" name="prOrganization[working_hours]" 
+			value="<?php echo $view->games->getOrganizationParam($view->game_id, 'work_hours_per_week');?>" class="small"></td>
+	</tr>
+	<theader>
+		<th class="small">Infraestructura</th>
+		<th class="small"></th>
+	</theader>
+	<tr>
+		<td>Número de Máquinas</td>
+		<td><input type="text" name="prOrganization[machines]"
+			 value="<?php echo $view->games->getOrganizationParam($view->game_id, 'machines');?>" class="small"></td>
+	</tr>
+	<theader>
+		<th class="small">Personal</th>
+		<th class="small"></th>
+	</theader>
+	<tr>
+		<td>Operarios de Fabricación</td>
+		<td><input type="text" name="prOrganization[production_workers]" 
+			value="<?php echo $view->games->getOrganizationParam($view->game_id, 'production_workers');?>" class="small"></td>
+	</tr>
+	<tr>
+		<td>Operarios de Ensamblado</td>
+		<td><input type="text" name="prOrganization[packaging_workers]" 
+			value="<?php echo $view->games->getOrganizationParam($view->game_id, 'packaging_workers');?>" class="small"></td>
+	</tr>
+	<tr>
+		<td>Operarios de Supervisores de Calidad</td>
+		<td><input type="text" name="prOrganization[quality_workers]" 
+			value="<?php echo $view->games->getOrganizationParam($view->game_id, 'quality_workers');?>" class="small"></td>
+	</tr>
+	<tr>
+		<td>Técnicos de Mantenimiento</td>
+		<td><input type="text" name="prOrganization[maintenance_workers]" 
+			value="<?php echo $view->games->getOrganizationParam($view->game_id, 'maintenance_workers');?>" class="small"></td>
+	</tr>
+</table>

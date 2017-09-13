@@ -1,0 +1,63 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.js', $type = 'text/javascript')?>
+<div id='content'>
+<img src="/images/people_1.gif" alt="people" width="90" height="85" style="float:right" />
+		<form name="humanResources" method="post">
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="humanResourcesCuartilFieldButton">
+					Política Salarial			
+				</div>
+				<div id="humanResourcesCuartilField" class="fieldDiv">
+					<div id="cuartilFieldDescription" class="fieldDescription" align="center">
+						Determine la política de retribución salarial que desea aplicar en su compa&ntildeía.
+					</div>
+					<br />
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Intervalo de retribución salarial:&nbsp;			
+					<select name="humanResources[cuartil]" id="humanResourcesCuartil" display="block" style="margin-left:50px;">	
+						<?php foreach ($this->wages as $wages){?> 
+								<option value="<?php echo $wages['value']?>" <?php echo (isset($this->cuartilDecision) && $this->cuartilDecision==$wages['value'])? "selected":""?>>
+								<?php echo $wages['descriptor']?>
+								</option>
+							<?php } ?>
+					</select>
+				</div>
+			</div>
+			<br />
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="humanResourcesFormationFieldButton">
+					Cualificación de la plantilla		
+				</div>
+				<div id="humanResourcesFormationField" class="fieldDiv">
+					<div id="formationFieldDescription" class="fieldDescription" align="center">
+						Determine el perfil de cualificación deseado para los trabajadores de su compa&ntildeía.
+					</div>
+					<br />
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nivel de cualificación:&nbsp;
+						<select <?php if ($this->round_number>1){?>disabled="disabled"<?php }?> name="humanResources[formation]" id="humanResourcesFormation" display="block" style="margin-left:50px;">
+						<?php foreach ($this->level as $level){?>
+								<option value="<?php echo $level['value']?>" <?php echo (isset($this->formationDecision) && $this->formationDecision==$level['value'])? "selected":""?>>
+								<?php echo $level['descriptor']?>
+								</option>
+							<?php } ?>
+					</select>
+				</div>
+			</div>
+			<br />
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Guardar">
+			</div>
+		</form>
+		<script>
+			$( "#humanResourcesCuartilFieldButton" ).click(function() {
+				$( "#humanResourcesCuartilField" ).toggle( "easeInElastic" );
+			});
+			$( "#humanResourcesFormationFieldButton" ).click(function() {
+				$( "#humanResourcesFormationField" ).toggle( "easeInElastic" );
+			});
+		</script>
+</div>

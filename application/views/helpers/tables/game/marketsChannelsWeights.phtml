@@ -1,0 +1,35 @@
+<?php $n_rounds=$view->games->getNumberOfRounds($view->game_id); ?>
+<?php for ($round_number=1;$round_number<=$n_rounds;$round_number++){ ?>
+<div style="float: left; margin-right: 15px;">	
+	Ronda <?php echo $round_number?>
+	<table>
+		<theader>
+			<th class="small"></th>
+			<th class="small">Canal</th>
+			<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+			<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+				<th class="small">Región <?php echo $region_number?></th>
+			<?php } //for region?>
+		</theader>
+		<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+			<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+			<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+		<tr>
+			<td><?php if ($channel_number==round($n_channels/2)){echo "Producto ".$product_number;}?></td>
+			<td>Canal <?php echo $channel_number?></td>
+			<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+			<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+				<?php $weight=$view->games->getChannelWeight($view->game_id, $round_number, $product_number, $channel_number, $region_number);?>
+			<td>
+				<input type="text" name="channelWeight[round_<?php echo $round_number;?>][product_<?php echo $product_number;?>][channel_<?php echo $channel_number;?>][region_<?php echo $region_number;?>]"
+					   value="<?php echo $weight?>" class="small">
+			</td>
+			<?php } //for region?>
+		</tr>
+			<?php } //for channel?>
+		<?php } //for product?>
+	</table>
+</div>
+<?php } ?>
+<div style="clear:both"></div>

@@ -1,0 +1,20 @@
+<table>
+	<theader>
+		<th class="small">Origen</th>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<th class="small">Región <?php echo $region_number?></th>
+		<?php } //for region?>
+	</theader>
+	<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($source_region_number=1;$source_region_number<=$n_regions;$source_region_number++){ ?>
+		<tr>
+			<td>Región <?php echo $source_region_number?></td>
+			<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+			<?php for ($destination_region_number=1;$destination_region_number<=$n_regions;$destination_region_number++){ ?>
+				<?php $cost=$view->games->getDistributionCost($view->game_id, 1, $source_region_number, $destination_region_number);?>
+				<td><input type="text" name="prDistributionCosts[round_1][region_<?php echo $source_region_number?>][region_<?php echo $destination_region_number?>]" class="small" value="<?php echo $cost?>"></td>
+			<?php } //for destination?>
+		</tr>
+	<?php }//for source ?>				
+</table>

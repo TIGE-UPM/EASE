@@ -1,0 +1,145 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/loading.css');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/loading.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-1.9.1.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui-1.10.3.custom.min.js', $type = 'text/javascript')?>
+
+
+<div id='content'>
+	<?php if (isset($this->game)) { //si se ha definido un juego concreto?>
+		<h1><?php echo $this->game['name']?> <a href="<?php echo $this->baseUrl()?>/game/">(volver a resumen)</a></h1>
+		<?php if (isset($this->rounds) && count($this->rounds)) {?>
+			<script>
+				//creación te las pestañas de rondas
+				$(function() {
+				$( "#datos_rondas" ).tabs({ active: <?php echo($round['round_number']-1);?> });
+				});
+			</script>
+			<div id="datos_rondas">
+				<div id="menu_rondas">
+					<ul>
+						<?php foreach ($this->rounds as $round){
+							echo ('<li><a href="#round_'.($round['round_number']).'_Field" style="text-align: center;">');
+								echo('Ronda '.($round['round_number']).'</br><span style="font-size: 10px;">');
+									echo('('.date('d/m/Y', strtotime($round['opening_date'])).' - '.date('d/m/Y', strtotime($round['closing_date'])).')</span></a></li>');
+						}
+						?>
+					</ul>
+				</div>
+
+			<?php foreach ($this->rounds as $round){?>
+			
+
+				<div id="round_<?php echo $round['round_number']?>_Field" class="fieldDiv">
+			
+					Duración: del <?php echo date('d/m/Y', strtotime($round['opening_date']))?> al <?php echo date('d/m/Y', strtotime($round['closing_date']))?>.
+						<div class="fieldSubHeader"><!-- Equipos -->
+							Empresas.			
+						</div>		
+						<div id="companiesField" class="fieldDiv">
+							<?php if (isset($this->companies) && count($this->companies)){?>
+								<table class="tablas_rondas" width="100%">
+									<theader>
+										<th>Empresa</th>
+										<th>Operaciones</th>
+										<th>Proveedores</th>
+										<th>Marketing</th>
+										<th>RecursosHumanos</th>
+										<th>Finanzas</th>
+										<th>Iniciativas</th>
+										<th>Estudios de Mercado</th>
+										<th>I+D+i</th>
+										<th>Validaci&oacute;n</th>
+										<th>Liquidez disponible</th>
+										<th>Decisiones</th>
+									</theader>
+								<?php foreach ($this->companies as $company){?>
+								<?php $validate=$this->validate_user->getDecision($this->game['id'], $company['id'], $round['round_number']);?>
+									<tr>
+										<td><?php echo $this->escape($company->name)?></td>
+										<td><?php echo ($this->production->getDecision($this->game['id'], $company['id'], $round['round_number'])!=null)? "OK":"Pendiente";?></td>
+										<td><?php echo ($this->suppliers->getDecision($this->game['id'], $company['id'], $round['round_number'])!=null)? "OK":"Pendiente";?></td>
+										<td><?php echo ($this->marketing->getDecision($this->game['id'], $company['id'], $round['round_number'])!=null)? "OK":"Pendiente";?></td>
+										<td><?php echo ($this->humanResources->getDecision($this->game['id'], $company['id'], $round['round_number'])!=null)? "OK":"Pendiente";?></td>
+										<td><?php if($round['round_number']==1){ echo "OK"; } else { echo ($this->finance->getDecision($this->game['id'], $company['id'], $round['round_number'])!=null)? "OK":"Pendiente";}?></td>
+										<td><?php if($round['round_number']==1){ echo "OK"; } else { echo ($this->initiatives->getDecision($this->game['id'], $company['id'], $round['round_number'])!=null)? "OK":"Pendiente"; }?></td>
+										<td><?php echo ($this->marketresearch->getDecision($this->game['id'], $company['id'], $round['round_number'])!=null)? "OK":"Pendiente";?></td>
+										<td><?php if($round['round_number']==1){ echo "OK"; } else { echo ($this->IDi->getDecision($this->game['id'], $company['id'], $round['round_number'])!=null)? "OK":"Pendiente";}?></td>
+										<td><?php echo ($validate['validated']==1)? "OK":"Decisiones no validadas";?></td>
+										<td><?php echo ($this->validate_game->getDecisionValidated($this->game['id'],$round['round_number'],$company['id'])==1)? "OK":"Liquidez insuficiente";?></td>
+										<td>
+											<a href='<?php echo $this->url(array('controller'=>'game', 'action'=>'edit_decision')). 																		
+																				"?game_id=".$this->game['id'].
+																				"&amp;company_id=".$company['id'].
+																				"&amp;round=".$round['round_number']?>'>Editar Decisiones</a>						
+										</td>
+									</tr>
+								<?php }//for?>
+								</table>
+									
+								<script>
+									//pone los colores en la tabla anterior para facilitar su visualización
+									$('.tablas_rondas td:contains("OK")').css('color','green');
+									$('.tablas_rondas td:contains("Pendiente")').css('color','orange');
+									$('.tablas_rondas td:contains("Decisiones no validadas")').css('color','red');
+									$('.tablas_rondas td:contains("Liquidez insuficiente")').css('color','red');
+								</script>
+					<div id="light" class="white_content">
+						<div id="imgLOAD" style="text-align:center;">
+							<br /><br /><br /><br /><br />
+							<b>Cargando...</b><br /><br /><br />
+							<img src="/images/loading.gif" style="float:center"/>
+						</div>
+					</div>
+					<div id="fade" class="black_overlay"></div>
+								<div class="fieldOptions" style="text-align:right">		
+									<a href='<?php echo $this->url(array('controller'=>'game',
+																		 'action'=>'process')).
+																		 "?game_id=".$this->game['id']."&round_number=".$round['round_number']?>' onclick="return confirm('¿Está seguro de querer procesar la ronda?');">Procesar Ronda</a> | 
+									<a href='<?php echo $this->url(array('controller'=>'game',
+																		 'action'=>'outcomes')).																									
+																		 "?game_id=".$this->game['id']."&round_number=".$round['round_number']?>'>Ver resultados</a>
+								</div>
+							<?php } // if  
+							else {?>
+								<p>No hay empresas en el juego.</p>
+						<?php }?>
+					</div>
+				</div>
+				<?php } // for round?>	
+			</div>
+		<?php }
+		else {?>
+			<p>No hay rondas definidas en el juego.</p>
+	<?php }?>
+<?php }
+	else{ //mostramos todos los juegos?>
+		<h1>Seleccionar juego.</h1>
+		
+		<?php if (isset($this->games) && count($this->games)){?>
+		<form method="get" action="">
+			<div class="fieldHeader">
+				Juego.
+			</div>
+			<p>Seleccione juego a visualizar.</p>
+			<div id="gamesField" class="fieldDiv">
+				<select name='game_id' onchange="this.form.submit()">
+				<?php foreach($this->games as $game){?>
+					<option value="<?php echo $this->escape($game->id)?>"><?php echo $this->escape($game->name)?></option>
+				<?php }?>
+				</select>
+				<!-- <div class="buttonsDiv">
+					 <input class=button type="submit" value="Ver">
+				 </div>
+				-->
+			</div>
+		</form>
+		<?php } // if  
+		else {?>
+			<p>No hay juegos en la plataforma.</p>
+		<?php }?>
+	<?php } ?>
+</div>

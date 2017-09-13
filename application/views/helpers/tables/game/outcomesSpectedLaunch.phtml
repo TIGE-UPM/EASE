@@ -1,0 +1,59 @@
+<?php
+	$n_rounds=$view->games->getNumberOfRounds($view->game['id']);
+	$products=$view->games->getProducts($view->game['id']);
+?>
+
+<?php if ( ($n_rounds>1) && (($view->round_number)+1)<=$n_rounds ) {?>
+	<?php //for ($round_number=($view->round_number)+1;$round_number<=$n_rounds;$round_number++){ ?>
+		<table>
+			<theader>
+				<th class="normal"></th>
+					<?php foreach ($products as $product){ 
+						$game_availability=$view->games->getProductParamAvailability($view->game['id'], $product['product_number']); 
+						if ($game_availability!=0){?>
+							<th class="normal"><?php echo $product['name']?></th>
+						<?php } 
+					}//for region?>
+			</theader>
+			<tr>
+				<td></td>
+					<?php foreach ($products as $product){
+						$game_availability=$view->games->getProductParamAvailability($view->game['id'], $product['product_number']); 
+						if ($game_availability!=0){?>
+							<td class="inCellFieldHeader">Lanzamiento esperado para el siguiente a&ntilde;o</td>
+						<?php } 
+					}//for product?>
+			</tr>
+			<?php foreach ($view->companies as $company){ ?>
+				<tr>
+					<td><?php echo $company['name']?></td>
+						<?php foreach ($products as $product){ 
+							$game_availability=$view->games->getProductParamAvailability($view->game['id'], $product['product_number']); 
+							if ($game_availability!=0){?>			
+								<?php $productInDevelopment=$view->games->getRoundLaunches($view->game['id'], $company['id'], ($view->round_number), $product['product_number']);  //$round_number, $product['product_number']);
+									$result=$productInDevelopment['product_'.$product['product_number']]['Equipo_'.$company['id']]; ?>
+								<td>
+									<?php switch($result){
+										case 1:
+											echo("<input style='text-align: center;color:green;' disabled='disabled' type='text' name='NewReleasesRound' value='Lanzamiento Exitoso' size='40'>");
+											break;
+										case 0:
+											echo("<input style='text-align: center;color:darkred;' disabled='disabled' type='text' name='NewReleasesRound' value='No ha conseguido lanzar el producto' size='40'>");
+											break;
+										case -1:
+											echo("<input style='text-align: center;color:darkblue;' disabled='disabled' type='text' name='NewReleasesRound' value='No ha solicitado lanzar el producto' size='40'>");
+											break;
+										}	
+									?>		
+									<!-- Outdated <input style="text-align: center" disabled="disabled" type="text" name="NewReleasesRound" value="<?php echo $result?>" size="40"> -->
+								</td>
+							<?php } 
+					}//for product?>
+				</tr>
+			<?php } //for company?>
+		</table>
+	<?php //}?>
+<?php }
+else {?> 
+	<h2 style="color:grey">No hay m&aacute;s rondas disponibles para este juego de simulaci&oacute;n</h2>
+<?php }?> 

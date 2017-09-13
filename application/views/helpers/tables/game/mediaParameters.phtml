@@ -1,0 +1,16 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Nombre del medio</th>
+		<th class="small">% Importancia Publicidad</th>
+	</theader>
+	<?php $n_media=$view->games->getNumberOfMedia($view->game_id); ?>
+	<?php for ($media_number=1;$media_number<=$n_media;$media_number++){ ?>
+	<?php $media=$view->game_media[$media_number-1]; ?>
+	<tr>
+		<td>Medio publicitario <?php echo $media_number?></td>
+		<td><input type="text" name="media_<?php echo $media_number?>[name]" class="medium" value="<?php echo $media['name']?>"></td>
+		<td><input type="text" name="media_<?php echo $media_number?>[media_weight]" class="small" value="<?php echo $media['media_weight'];?>"></td>
+	</tr>
+	<?php } //for product?>
+</table>

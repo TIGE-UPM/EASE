@@ -1,0 +1,439 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-1.10.2.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.1.10.3.min.js', $type = 'text/javascript')?>
+
+<!--http://simeydotme.github.io/jQuery-ui-Slider-Pips/-->
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/pips-slider/jquery-ui-slider-pips.min.js', $type = 'text/javascript')?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/pips-slider/jquery-ui-slider-pips.css');?>
+
+
+<div id='content'>
+<img src="/images/research.gif" alt="research" width="70" height="85" style="float:right" />
+		<form name="marketresearch" method="post">
+			<div class="fieldDiv">		
+			</div>
+			<div id="marketresearchFieldDescription" class="fieldDescription" align="center">
+				Determine aquellos estudios de mercado que desea contratar para su compa&ntildeía.<br/>La información estar&aacute; disponible para el siguiente periodo de simulación.
+			</div>
+			<br />
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="channelResearchFieldButton">
+					Crecimiento de canales			
+				</div>
+				<div id="channelResearchField" class="fieldDiv">
+					<div id="channelResearchFieldDescription" class="fieldDescription" align="center">
+						Este estudio le ofrece un pronóstico del crecimiento esperado de los distintos canales de distribución.
+					</div>
+					<div style="width: 600px; margin-left: auto; margin-right: auto;">
+						<div style="width: 600px;">
+							Contratar:
+							<br/><br/>
+						</div>
+						<div id="marketResearchChannelslider" style="width: 50px; float: left;" class="slide"></div>	
+						<div id="marketResearchChannelField" style="width: 350px; float: left;" class="fieldDiv">
+							<select name="marketresearch[channelResearch]" id="marketResearchChannel" display="block" style="margin-left:50px;">	
+								<?php foreach ($this->researchvalue as $researchvalue){?> 
+									<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['channelResearch']['active']==$researchvalue['value'])? "selected":""?>>
+									<?php echo $researchvalue['descriptor']?>
+									</option>
+								<?php } ?>
+							</select>
+							Coste <?php echo number_format($this->researchcosts[0]['cost'], 2, '.', ',').' €'?>
+						</div>
+					</div>
+					<div style="clear:both;"></div>
+				</div>
+			</div>
+			<style>
+				.slide {
+					background: red;
+				}
+			</style>
+			
+			
+			<br/>
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="pricesResearchFieldButton">
+					Comparativa de precios			
+				</div>
+				<div id="pricesResearchField" class="fieldDiv">
+					<div id="pricesResearchFieldDescription" class="fieldDescription" align="center">
+						Este estudio le presenta una comparativa de precios entre los productos de las diferentes compa&ntildeías del mercado.
+					</div>
+					<div style="width: 600px; margin-left: auto; margin-right: auto;">
+						<div style="width: 600px;">
+							Contratar:
+							<br/><br/>
+						</div>
+						<div id="marketResearchPricesslider" style="width: 50px; float: left;" class="slide"></div>	
+						<div id="marketResearchPricesField" style="width: 350px; float: left;" class="fieldDiv">
+							<select name="marketresearch[pricesResearch]" id="marketResearchPrices" display="block" style="margin-left:50px;">	
+								<?php foreach ($this->researchvalue as $researchvalue){?> 
+									<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['pricesResearch']['active']==$researchvalue['value'])? "selected":""?>>
+									<?php echo $researchvalue['descriptor']?>
+									</option>
+								<?php } ?>
+							</select>
+							Coste <?php echo number_format($this->researchcosts[1]['cost'], 2, '.', ',').' €'?>
+						</div>
+					</div>
+					<div style="clear:both;"></div>
+				</div>
+			</div>
+			<br/>
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="mktResearchFieldButton">
+					Comparativa de MKT
+				</div>
+				<div id="mktResearchFieldContainer">
+					<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">Estudio no disponible para esta ronda</h3><?php }?>
+					<div id="mktResearchField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>
+						<div id="mktResearchFieldDescription" class="fieldDescription" align="center">
+							Este estudio le ofrece una relación de las acciones de marketing de su compa&ntildeía en comparación con la competencia.
+						</div>
+						<div style="width: 600px; margin-left: auto; margin-right: auto;">
+							<div style="width: 600px;">
+								Contratar:
+								<br/><br/>
+							</div>
+							<div id="marketResearchMktslider" style="width: 50px; float: left;" class="slide"></div>	
+							<div id="marketResearchMktField" style="width: 350px; float: left;" class="fieldDiv">
+								<select name="marketresearch[mktResearch]" id="marketResearchMkt" display="block" style="margin-left:50px;">	
+									<?php foreach ($this->researchvalue as $researchvalue){?> 
+										<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['mktResearch']['active']==$researchvalue['value'])? "selected":""?>>
+										<?php echo $researchvalue['descriptor']?>
+										</option>
+									<?php } ?>
+								</select>
+								Coste <?php echo number_format($this->researchcosts[2]['cost'], 2, '.', ',').' €'?>
+							</div>
+						</div>
+						<div style="clear:both;"></div>
+					</div>
+				</div>
+			</div>
+			<br/>
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="spectedResearchFieldButton">
+					Lanzamientos esperados		
+				</div>
+				<div id="spectedResearchFieldContainer">
+					<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">Estudio no disponible para esta ronda</h3><?php }?>
+					<div id="spectedResearchField" class="fieldDiv" <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
+						<div id="spectedResearchFieldDescription" class="fieldDescription" align="center">
+							Este estudio trata de hacer una prospección de los mercados recogiendo información de los nuevos productos que próximamente van a incurrir en ellos.
+						</div>
+						<div style="width: 600px; margin-left: auto; margin-right: auto;">
+							<div style="width: 600px;">
+								Contratar:
+								<br/><br/>
+							</div>
+							<div id="marketResearchSpectedslider" style="width: 50px; float: left;" class="slide"></div>	
+							<div id="marketResearchSpectedField" style="width: 350px; float: left;" class="fieldDiv">
+								<select name="marketresearch[spectedResearch]" id="marketResearchSpected" display="block" style="margin-left:50px;">	
+									<?php foreach ($this->researchvalue as $researchvalue){?> 
+										<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['spectedResearch']['active']==$researchvalue['value'])? "selected":""?>>
+										<?php echo $researchvalue['descriptor']?>
+										</option>
+									<?php } ?>
+								</select>
+								Coste <?php echo number_format($this->researchcosts[3]['cost'], 2, '.', ',').' €'?>
+							</div>
+						</div>
+						<div style="clear:both;"></div>
+					</div>
+				</div>
+			</div>
+			<br/>
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="accountResearchFieldButton">
+					Cuentas anuales		
+				</div>
+				<div id="accountResearchField" class="fieldDiv">
+					<div id="accountResearchFieldDescription" class="fieldDescription" align="center">
+						Este estudio presenta una comparación del rendimiento contable de su empresa y de su competencia.
+					</div>
+					<div style="width: 600px; margin-left: auto; margin-right: auto;">
+						<div style="width: 600px;">
+							Contratar:
+							<br/><br/>
+						</div>
+						<div id="marketResearchAccountslider" style="width: 50px; float: left;" class="slide"></div>	
+						<div id="marketResearchAccountField" style="width: 350px; float: left;" class="fieldDiv">
+							<select name="marketresearch[accountResearch]" id="marketResearchAccount" display="block" style="margin-left:50px;">	
+								<?php foreach ($this->researchvalue as $researchvalue){?> 
+									<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['accountResearch']['active']==$researchvalue['value'])? "selected":""?>>
+									<?php echo $researchvalue['descriptor']?>
+									</option>
+								<?php } ?>
+							</select>
+							Coste <?php echo number_format($this->researchcosts[4]['cost'], 2, '.', ',').' €'?>
+						</div>
+					</div>
+					<div style="clear:both;"></div>
+				</div>
+			</div>
+			<br/>
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Solicitar">
+			</div>	
+		</form>
+		<script>
+			$( "#channelResearchFieldButton" ).click(function() {
+				$( "#channelResearchField" ).toggle( "easeInElastic" );
+			});
+			$( "#pricesResearchFieldButton" ).click(function() {
+				$( "#pricesResearchField" ).toggle( "easeInElastic" );
+			});
+			$( "#mktResearchFieldButton" ).click(function() {
+				$( "#mktResearchFieldContainer" ).toggle( "easeInElastic" );
+			});
+			$( "#spectedResearchFieldButton" ).click(function() {
+				$( "#spectedResearchFieldContainer" ).toggle( "easeInElastic" );
+			});
+			$( "#accountResearchFieldButton" ).click(function() {
+				$( "#accountResearchField" ).toggle( "easeInElastic" );
+			});
+		</script>
+		<script>
+			//Slider crecimiento de canales
+			var marketResearchChannel = $('#marketResearchChannel');
+			var slider = $('#marketResearchChannelslider').slider({
+				min: 0,
+				max: 1,
+				value: [marketResearchChannel[0].selectedIndex],
+				slide: function (e, ui) {
+					var r1 = $('#marketResearchChannel option').eq(ui.value).text();
+					marketResearchChannel.val(ui.value);
+					var valor = ui.value;
+					if (valor == 1){
+					   $("#marketResearchChannelslider").css("background-color","green"); 
+					}
+					 if (valor == 0){
+					   $("#marketResearchChannelslider").css("background-color","red"); 
+					}
+				}
+			});
+			var plazo = ["No", "Si"];
+			$("#marketResearchChannelslider").slider("pips", {
+				rest: "label",
+				labels: plazo
+			});
+			$("#marketResearchChannelslider").slider("float", { 
+				labels: plazo 
+			});
+			
+			$('#marketResearchChannel').change(function() {
+				$( "#marketResearchChannelslider" ).slider( "value", $(this).val() );
+				var valormarketResearchChannel = $(this).val();
+					if (valormarketResearchChannel == 1){
+					   $("#marketResearchChannelslider").css("background-color","green"); 
+					}
+					 if (valormarketResearchChannel == 0){
+					   $("#marketResearchChannelslider").css("background-color","red"); 
+					}
+			});
+			
+			
+			//Slider comparativa de precios
+			var marketResearchPrices = $('#marketResearchPrices');
+			var slider = $('#marketResearchPricesslider').slider({
+				min: 0,
+				max: 1,
+				value: [marketResearchPrices[0].selectedIndex],
+				slide: function (e, ui) {
+					var r1 = $('#marketResearchPrices option').eq(ui.value).text();
+					marketResearchPrices.val(ui.value);
+					var valor = ui.value;
+					if (valor == 1){
+					   $("#marketResearchPricesslider").css("background-color","green"); 
+					}
+					 if (valor == 0){
+					   $("#marketResearchPricesslider").css("background-color","red"); 
+					}
+				}
+			});
+			var plazo = ["No", "Si"];
+			$("#marketResearchPricesslider").slider("pips", {
+				rest: "label",
+				labels: plazo
+			});
+			$("#marketResearchPricesslider").slider("float", { 
+				labels: plazo 
+			});
+			
+			$('#marketResearchPrices').change(function() {
+				$( "#marketResearchPricesslider" ).slider( "value", $(this).val() );
+				var valormarketResearchPrices = $(this).val();
+					if (valormarketResearchPrices == 1){
+					   $("#marketResearchPricesslider").css("background-color","green"); 
+					}
+					 if (valormarketResearchPrices == 0){
+					   $("#marketResearchPricesslider").css("background-color","red"); 
+					}
+			});
+			
+			//Comparativa mkt
+			var marketResearchMkt = $('#marketResearchMkt');
+			var slider = $('#marketResearchMktslider').slider({
+				min: 0,
+				max: 1,
+				value: [marketResearchMkt[0].selectedIndex],
+				slide: function (e, ui) {
+					var r1 = $('#marketResearchMkt option').eq(ui.value).text();
+					marketResearchMkt.val(ui.value);
+					var valor = ui.value;
+					if (valor == 1){
+					   $("#marketResearchMktslider").css("background-color","green"); 
+					}
+					 if (valor == 0){
+					   $("#marketResearchMktslider").css("background-color","red"); 
+					}
+				}
+			});
+			var plazo = ["No", "Si"];
+			$("#marketResearchMktslider").slider("pips", {
+				rest: "label",
+				labels: plazo
+			});
+			$("#marketResearchMktslider").slider("float", { 
+				labels: plazo 
+			});
+			
+			$('#marketResearchMkt').change(function() {
+				$( "#marketResearchMktslider" ).slider( "value", $(this).val() );
+				var valormarketResearchMkt = $(this).val();
+					if (valormarketResearchMkt == 1){
+					   $("#marketResearchMktslider").css("background-color","green"); 
+					}
+					 if (valormarketResearchMkt == 0){
+					   $("#marketResearchMktslider").css("background-color","red"); 
+					}
+			});
+			
+			//Lanzamientos esperados
+			var marketResearchSpected = $('#marketResearchSpected');
+			var slider = $('#marketResearchSpectedslider').slider({
+				min: 0,
+				max: 1,
+				value: [marketResearchSpected[0].selectedIndex],
+				slide: function (e, ui) {
+					var r1 = $('#marketResearchSpected option').eq(ui.value).text();
+					marketResearchSpected.val(ui.value);
+					var valor = ui.value;
+					if (valor == 1){
+					   $("#marketResearchSpectedslider").css("background-color","green"); 
+					}
+					 if (valor == 0){
+					   $("#marketResearchSpectedslider").css("background-color","red"); 
+					}
+				}
+			});
+			var plazo = ["No", "Si"];
+			$("#marketResearchSpectedslider").slider("pips", {
+				rest: "label",
+				labels: plazo
+			});
+			$("#marketResearchSpectedslider").slider("float", { 
+				labels: plazo 
+			});
+			
+			$('#marketResearchSpected').change(function() {
+				$( "#marketResearchSpectedslider" ).slider( "value", $(this).val() );
+				var valormarketResearchSpected = $(this).val();
+					if (valormarketResearchSpected == 1){
+					   $("#marketResearchSpectedslider").css("background-color","green"); 
+					}
+					 if (valormarketResearchSpected == 0){
+					   $("#marketResearchSpectedslider").css("background-color","red"); 
+					}
+			});
+			
+			//Cuentas anuales
+			var marketResearchAccount = $('#marketResearchAccount');
+			var slider = $('#marketResearchAccountslider').slider({
+				min: 0,
+				max: 1,
+				value: [marketResearchAccount[0].selectedIndex],
+				slide: function (e, ui) {
+					var r1 = $('#marketResearchAccount option').eq(ui.value).text();
+					marketResearchAccount.val(ui.value);
+					var valor = ui.value;
+					if (valor == 1){
+					   $("#marketResearchAccountslider").css("background-color","green"); 
+					}
+					 if (valor == 0){
+					   $("#marketResearchAccountslider").css("background-color","red"); 
+					}
+				}
+			});
+			var plazo = ["No", "Si"];
+			$("#marketResearchAccountslider").slider("pips", {
+				rest: "label",
+				labels: plazo
+			});
+			$("#marketResearchAccountslider").slider("float", { 
+				labels: plazo 
+			});
+			
+			$('#marketResearchAccount').change(function() {
+				$( "#marketResearchAccountslider" ).slider( "value", $(this).val() );
+				var valormarketResearchAccount = $(this).val();
+					if (valormarketResearchAccount == 1){
+					   $("#marketResearchAccountslider").css("background-color","green"); 
+					}
+					 if (valormarketResearchAccount == 0){
+					   $("#marketResearchAccountslider").css("background-color","red"); 
+					}
+			});
+			
+			$( document ).ready(function() {
+				//crecimiento de canales
+				var valormarketResearchChannel = $('#marketResearchChannel').val();
+				if (valormarketResearchChannel == 1){
+				   $("#marketResearchChannelslider").css("background-color","green"); 
+				}
+				 if (valormarketResearchChannel == 0){
+				   $("#marketResearchChannelslider").css("background-color","red"); 
+				}
+				//comparativa de precios
+				var valormarketResearchPrices = $('#marketResearchPrices').val();
+				if (valormarketResearchPrices == 1){
+				   $("#marketResearchPricesslider").css("background-color","green"); 
+				}
+				 if (valormarketResearchPrices == 0){
+				   $("#marketResearchPricesslider").css("background-color","red"); 
+				}
+				//Comparativa mkt
+				var valormarketResearchMkt = $('#marketResearchMkt').val();
+				if (valormarketResearchMkt == 1){
+				   $("#marketResearchMktslider").css("background-color","green"); 
+				}
+				 if (valormarketResearchMkt == 0){
+				   $("#marketResearchMktslider").css("background-color","red"); 
+				}
+				//Lanzamientos esperados
+				var valormarketResearchSpected = $('#marketResearchSpected').val();
+				if (valormarketResearchSpected == 1){
+				   $("#marketResearchSpectedslider").css("background-color","green"); 
+				}
+				 if (valormarketResearchSpected == 0){
+				   $("#marketResearchSpectedslider").css("background-color","red"); 
+				}
+				//Cuentas anuales
+				var valormarketResearchAccount = $('#marketResearchAccount').val();
+				if (valormarketResearchAccount == 1){
+				   $("#marketResearchAccountslider").css("background-color","green"); 
+				}
+				 if (valormarketResearchAccount == 0){
+				   $("#marketResearchAccountslider").css("background-color","red"); 
+				}
+			});
+		</script>
+</div>

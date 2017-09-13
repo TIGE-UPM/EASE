@@ -1,0 +1,51 @@
+<div id="productionCostsEvolutionFieldDescription" class="fieldDescription" style="background-color:white">
+	Configure de forma porcentual (%) la evolución temporal de los costes de producción en cada ronda.
+</div>
+<?php $n_rounds=$view->games->getNumberOfRounds($view->game_id); ?>
+	<?php if ($n_rounds>1) {?>
+		<?php for ($round_number=2;$round_number<=$n_rounds;$round_number++){ ?>
+			<div style="float: left; margin-right: 15px;">
+				Ronda <?php echo $round_number?>
+				<table>
+					<theader>
+						<th class="small"></th>
+						<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+						<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+						<th class="small">Región <?php echo $region_number?></th>
+						<?php } //for region?>
+					</theader>
+					<tr>
+						<td></td>
+						<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+						<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+							<td class="inCellFieldHeader">Variación (%)</td>
+						<?php } //for region?>
+					</tr>
+					<tr>
+						<td>Costes Fijos</td>
+						<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+						<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+							<?php $fixedCostEvolution=$view->games->getProductionCostEvolution($view->game_id, $round_number, $region_number, 'fixed');?>
+						<td><input type="text" name="prProductionCostsEvolution[round_<?php echo $round_number?>][region_<?php echo $region_number?>][fixed]" class="small" value="<?php echo $fixedCostEvolution?>"></td>
+						<?php } //for region?>
+					</tr>
+					<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+					<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+						<tr>
+							<td>Unitarios Producto <?php echo $product_number?></td>
+							<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+							<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+								<?php $unitCostEvolution=$view->games->getProductionCostEvolution($view->game_id, $round_number, $region_number, 'unit', $product_number);?>
+							<td><input type="text" name="prProductionCostsEvolution[round_<?php echo $round_number?>][region_<?php echo $region_number?>][unit][product_<?php echo $product_number?>]" class="small" value="<?php echo $unitCostEvolution?>"></td>
+							<?php } //for region?>
+						</tr>
+					<?php }//for product ?>				
+				</table>
+			</div>
+		<?php }?>
+	<?php } else {?>
+		<div style="float: left">
+			Sólo se ha configurado una ronda para este juego de simulación
+		</div>
+	<?php }?>
+<div style="clear:both"></div>

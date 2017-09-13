@@ -1,0 +1,930 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/display.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/factoryProduction.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/interestRate.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/marketing.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/production.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/initiatives.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/edit-decisions.js', $type = 'text/javascript')?>
+						<!-- <?php var_dump($this->newIdiDecision);?> -->
+<div class="outcomes_header">
+	<div class="fieldHeader">
+		Decisiones 
+	</div>
+	<div class="fieldDiv">
+		Juego: <?php echo $this->game['name'];?><br>
+		Ronda: <?php echo $this->round_number;?><br>
+		Equipo: <?php echo $this->company['name'];?><br>	
+	</div>
+</div>
+<div id="tabs">
+	<ul>
+		<li><a href="#tabs-1">Dirección de Operaciones</a></li>
+		<li><a href="#tabs-2">Marketing</a></li>
+		<li><a href="#tabs-3">Recursos Humanos</a></li>
+		<li><a href="#tabs-4">Finanzas</a></li>
+		<li><a href="#tabs-6">Iniciativas</a></li>
+		<li><a href="#tabs-7">Estudios de Mercado</a></li>
+		<li><a href="#tabs-8">I+D+i</a></li>
+	</ul>
+	
+	<div id="tabs-1" class="decisions_tab" id="production_decision">
+	<img src="/images/factory.gif" alt="factory" width="85" height="98" style="float:right" />	
+		<form name="production" onsubmit="return validateProductionForm();" method="post">
+			<div class="fieldHeader">
+				Región de Fabricación<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"regionField")))?>			
+			</div>
+			<div id="regionField" class="fieldDiv">
+				<div id="regionFieldDescription" class="fieldDescription" align="center">
+					Elija la región de fabricación de sus productos.
+				</div >
+				<br />
+				<?php $factory_number=1;?>
+				<?php $factory_count=1;?>
+				<input type="hidden" value="<?php echo $this->numberOfFactories?>" id="numberOfFactories" />			
+				<div id='newFactoryFieldDiv'>
+				
+				   Número de F&aacute;bricas:
+				<?php echo ($this->numberOfFactories);
+				$factory_counter=$this->numberOfFactories;?>
+				<br />
+				<br />
+					<?php $region_count=0;?>
+					<?php foreach ($this->regions as $region){?>
+					<?php $nameRegion[]=$region['name'];?>
+					<?php $valueRegion[]=$region['region_number'];?>
+					<input type="hidden" value="<?php echo $nameRegion[$region_count]?>" id="namesRegions_<?php echo $region_count?>" />
+					<input type="hidden" value="<?php echo $valueRegion[$region_count]?>" id="numbersRegions_<?php echo $region_count?>" />
+					<?php $region_count++;?>
+					<?php }?>
+				<?php foreach ($this->game_factories as $factory){?>
+				<div id="factoryField_<?php echo $factory_number?>" class="factoryField">
+				<div class="factoryHeader">
+				F&aacute;brica <?php echo $factory['factory_number']?>
+				</div>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Región:&nbsp;
+				<?php $constructed=$this->lastFactory;
+					 $round_constructed=$this->roundFactory;
+					?>
+				<select disabled="disabled" name="production_decision[factories][factory_number_<?php echo $factory_number?>][region]" id="regionField" display="block">	
+					<?php foreach ($this->regions as $region){?>
+						<option value="<?php echo $region['region_number']?>" <?php echo(isset($this->regionDecision) && $this->regionDecision['factory_number_'.$factory_number]==$region['region_number'])? "selected":""?>>
+							&nbsp;&nbsp;&nbsp; <?php echo $region['name']?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						</option>
+						<br />
+					<?php }?>
+				</select>
+				<?php
+						if (isset($this->addCapacityDecision)&&count($this->addCapacityDecision)>0) { 
+							if(array_key_exists("factory_number_".$factory_number,$this->addCapacityDecision)) { ?>
+								<br /><br />
+								<div class="factoryCapacityHeader">Ampliar F&aacute;brica <?php echo $factory_number?></div>
+								&nbsp;&nbsp;Número de m&aacute;quinas:&nbsp;
+								<input readonly type="text" name="production_decision[capacity][factory_number_<?php echo $factory_number?>]" class="small" value="<?php echo($this->addCapacityDecision['factory_number_'.$factory_number]);?>" /><br/>
+						<?php }
+						} else {
+							if($this->round_number>1){  ?>
+								<br /><br />
+								<div id="addCapacity<?php echo $factory_number ?>" class="fieldOptions" <?php if ($this->round_number<2 || ($round_constructed['factory_number_'.$factory_number]==$this->round_number)){?> style="visibility:hidden"<?php }?>>
+									<a href="javascript:void(0);" OnClick="addCapacity(<?php echo $factory_number ?>);return false;">(+) Ampliar F&aacute;brica <?php echo $factory_number?></a>
+								</div>
+							<?php }
+						}
+					?>
+				<br />
+				<br />
+				</div>
+				<?php $factory_number++;?>
+				<?php }?>	
+				</div>		
+				<br />
+			</div>					
+			<div class="fieldHeader">
+				Calidad<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"qualityField")))?>			
+			</div>
+			<div id="qualityField" class="fieldDiv">
+				<div id="qualityFieldDescription" class="fieldDescription" align="center">
+					Elija la calidad de fabricación de sus productos.
+				</div>
+				<?php foreach ($this->products as $product){?>
+				<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+				
+				<div class="fieldSubHeader" style="color:#F2610D">
+				<br />
+						<?php echo $product['name']?>
+				</div>
+				<div id="calidadFieldDescription" class="fieldDescription">
+				<br />
+				<div class="fieldDiv" style="color:#4169E1" align="center">
+					  <?php foreach ($this->qualityParams as $qualityParam){?>
+					  <?php echo $qualityParam['name'] ?> : &nbsp
+					<select disabled="disabled" name="production_decision[quality_params][product_quality_<?php echo $qualityParam['quality_param_number'];?>][product_<?php echo $product['product_number'];?>]">
+						<?php for ($i=1;$i<=10;$i++){?>
+							<option value="<?php echo $i?>" <?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)? "selected":""?>>
+								<?php echo $i?>
+							</option>
+						<?php }//for?>
+					</select>
+					&nbsp;&nbsp;
+						<?php } ?>
+						</div>
+						</div>
+						<?php } ?>
+					<?php } ?>
+				
+			</div>
+			<div class="fieldHeader">
+				Unidades a Producir<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"unitsFields")))?>			
+			</div>
+			<div id="unitsFields" class="fieldDiv">
+				<div id="unitsFieldDescription" class="fieldDescription" align="center">
+					Determine la cantidad de unidades a producir y distribuir en cada canal y para cada región.
+				</div>
+				<div id="unitsFieldsErrors" class="fieldErrors">
+				</div>
+			<?php foreach ($this->game_factories as $factory){?>
+			<?php $round_constructed=$this->roundFactory;?>
+			<?php if (($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']]) && ($this->round_number>1)){?><br /><br /><h3 style="color:grey;text-align:center">La f&aacute;brica n&uacute;mero <?php echo $factory['factory_number']?> no estar&aacute; disponible hasta el siguiente turno</h3><br /><br /><?php }?>
+			<?php if (!((($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']])&&($this->round_number>1))||($round_constructed['factory_number_'.$factory['factory_number']]>$this->round_number))){?>
+				<div class="factoryHeader">
+				F&aacute;brica <?php echo $factory['factory_number']?>
+				</div>
+				<?php foreach ($this->products as $product){?>
+				<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+				<div class="fieldSubHeader" <?php if (($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']])&&($this->round_number>1)){?> style="visibility:hidden" <?php } ?> style="color:#F2610D">
+				<br />
+ 						<?php echo $product['name']?>
+				</div>
+				<?php if (($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']]) && ($this->round_number>1)){?> <h3 style="color:grey;text-align:center">La f&aacute;brica no estar&aacute; disponible hasta el siguiente turno</h3><?php }?>
+				<div class="fieldDiv" <?php if ((($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']])&&($this->round_number>1))||($round_constructed['factory_number_'.$factory['factory_number']]>$this->round_number)){?> style="visibility:hidden"<?php }?>>
+					<table align="center">
+						<thead>
+							<th class="small"></th>
+						<?php foreach ($this->regions as $region){?>
+							<th class="small"><?php echo $region['name']?></th>
+						<?php } //for region?>
+						</thead>
+						<?php foreach ($this->channels as $channel){ ?>	
+						<tr>
+							<td><?php echo $channel['name']?></td>
+							<?php foreach ($this->regions as $region){?>
+							<td><input type="text" disabled="disabled" 
+								name="production_decision[production_units][factory_number_<?php echo $factory['factory_number']?>][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]" 
+								class="small" 
+								<?php echo isset($this->unitsDecision)? 
+									  'value = "'.$this->unitsDecision['factory_number_'.$factory['factory_number']]
+																	  ['product_'.$product['product_number']]
+																	  ['channel_'.$channel['channel_number']]
+																	  ['region_'.$region['region_number']]
+											 .'"':""?>
+								></td>
+							<?php } //for region?>
+						</tr>
+							<?php } //for channel?>
+					</table>
+				</div>
+				<?php } // product?>
+			<?php } // if availability?>
+			<?php } // if?>
+			<?php } // factory?>			
+			</div>
+            <div class="fieldHeader">
+				Gesti&oacute;n de los Proveedores<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"suppliersField")))?>
+			</div>
+			<img src="/images/truck_2.gif" alt="finance" width="120" height="75" style="float:right" />
+			<div id="suppliersField" class="fieldDiv">
+			<div id="SuppliersFieldDescription" class="fieldDescription" align="center">
+					Determine la política para la gesti&oacute;n de los proveedores.
+				</div> 
+			<div class="fieldHeader">
+				Número de Proveedores<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"suppliersNumberField")))?>			
+			</div>
+			<div id="suppliersNumberField" class="fieldDiv" style="margin-left:150px;">
+				Número:&nbsp
+				<select disabled="disabled" name="suppliers[number]" id="suppliersNumber" display="block">
+					<?php for($i=0;$i<=5;$i++){?>
+						<option value="<?php echo $i?>" <?php echo (isset($this->numberDecision) && $this->numberDecision['number']==$i)? "selected":""?>><?php echo $i?></option>
+					<?php }?>
+				</select>
+			</div>
+			<div class="fieldHeader">
+				Plazos de pago<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"payTermsField")))?>			
+			</div>
+			<div id="payTermsField" class="fieldDiv" >
+				<div class="fieldDiv" style="margin-right:500px;" align="right" > 
+					Canales de distribuci&oacute;n:
+					<select name="suppliers[payterms][channel_1]" style="margin-left:10px;" disabled="disabled" > <!-- Añadido disabled 20120323 -->
+						<?php foreach ($this->channel_payterms as $payterm){?>
+							<option value="<?php echo $payterm['value']?>" <?php echo (isset($this->paytermsDecision) && $this->paytermsDecision['channel_1']==$payterm['value'])? "selected":""?>>
+							<?php echo $payterm['descriptor']?>
+							</option>
+						<?php } ?>
+					</select>
+				</div>
+			</div>
+			</div>
+		</form>		
+	</div>
+	<div id="tabs-2" class="decisions_tab" id="marketing_decision">
+	<img src="/images/marketing.gif" alt="finance" width="135" height="95" style="float:right" />
+		<form name="marketing" onsubmit="return validateMarketingForm();" method="post">
+			<div class="fieldHeader">
+				Precios<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"pricesField")))?>			
+			</div>
+			<div id="pricesField" class="fieldDiv">
+				<div id="pricesFieldDescription" class="fieldDescription" align="center">
+					Determine la política de precios de sus productos.
+				</div>
+				<div id="pricesFieldsErrors" class="fieldErrors">
+				</div>
+			<?php foreach ($this->products as $product){?>
+			<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+				<div class="fieldSubHeader" style="color:#F2610D">
+					<br />
+					<?php echo $product['name']?>
+				</div>
+				<div class="fieldDiv">
+					<table align="center">
+						<thead>
+							<th class="small"></th>
+						<?php foreach ($this->regions as $region){?>
+							<th class="small"><?php echo $region['name']?></th>
+						<?php } //for region?>
+						</thead>
+						<?php foreach ($this->channels as $channel){ ?>	
+						<tr>
+							<td><?php echo $channel['name']?></td>
+							<?php foreach ($this->regions as $region){?>
+							<td><input disabled="disabled"  type="text" name="marketing[prices][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]" class="small"
+								<?php echo isset($this->pricesDecision)? 
+									  'value = "'.$this->pricesDecision['product_'.$product['product_number']]
+																	  ['channel_'.$channel['channel_number']]
+																	  ['region_'.$region['region_number']]
+											 .'"':""?></input>
+								</td>
+							<?php } //for region?>
+						</tr>
+							<?php } //for channel?>
+					</table>
+				</div>
+				<?php } ?>
+			<?php } // product?>
+			</div>
+			<br />
+			<br />
+			<div class="fieldHeader">
+				Publicidad<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"advertisingField",'id'=>"mediaField")))?>			
+			</div>
+				<div id="advertisingbudgetField" class="fieldDiv">
+					<div id="advertisingbudgetFieldDescription" class="fieldDescription" align="center">
+					Determine el presupuesto asignado a Publicidad.
+					</div>
+					<div id="advertisingbudgetFieldsErrors" class="fieldErrors">
+					</div>
+				<br />
+					<table  border="3" bordercolor="brown" align="center">
+					<td><label for="advertisingBudget">Presupuesto Publicidad&nbsp</label>
+					<input disabled="disabled"  type="text" name="marketing[advertising_budget]" id="advertisingBudget" display="block"
+						<?php echo isset($this->advertisingbudgetDecision)? 
+							'value = "'.$this->advertisingbudgetDecision
+							.'"':""?></input>
+				</td>
+				</table>
+				</div>
+				<div id="advertisingbudgetDistributionField" class="fieldDiv">
+				<br />
+					<div id="advertisingbudgetDistributionFieldDescription" class="fieldDescription" align="center">
+					Determine la distriuci&oacute;n del presupuesto de Publicidad por productos (%).
+					</div>
+					<div id="advertisingbudgetDistributionFieldsErrors" class="fieldErrors">
+					</div>
+					<br />
+					<table border="3" bordercolor="brown" align="center">
+						<thead>
+							<th>Producto</th>
+							<th>(%)</th>
+						</thead>
+							<?php foreach ($this->products as $product){ ?>
+							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>	
+							<tr>
+							<td><?php echo $product['name']?></td>
+							<td><input disabled="disabled" type="text" name="marketing[advertising_budget_distribution][product_<?php echo $product['product_number']?>]" class="small"
+											<?php echo isset($this->advertisingbudgetProductsDecision)?
+												'value = "'.$this->advertisingbudgetProductsDecision['product_'.$product['product_number']] 
+														.'"':""?></input>
+											
+							</td>
+							</tr>
+							<?php }
+							} //for product?>
+						</table>
+				</div>
+				<div id="mediaField" class="fieldDiv">
+					<div id="mediaFieldDescription" class="fieldDescription" align="center">
+						Determine la política de publicidad de sus productos (%).
+					</div>
+						<div id="mediaFieldsErrors" class="fieldErrors">
+						</div>
+						<?php foreach ($this->products as $product){?>
+						<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+						<div class="fieldSubHeader" style="color:#F2610D">
+							<br />
+							<?php echo $product['name']?>
+						</div>
+						
+						<div class="fieldDiv">
+						<table align="center">
+						<thead>
+							<th class="small"></th>
+						<?php foreach ($this->regions as $region){?>
+							<th class="small"><?php echo $region['name']?></th>
+						<?php } //for region?>
+						</thead>
+							<?php foreach ($this->media as $media){ ?>	
+							<tr>
+							<td><?php echo $media['name']?></td>
+								<?php foreach ($this->regions as $region){?>
+							<td><input disabled="disabled" type="text" name="marketing[advertising_percentage][product_<?php echo $product['product_number']?>][media_<?php echo $media['media_number']?>][region_<?php echo $region['region_number']?>]" class="small"
+											<?php echo isset($this->advertisingpercentageDecision)?
+												'value = "'.$this->advertisingpercentageDecision['product_'.$product['product_number']]
+																							['media_'.$media['media_number']]
+																							['region_'.$region['region_number']] 
+														.'"':""?></input>		
+							</td>
+								<?php } //for region?>
+							</tr>
+							<?php } //for media?>
+						</table>
+						</div>
+						<?php } ?>
+						<?php } // product?>
+					</div>
+				<br />
+			
+			<div class="fieldHeader">
+				Trade MKT<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"trademktField",'id'=>"trademediaField")))?>			
+			</div>
+				<div id="trademktField" class="fieldDiv">
+					<div id="trademktFieldDescription" class="fieldDescription" align="center">
+					Determine el presupuesto asignado a Trade MKT.
+					</div>
+					<div id="trademktbudgetFieldsErrors" class="fieldErrors">
+					</div>
+				<br />
+					<table border="3" bordercolor="brown" align="center">
+					<td><label for="trademktBudget">Presupuesto Trade MKT&nbsp;</label>
+						<input disabled="disabled"  type="text" name="marketing[trademkt_budget]" id="trademkt" class="normal"
+									<?php echo isset($this->trademktbudgetDecision)? 'value = "'.$this->trademktbudgetDecision.'"':""?>
+						</input>
+				</td>
+				</table>
+				</div>
+				<div id="trademktbudgetDistributionField" class="fieldDiv">
+				<br />
+					<div id="trademktbudgetDistributionFieldDescription" class="fieldDescription" align="center">
+					Determine la distriuci&oacute;n del presupuesto de Trade Mkt por productos (%).
+					</div>
+					<div id="trademktbudgetDistributionFieldsErrors" class="fieldErrors">
+					</div>
+					<br />
+					<table border="3" bordercolor="brown" align="center">
+						<thead>
+							<th>Producto</th>
+							<th>(%)</th>
+						</thead>
+							<?php foreach ($this->products as $product){ ?>
+							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>	
+							<tr>
+							<td><?php echo $product['name']?></td>
+							<td><input disabled="disabled" type="text" name="marketing[trademkt_budget_distribution][product_<?php echo $product['product_number']?>]" class="small"
+											<?php echo isset($this->trademktbudgetProductsDecision)?
+												'value = "'.$this->trademktbudgetProductsDecision['product_'.$product['product_number']] 
+														.'"':""?></input>
+											
+							</td>
+							</tr>
+							<?php }
+							 } //for product?>
+						</table>
+				</div>
+			<div id="trademediaField" class="fieldDiv">
+				<div id="trademediaFieldDescription" class="fieldDescription" align="center">
+					Determine la política de Trade MKT de sus productos (%).
+				</div>
+				<div id="trademediaFieldsErrors" class="fieldErrors">
+				</div>
+					<?php foreach ($this->products as $product){?>
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+					<div class="fieldSubHeader" style="color:#F2610D">
+						<br />	
+						<?php echo $product['name']?>
+					</div>
+					<div class="fieldDiv">
+						<table align="center">
+							<thead>
+								<th class="small"></th>
+							<?php foreach ($this->channels as $channel){?>
+								<th class="small"><?php echo $channel['name']?>&nbsp;&nbsp;</th>
+							<?php } //for region?>
+							</thead>
+							<?php foreach ($this->trademedia as $trademedia){ ?>	
+							<tr>
+								<td><?php echo $trademedia['name']?></td>
+								<?php foreach ($this->channels as $channel){?>
+								<td>							
+									<input disabled="disabled"  type="text" name="marketing[trademkt_percentage][product_<?php echo $product['product_number']?>][trademedia_<?php echo $trademedia['trademedia_number']?>][channel_<?php echo $channel['channel_number']?>]" class="small"
+										   <?php echo isset($this->trademktpercentageDecision)? 
+										   'value = "'.$this->trademktpercentageDecision['product_'.$product['product_number']]
+										   												['trademedia_'.$trademedia['trademedia_number']]
+										   												['channel_'.$channel['channel_number']]
+										   	.'"':""?>
+									</input>
+								</td>
+								<?php } //for region?>
+							</tr>
+								<?php } //for media?>
+						</table>
+					</div>
+					<?php } ?>
+					<?php } // product?>
+				</div>				
+		</form>
+	</div>	
+	<div id="tabs-3" class="decisions_tab" id="humanResources_decision">
+		<img src="/images/people_1.gif" alt="people" width="90" height="85" style="float:right" />
+		<form name="humanResources" method="post">
+			<div class="fieldHeader">
+				Política Salarial<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"humanResourcesCuartilField")))?>			
+			</div>
+			<div id="humanResourcesCuartilField" class="fieldDiv">
+				<div id="cuartilFieldDescription" class="fieldDescription" align="center">
+					Determine la política de retribución salarial que desea aplicar en su compa&ntilde;ía.
+				</div>
+				<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cuartil:&nbsp;			
+				<select disabled="disabled"  name="humanResources[cuartil]" id="humanResourcesCuartil" display="block" style="margin-left:50px;">	
+					<?php foreach ($this->wages as $wages){?> 
+							<option value="<?php echo $wages['value']?>" <?php echo (isset($this->cuartilDecision) && $this->cuartilDecision==$wages['value'])? "selected":""?>>
+							<?php echo $wages['descriptor']?>
+							</option>
+						<?php } ?>
+				</select>
+			</div>
+			<br />
+			<div class="fieldHeader">
+				Cualificación del Staff<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"humanResourcesFormationField")))?>			
+			</div>
+			<div id="humanResourcesFormationField" class="fieldDiv">
+				<div id="formationFieldDescription" class="fieldDescription" align="center">
+					Determine el perfil de cualificación deseado para los trabajadores de su compa&ntilde;ía.
+				</div>
+				<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Nivel de cualificación:&nbsp;
+					<select disabled="disabled"  name="humanResources[formation]" id="humanResourcesFormation" display="block" style="margin-left:50px;">
+					<?php foreach ($this->level as $level){?>
+							<option value="<?php echo $level['value']?>" <?php echo (isset($this->formationDecision) && $this->formationDecision==$level['value'])? "selected":""?>>
+							<?php echo $level['descriptor']?>
+							</option>
+						<?php } ?>
+				</select>
+			</div>
+			<br />
+		</form>
+	</div>	
+	<div id="tabs-4" class="decisions_tab" id="finance_decision">
+	<img src="/images/finance.gif" alt="finance" width="75" height="85" style="float:right" />
+		<form name="finance" method="post">
+			<?php if($this->round_number==1){?><br /><br /><h3 style="color:grey;text-align:center">Esta secci&oacute;n no est&aacute; disponible para esta ronda</h3><br /><br /><?php } ?>
+			<?php if(($this->round_number>1) || ($this->round_number==6)){?>
+			<div class="fieldHeader">
+				Oficina del accionista<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financePatrimonyField")))?>			
+			</div>
+			<div id="financePatrimonyField" class="fieldDiv" align="center">
+				<div id="patrimonyFieldDescription" class="fieldDescription" align="center">
+					Indique la cuant&iacute;a porcentual sobre beneficios que desea retribuir a los accionistas en concepto de dividendos tras el ejercicio de su compañía en la &uacute;litima ronda. Tenga en cuenta que es necesario un resultado positivo para llevar a cabo esta acci&oacute;n.
+				</div>
+				<br />
+				<table align="center">
+					<thead>
+						<th class="small"></th>
+						<th class="small">&nbsp;&nbsp;Dividendos</th>
+					</thead>
+					<tr>
+						<td>Payout (%)</td>
+						<td><input disabled="disabled"  type="text" name="finance[patrimony]" id="patrimony" class="normal"
+								<?php echo isset($this->dividends)? 'value = "'.$this->dividends.'"':""?>
+							</input>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Guardar">
+			</div>
+			<br />
+			<div class="fieldHeader">
+				Financiación: Cuantía<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financeAmountField")))?>			
+			</div>
+			<div id="financeAmountField" class="fieldDiv" align="center">
+				<div id="amountFieldDescription" class="fieldDescription" align="center">
+					Seleccione la cuantía que desea financiar mediante cr&eacute;dito para su compa&ntildeía.
+				</div>
+				<br />
+				<table align="center">
+				<thead>Opciones</thead>
+				<br />
+				<br />
+				<?php foreach ($this->amount as $amount){?>
+					<tr>
+						<td style="text-align:left">
+							<input disabled="disabled" type="radio" name="finance[amount]" value="<?php echo $amount['value']?>" <?php echo (isset($this->amountDecision) && $this->amountDecision==$amount['value'])? "checked":""?>>
+									<?php echo $amount['descriptor']?>
+						</td>
+					</tr>
+					<?php }?>
+				</table>
+			</div>
+			<div class="fieldHeader">
+				Financiación: Plazo de amortización<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"financeTermField")))?>			
+			</div>
+			<div id="financeTermField" class="fieldDiv" align="center">
+				<div id="termFieldDescription" class="fieldDescription" align="center">
+					Seleccione el plazo de amortización para el cr&eacute;dito que solicita su compa&ntildeía.
+				</div>
+				<br />
+				Opciones: <br />				
+				<br />	
+					<?php $number_term=2;
+					foreach ($this->term as $term){
+							$number_term++;
+					}?>
+					<?php $term_counter=2;
+					foreach ($this->term as $term){?>
+						<input disabled="disabled"  id="term_<?php echo $term_counter?>" onClick="updateInterest(<?php echo $this->interest_adjustment ?>, <?php echo ($number_term) ?>);" type="radio" name="finance[term]" value="<?php echo $term['value']?>" <?php echo (isset($this->termDecision) && $this->termDecision['term']==$term['value'])? "checked":""?>>
+							<?php echo $term['descriptor']?> &nbsp;&nbsp;&nbsp;&nbsp;
+					<?php $term_counter++;
+					} ?>	
+			</div>
+			<br />
+			<?php 	$interest_counter=2;
+					foreach ($this->interest_aux as $interest){
+						$valueInterest[$interest_counter]=$interest['value'];?>
+						<input type="hidden" value="<?php echo $valueInterest[$interest_counter]?>" id="interestRate_<?php echo $interest_counter?>" />
+						<?php $interest_counter++;
+					} ?>
+			<div id="financeInterestField">
+			</div>
+			<div id="calculateInterest" class="fieldOptions">
+					<a href="" OnClick="calculateInterest(<?php echo $this->interest_adjustment ?>, <?php echo ($number_term) ?>);return false;">(+) Calcular el inter&eacute;s de la opci&oacute;n elegida.</a>
+			</div>
+			<?php } ?>
+		</form>
+	</div>		
+	<div id="tabs-6" class="decisions_tab" id="initiatives_decision">
+		<img src="/images/initiative.gif" alt="finance" width="70" height="90" style="float:right" />
+		<form name="initiatives" method="post">
+		<?php if($this->round_number==1){?><br /><br /><h3 style="color:grey;text-align:center">Esta secci&oacute;n no est&aacute; disponible para esta ronda</h3><br /><br /><?php } ?>
+			<?php if($this->round_number>1){?>
+			<div id="initiativesFieldDescription" class="fieldDescription" align="center">
+				Determine aquellas iniciativas que desea llevar a cabo para mejorar el rendimiento de su compa&ntildeía.
+			</div>
+			<br />
+			<div class="fieldHeader">
+				Iniciativas de Producción y Distribución<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"initiativesproductionField")))?>			
+			</div>
+			<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">No existen iniciativas disponibles para esta ronda</h3><?php }?>
+			<div id="initiativesproductionField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>					
+				<table align="center">
+					<thead>
+						<th class="small">Acción de la iniciativa</th>
+						<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
+						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
+					</thead>
+					<?php $numberp=1;?>
+					<?php foreach ($this->initiativesProd as $initiativesprod) {
+							$chosen=0;
+							for ($round = 1; $round < $this->round_number; $round++) {
+						  		$chosen_aux=$this->initiative_chosen['initiative_production']['round_'.$round]['initiativeproduction_number_'.$numberp];
+						  		if ($chosen_aux==1) {
+						  			$chosen=1;
+						  		}
+						  	}
+						?>
+					<tr>
+						<td><?php echo $initiativesprod['name']?></td>
+						<td><select disabled="disabled" name="initiatives[initiativeproduction][initiativeproduction_number_<?php echo $numberp?>]" id="initiativesProd<?php echo $numberp?>" display="block" <?php if ($chosen==1){?> disabled="disabled"<?php }?>	
+								<?php foreach ($this->initiativevalue as $initiativevalue){?>
+								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativeproductionDecision) && $this->initiativeproductionDecision['initiativeproduction_number_'.$numberp])? "selected":""?></input>
+								<?php if ($chosen==1){ ?>
+									<?php echo ("Contratada");
+									} ?><?php 
+									if ($chosen!=1) { 
+										echo ($initiativevalue['descriptor']);
+									}?>
+								</option>
+								<?php } ?>
+							</select>
+						</td>
+						<td><?php echo $initiativesprod['cost']?> (&euro;)</td>
+						<?php $numberp++;?>
+						<?php } ?>	
+					</tr>
+					<?php $numberd=1;?>
+					<?php $factory_number_deterioration=1;?>
+					<?php foreach ($this->initiativesDET as $initiativesdet) {?>
+					<?php foreach ($this->game_factories as $factory) {?>
+					<tr>
+						<td><?php echo $initiativesdet['name']?>: F&aacute;brica <?php echo $factory_number_deterioration?></td>
+						<td><select disabled="disabled" name="initiatives[initiativedeterioration][initiativedeterioration_number_1][factory_number_<?php echo $factory['factory_number']?>]" id="initiativesProd<?php echo $numberd?>" display="block">
+								<?php foreach ($this->initiativevalue as $initiativevalue){?>
+								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativedeteriorationDecision) && $this->initiativedeteriorationDecision['factory_number_'.$factory['factory_number']])? "selected":""?>>
+								<?php echo $initiativevalue['descriptor']?>
+								</option>
+								<?php } ?>
+							</select>
+						</td>
+						<td><?php echo $initiativesdet['cost']?> (&euro;)</td>
+						<?php $factory_number_deterioration++;?>
+						<?php } ?>
+						<?php } ?>
+					</tr>
+				</table>
+			</div>
+		<br />
+		<br />		
+			<div class="fieldHeader">
+				Iniciativas de Marketing<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"initiativesmarketingField")))?>			
+			</div>
+			<?php if ($this->round_number<4){?> <h3 style="color:grey;text-align:center">No existen iniciativas disponibles para esta ronda</h3><?php }?>
+			<div id="initiativesmarketingField" class="fieldDiv" <?php if ($this->round_number<4){?> style="visibility:hidden"<?php }?>>
+				<table align="center">
+					<thead>
+						<th class="small">Acción de la iniciativa</th>
+						<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
+						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
+					</thead>
+					<?php $numberm=1;?>
+					<?php foreach ($this->initiativesMKT as $initiativesmkt) {
+							$chosen=0;
+							for ($round = 1; $round < $this->round_number; $round++) {
+						  		$chosen_aux=$this->initiative_chosen['initiative_marketing']['round_'.$round]['initiativemarketing_number_'.$numberm];
+						  		if ($chosen_aux==1) {
+						  			$chosen=1;
+						  		}
+						  	}
+						?>
+					<tr>
+						<td><?php echo $initiativesmkt['name']?></td>	
+						<td><select disabled="disabled" name="initiatives[initiativemarketing][initiativemarketing_number_<?php echo $numberm?>]" id="initiativesMkt<?php echo $numberm?>" display="block" <?php if ($chosen==1){?> disabled="disabled"<?php }?>>	
+							<?php foreach ($this->initiativevalue as $initiativevalue){?>
+							<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativemarketingDecision) && $this->initiativemarketingDecision['initiativemarketing_number_'.$numberm])? "selected":""?>>
+							<?php if ($chosen==1){ ?>
+									<?php echo ("Contratada");
+									} ?><?php 
+									if ($chosen!=1) { 
+										echo ($initiativevalue['descriptor']);
+									}?>
+							</option>
+							<?php } ?>
+						</select>
+						</td>
+						<td><?php echo $initiativesmkt['cost']?> (&euro;)</td>
+						<?php $numberm++;?>
+						<?php } ?>
+					</tr>
+				</table>
+			</div>
+			<div class="fieldHeader">
+				Iniciativas de Recursos Humanos<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"initiativeshumanresourcesField")))?>			
+			</div>
+			<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">No existen iniciativas disponibles para esta ronda</h3><?php }?>
+			<div id="initiativeshumanresourcesField" class="fieldDiv" <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
+				<table align="center">
+					<thead>
+						<th class="small">Acción de la iniciativa</th>
+						<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
+						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
+					</thead>
+					<?php $numberh=1;?>
+					<?php foreach ($this->initiativesHR as $initiativeshr) {?>
+					<tr>
+						<td><?php echo $initiativeshr['name']?></td>
+						<td><select disabled="disabled" name="initiatives[initiativehumanresources][initiativehumanresources_number_<?php echo $numberh?>]" id="initiativesHuman<?php echo $numberh?>" display="block">
+					 			<?php foreach ($this->initiativevalue as $initiativevalue){?>
+								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativehumanresourcesDecision) && $this->initiativehumanresourcesDecision['initiativehumanresources_number_'.$numberh])? "selected":""?>>
+								<?php echo $initiativevalue['descriptor']?>
+								</option>
+								<?php } ?>
+							</select>
+						</td>
+						<td><?php echo $initiativeshr['cost']?> (&euro;)</td>
+						<?php $numberh++;?>
+						<?php } ?>
+					</tr>
+				</table>
+			</div>
+			<?php } ?>
+		</form>
+	</div>
+	<div id="tabs-7" class="decisions_tab" id="marketresearch_decision">
+		<img src="/images/research.gif" alt="research" width="70" height="85" style="float:right" />
+		<form name="marketresearch" method="post">
+			<div class="fieldDiv">		
+			</div>
+			<div id="marketresearchFieldDescription" class="fieldDescription" align="center">
+				Determine aquellos estudios de mercado que desea contratar para su compa&ntildeía.<br/>La información estar&aacute; disponible para el siguiente periodo de simulación.
+			</div>
+			<br />
+			<div class="fieldHeader">
+				Crecimiento de canales<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"channelResearchField")))?>			
+			</div>
+			<div id="channelResearchField" class="fieldDiv">
+				<div id="channelResearchFieldDescription" class="fieldDescription" align="center">
+					Este estudio le ofrece un pronóstico del crecimiento esperado de los distintos canales de distribución.
+				</div>
+				<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
+				<select disabled="disabled" name="marketresearch[channelResearch]" id="marketResearchChannel" display="block" style="margin-left:50px;">	
+					<?php foreach ($this->researchvalue as $researchvalue){?> 
+						<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['channelResearch']['active']==$researchvalue['value'])? "selected":""?>>
+						<?php echo $researchvalue['descriptor']?>
+						</option>
+					<?php } ?>
+				</select>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo $this->researchcosts[0]['cost']?> (&euro;)
+			</div>
+			<div class="fieldHeader">
+				Comparativa de precios<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"pricesResearchField")))?>			
+			</div>
+			<div id="pricesResearchField" class="fieldDiv">
+				<div id="pricesResearchFieldDescription" class="fieldDescription" align="center">
+					Este estudio le presenta una comparativa de precios entre los productos de las diferentes compa&ntildeías del mercado.
+				</div>
+				<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
+				<select disabled="disabled" name="marketresearch[pricesResearch]" id="marketResearchPrices" display="block" style="margin-left:50px;">	
+					<?php foreach ($this->researchvalue as $researchvalue){?> 
+						<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['pricesResearch']['active']==$researchvalue['value'])? "selected":""?>>
+						<?php echo $researchvalue['descriptor']?>
+						</option>
+					<?php } ?>
+				</select>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo $this->researchcosts[1]['cost']?> (&euro;)
+			</div>
+			<div class="fieldHeader">
+				Comparativa de MKT<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"mktResearchField")))?>			
+			</div>
+			<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">Estudio no disponible para esta ronda</h3><?php }?>
+			<div id="mktResearchField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>
+				<div id="mktResearchFieldDescription" class="fieldDescription" align="center">
+					Este estudio le ofrece una relación de las acciones de marketing de su compa&ntildeía en comparación con la competencia.
+				</div>
+				<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
+				<select disabled="disabled" name="marketresearch[mktResearch]" id="marketResearchMkt" display="block" style="margin-left:50px;">	
+					<?php foreach ($this->researchvalue as $researchvalue){?> 
+						<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['mktResearch']['active']==$researchvalue['value'])? "selected":""?>>
+						<?php echo $researchvalue['descriptor']?>
+						</option>
+					<?php } ?>
+				</select>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo $this->researchcosts[2]['cost']?> (&euro;)
+			</div>
+			<div class="fieldHeader">
+				Lanzamientos esperados<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"spectedResearchField")))?>			
+			</div>
+			<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">Estudio no disponible para esta ronda</h3><?php }?>
+			<div id="spectedResearchField" class="fieldDiv" <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
+				<div id="spectedResearchFieldDescription" class="fieldDescription" align="center">
+					Este estudio trata de hacer una prospección de los mercados recogiendo información de los nuevos productos que próximamente van a incurrir en ellos.
+				</div>
+				<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
+				<select disabled="disabled" name="marketresearch[spectedResearch]" id="marketResearchSpected" display="block" style="margin-left:50px;">	
+					<?php foreach ($this->researchvalue as $researchvalue){?> 
+						<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['spectedResearch']['active']==$researchvalue['value'])? "selected":""?>>
+						<?php echo $researchvalue['descriptor']?>
+						</option>
+					<?php } ?>
+				</select>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo $this->researchcosts[3]['cost']?> (&euro;)
+			</div>
+			<div class="fieldHeader">
+				Cuentas anuales<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"accountResearchField")))?>			
+			</div>
+			<div id="accountResearchField" class="fieldDiv">
+				<div id="accountResearchFieldDescription" class="fieldDescription" align="center">
+					Este estudio presenta una comparación del rendimiento contable de su empresa y de su competencia.
+				</div>
+				<br />
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Contratar
+				<select disabled="disabled" name="marketresearch[accountResearch]" id="marketResearchAccount" display="block" style="margin-left:50px;">	
+					<?php foreach ($this->researchvalue as $researchvalue){?> 
+						<option value="<?php echo $researchvalue['value']?>" <?php echo (isset($this->marketResearchDecision) && $this->marketResearchDecision['accountResearch']['active']==$researchvalue['value'])? "selected":""?>>
+						<?php echo $researchvalue['descriptor']?>
+						</option>
+					<?php } ?>
+				</select>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Coste <?php echo $this->researchcosts[4]['cost']?> (&euro;)
+			</div>
+		</form>
+	</div>	
+	<div id="tabs-8" class="decisions_tab" id="idi_decision">
+	<img src="/images/i+d.gif" alt="i+d" width="90" height="110" style="float:right" />
+		<form name="idi" method="post">
+		<?php if($this->round_number==1){?><br /><br /><h3 style="color:grey;text-align:center">Esta secci&oacute;n no est&aacute; disponible para esta ronda</h3><br /><br /><?php } ?>
+			<?php if($this->round_number>1){?>
+			<div class="fieldDiv">		
+			</div>
+			<div class="fieldHeader">
+				Modificación de productos <?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"modificationIdiField")))?>			
+			</div>
+			<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">No disponible para esta ronda</h3><?php }?>
+			<div id="modificationIdiField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>
+				<div id="modificationIdiFieldDescription" class="fieldDescription" align="center">
+					Esta acción le permite modificar las características con las que est&aacute;n siendo fabricados sus productos.
+				</div>
+				<?php foreach ($this->products as $product){?>
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+						<div class="fieldSubHeader" style="color:#F2610D">
+							<br />
+							<?php echo $product['name']?>
+						</div>
+						<div id="changeIdiFieldDescription" class="fieldDescription">
+						<br />
+						<div class="fieldDiv" style="color:#4169E1" align="center">
+							  <?php foreach ($this->qualityParams as $qualityParam){?>
+							  <?php echo $qualityParam['name'] ?> : &nbsp;
+							<select disabled="disabled" name="idi[changeIdi][product_<?php echo $product['product_number'];?>][product_quality_<?php echo $qualityParam['quality_param_number'];?>]">
+								<?php if (isset($this->changeIdiDecision)) { ?>
+										<?php foreach ($this->changeidi as $changeidi){?> 
+											<option value="<?php echo $changeidi['value']?>" 
+												<?php echo (isset($this->changeIdiDecision) && $this->changeIdiDecision['product_'.$product['product_number']]['product_quality_'.$qualityParam['quality_param_number']]==$changeidi['value'])? "selected":""?>>
+												<?php echo $changeidi['descriptor']?>
+											</option>
+										<?php } } else { ?>
+										<?php foreach ($this->changeidi as $changeidi){?> 
+											<option value="<?php echo $changeidi['value']?>" 
+												<?php echo ($changeidi['value']==0)? "selected":""?>>
+												<?php echo $changeidi['descriptor']?>
+											</option>
+										<?php } //chageidi ?>				
+								<?php }//else?>
+							</select>
+							&nbsp;&nbsp;
+							<?php } ?>
+						</div>
+						</div>
+					<?php } // if?>
+				<?php } //products?>
+			</div>
+			<div class="fieldHeader">
+				Nuevos productos <?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"newIdiField")))?>			
+			</div>
+			<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">No disponible para esta ronda</h3><?php }?>
+			<div id="newIdiField" class="fieldDiv"  <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
+				<div id="newIdiFieldDescription" class="fieldDescription" align="center">
+					Determine el nuevo producto que desea desarrollar y el presupuesto que destina al proyecto de investigación y desarrollo asociado.
+				</div>
+				<br />
+				<table align="center">
+					<thead>
+						<th class="small">Nuevo producto</th>
+						<th class="small">&nbsp;&nbsp;Lanzar&nbsp;&nbsp;</th>
+						<th class="small">&nbsp;&nbsp;Presupuesto del proyecto&nbsp;&nbsp;</th>
+					</thead>
+				<?php $idiP=1;?>
+				<?php foreach ($this->idiProducts as $idiProduct){?>
+				<?php if($this->product_availability['product_number_'.$idiProduct['product_number']]!=1) {?>
+					<tr>
+						<td><?php echo $idiProduct['name']?></td>
+
+						<td><select disabled="disabled" name="idi[newIdi][idiproduct_<?php echo $idiP?>][product_number_<?php echo $idiProduct['product_number']?>][newidivalue]" style="margin-left:10px;" >
+							<?php foreach ($this->newidivalue as $newidivalue){?>
+								<option value="<?php echo $newidivalue['value']?>" <?php echo (isset($this->newIdiDecision) && $this->newIdiDecision['idiproduct_'.$idiP]['product_number_'. $idiProduct['product_number']]['newidivalue']==$newidivalue['value'])? "selected":""?>>
+								<?php echo $newidivalue['descriptor']?>
+								</option>
+							<?php } ?>
+							</select></td>
+						<td><input disabled="disabled" type="text" name="idi[newIdi][idiproduct_<?php echo $idiP?>][product_number_<?php echo $idiProduct['product_number']?>][newidibudget]"id="newidibudget" display="block"
+							<?php echo isset($this->newIdiDecision)? 
+							'value = "'.$this->newIdiDecision['idiproduct_'.$idiP]['product_number_'. $idiProduct['product_number']]['newidibudget']
+							.'"':""?></input></td>
+						<?php $idiP++;?>
+						<?php } ?>
+						<?php } ?>
+					</tr>
+				</table>
+			</div>
+			<?php } ?>	
+		</form>
+	</div>
+</div>

@@ -1,0 +1,23 @@
+<table>
+	<theader>
+		<th class="small"></th>
+	<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+	<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<th class="small">Región <?php echo $region_number?></th>
+	<?php } //for region?>
+	</theader>
+	<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+	<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+	<tr>
+		<td>Producto <?php echo $product_number?></td>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<?php $marketSize=$view->games->getMarketSize($view->game_id, 1, $product_number, $region_number);?>
+		<td>
+			<input type="text" name="marketSize[round_1][product_<?php echo $product_number?>][region_<?php echo $region_number?>]" 
+				   value="<?php echo $marketSize?>" class="medium">
+		</td>
+		<?php } //for region?>
+	</tr>
+	<?php } //for product?>
+</table>

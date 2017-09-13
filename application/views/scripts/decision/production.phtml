@@ -1,0 +1,405 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/factoryProduction.js', $type = 'text/javascript');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/production.js', $type = 'text/javascript');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-1.10.2.min.js', $type = 'text/javascript');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.1.10.3.min.js', $type = 'text/javascript');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/edit-decisions.js', $type = 'text/javascript');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/build_factory_confirm.js', $type = 'text/javascript');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.progressbar.js', $type = 'text/javascript');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.progressbar.min.js', $type = 'text/javascript');?>
+
+<!--http://simeydotme.github.io/jQuery-ui-Slider-Pips/-->
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/pips-slider/jquery-ui-slider-pips.min.js', $type = 'text/javascript');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/pips-slider/jquery-ui-slider-pips.css');?>
+
+
+<style>
+	.factoryContainer {
+		display: table;
+		border-radius: 3px;
+		float: left;
+		margin: 3px;
+		padding: 3px;
+	}
+</style>
+
+<div id='content'>
+	<img src="/images/factory.gif" alt="factory" width="85" height="98" style="float:right" />	
+	<form name="production" onsubmit="return validateProductionForm();" method="post">
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="regionFieldButton">
+				Región de Fabricación			
+			</div>
+			<div id="regionField" class="fieldDiv">
+				<div id="regionFieldDescription" class="fieldDescription" align="center">
+					Elija la región de fabricación de sus productos.
+				</div >
+				<br />
+				<?php $factory_number=1;?>
+				<?php $factory_count=1;?>
+				<input type="hidden" value="<?php echo ($this->numberOfFactories);?>" id="numberOfFactories" />			
+				<div id='newFactoryFieldDiv'>
+				
+				   Número de F&aacute;bricas: 
+					<?php echo ($this->numberOfFactories);
+					$factory_counter=$this->numberOfFactories;
+					if ($factory_counter==0)
+						$builts="0";
+					?>
+					<br />
+					<br />
+						<?php $region_count=0;?>
+							<?php foreach ($this->regions as $region){?>
+							<?php $nameRegion[]=$region['name'];?>
+							<?php $valueRegion[]=$region['region_number'];?>
+							<input type="hidden" value="<?php echo ($nameRegion[$region_count]);?>" id="namesRegions_<?php echo ($region_count);?>" />
+							<input type="hidden" value="<?php echo ($valueRegion[$region_count]);?>" id="numbersRegions_<?php echo ($region_count);?>" />
+							<?php $region_count++;?>
+						<?php } ?>
+					<?php foreach ($this->game_factories as $factory){
+						$existing_factory = 0;					
+						$built_factories[]=$factory['region_number'];			
+					?>				
+						<?php $builts = implode(":",$built_factories)?>
+						<div id="factoryField_<?php echo ($factory_number);?>" class="factoryField">
+						<div class="factoryHeader">
+							F&aacute;brica <?php echo $factory['factory_number'];?>
+						</div>
+							<div style="margin-left:10px">Región:&nbsp;
+							<?php $constructed=$this->lastFactory;
+								$round_constructed=$this->roundFactory;
+								if ($factory_number<$constructed && (($this->round_number>$round_constructed['factory_number_'.$factory_number])||($round_constructed['factory_number_'.$factory_number]>$this->round_number))){
+									$existing_factory=1;
+								}
+							?>
+							<!-- Desde aquí -->
+							<?php if ($existing_factory==1) {?>
+								<select disabled="disabled" name="production_decision[factories][factory_number_<?php echo $factory_number?>][region]" id="regionField" display="block">	
+									<?php foreach ($this->regions as $region){?>
+										<option value="<?php echo $region['region_number']?>" <?php echo (isset($this->regionDecision) && $this->regionDecision['factory_number_'.$factory_number]==$region['region_number'])? "selected":""?>>
+											<?php echo $region['name']?></div>
+										</option>
+										<br /><br />
+									<?php } ?>
+								</select>
+								<?php foreach ($this->regions as $region){?>
+										<?php if(isset($this->regionDecision) && $this->regionDecision['factory_number_'.$factory_number]==$region['region_number']) { ?> 
+											<input type="hidden" name="production_decision[factories][factory_number_<?php echo $factory_number?>][region]" value="<?php echo $region['region_number']?>">
+											<!--<br/><br/>
+											M&aacute;quinas totales:-->
+										<?php } ?>
+								<?php } ?>							
+								
+							<?php } else { ?>
+									<select name="production_decision[factories][factory_number_<?php echo $factory_number?>][region]" id="regionField" display="block">	
+									<?php foreach ($this->regions as $region){?>
+										<option value="<?php echo $region['region_number']?>" <?php echo (isset($this->regionDecision) && $this->regionDecision['factory_number_'.$factory_number]==$region['region_number'])? "selected":""?>>
+											&nbsp;&nbsp;&nbsp; <?php echo $region['name']?>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										</option>
+										<br /><br />
+									<?php } ?>
+									</select>
+							<?php } ?>
+							<!-- Hasta aquí -->
+						<?php
+							//var_dump($this->addCapacityDecision['factory_number_'.$factory_number]);die();
+							if (isset($this->addCapacityDecision)&&count($this->addCapacityDecision)>0) { 
+								//if(array_key_exists("factory_number_".$factory_number,$this->addCapacityDecision)) { ?>
+								<br /><br />
+									<div class="factoryCapacityHeader">Ampliar F&aacute;brica <?php echo $factory_number?></div>
+									<div id="addCapacity<?php echo $factory_number ?>" class="fieldOptions">
+										<div class="factoryCapacityField" id="factoryCapacityField_<?php echo $factory_number ?>">
+											&nbsp;&nbsp;Número de m&aacute;quinas:&nbsp;
+											<input type="text" name="production_decision[capacity][factory_number_<?php echo $factory_number ?>]" class="small" value="<?php echo($this->addCapacityDecision['factory_number_'.$factory_number]); ?>"></input>
+											</div>
+										</div>
+									</div>		
+							<?php //}
+							} else {
+								if($this->round_number>1){  ?>
+									<br /><br />
+									<div id="addCapacity<?php echo $factory_number ?>" class="fieldOptions" <?php if ($this->round_number<2 || ($round_constructed['factory_number_'.$factory_number]==$this->round_number)){?> style="visibility:hidden"<?php } ?>>
+										<!-- <a href="javascript:void(0);" OnClick="addCapacity(<?php //echo $factory_number ?>);return false;">(+) Ampliar F&aacute;brica <?php //echo $factory_number?></a> -->
+										<a href="javascript:void(0);" OnClick="addCapacity('factoryCapacityField_<?php echo $factory_number ?>');return false;">(+) Ampliar F&aacute;brica</a>
+										<div class="factoryCapacityField" id="factoryCapacityField_<?php echo $factory_number ?>" style="visibility:hidden;">
+											&nbsp;&nbsp;Número de m&aacute;quinas:&nbsp;
+											<input type="text" name="production_decision[capacity][factory_number_<?php echo $factory_number ?>]" class="small"></input>
+											</div>
+										</div>
+									</div>
+								<?php }
+							}
+						?>
+						<?php /* if ($existing_factory==1){
+							$region_where=0; 
+							/*foreach ($this->regions as $region){							
+								if (isset($this->regionDecision) && $this->regionDecision['factory_number_'.$factory_number]==$region['region_number']) {
+									$region_where=$region['region_number'];
+								}
+							} //endfor ?> 
+							<!--<input name="production_decision[factories][factory_number_<?php echo $factory_number?>][region]" type="hidden" value="<?php echo $region_where ?>">-->	
+						<?php } //endif */ ?>
+						</div>
+						
+						<?php $factory_number++;?>
+					<?php } ?>	
+				</div>	
+				<div style="clear:both;"></div>
+				
+			<?php /* if($this->round_number>1){?>
+				<?php $capacity_number=1;?>
+				<?php foreach ($this->game_factories as $factory){?>
+					<br />
+					<div id="addCapacity<?php echo $capacity_number ?>" class="fieldOptions" <?php if ($this->round_number<2 || ($round_constructed['factory_number_'.$capacity_number]==$this->round_number)){?> style="visibility:hidden"<?php } ?>>
+						<a href="javascript:void(0);" OnClick="addCapacity(<?php echo $capacity_number?>);return false;">(+) Ampliar F&aacute;brica <?php echo $capacity_number?></a>
+					</div>
+					<?php $capacity_number++;?> 
+				<?php	} ?>
+			<?php	} */ ?>
+				<br />
+				<input type="hidden" value="<?php echo $this->booleanCreate?>" id="booleanCreate" />	
+				<div style="clear:both;"></div>
+				<div id="addFactory" class="fieldOptions" <?php if (($this->round_number<2 && $this->numberOfFactories==1) || ($this->round_number==$round_constructed['factory_number_'.($constructed-1)])){?> style="visibility:hidden"<?php } ?>>
+					<a href="javascript:void(0);" OnClick="addFactory('numberOfFactories',<?php echo $factory_number?>,<?php echo $region_count+1?>,<?php echo $builts?>);return false;">(+) Construir F&aacute;brica.</a>
+				</div>
+				<div class="buttonsDiv">
+				<input class="button" type="submit" value="Construir" OnClick="javascript:buildFactoryConfirm();">
+				<input id="buildValidate" type="hidden" name="buildValidate" value="1">
+				</div>
+			</div>					
+		</div>
+		<br/>
+
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="qualityFieldButton">
+				Calidad			
+			</div>
+			<div id="qualityField" class="fieldDiv">
+				<div id="qualityFieldDescription" class="fieldDescription" align="center">
+					Elija la calidad de fabricación de sus productos.
+				</div>
+				<?php foreach ($this->products as $product){?>
+				<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+				
+				<div class="fieldSubHeader" style="color:#F2610D">
+				<br />
+						<?php echo $product['name']?>
+				</div>
+				<div id="calidadFieldDescription" class="fieldDescription">
+				<br />
+				<div class="fieldDiv" style="color:#4169E1" align="center">
+					  <?php 
+						$new_launch=0;
+						//$myproduct=new Model_DbTable_Games_Evolution_Np_NewProducts();
+						//echo($this->game_id."-".$this->company_id."-".$this->round_number."-".$product['product_number']);
+						//$myproduct_aux=$this->myproduct->getActualAvailability($this->game_id, $this->company_id, $this->round_number, $product['product_number']);
+						$new_launch=0;
+						if ($this->new_product[$product['product_number']]==1 && $this->prev_rnd_new_product[$product['product_number']]!=1){
+							$new_launch=1;
+						}
+						foreach ($this->qualityParams as $qualityParam){?>
+							<?php echo $qualityParam['name'] ?> : &nbsp;
+							<select <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[quality_params][product_quality_<?php echo $qualityParam['quality_param_number'];?>][product_<?php echo $product['product_number'];?>]">
+								<?php for ($i=1;$i<=10;$i++){?>
+									<option value="<?php echo $i?>" <?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)? "selected":""?>>
+								<?php echo $i?>
+							</option>
+						<?php }//for?>
+					</select>
+					&nbsp;&nbsp;
+						<?php } ?>
+						</div>
+						</div>
+						<?php } ?>
+					<?php } ?>
+				
+			</div>
+		</div>
+		<br/>
+
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="unitsFieldsButton">
+				Unidades a Producir			
+			</div>
+			<div id="unitsFields" class="fieldDiv">
+				<div id="unitsFieldDescription" class="fieldDescription" align="center">
+					Determine la cantidad de unidades a producir y distribuir en cada canal y para cada región.
+				</div>
+				<div id="unitsFieldsErrors" class="fieldErrors">
+				</div>
+				<div style="clear:both"></div>
+				<?php foreach ($this->game_factories as $factory){?>
+					<?php $round_constructed=$this->roundFactory;?>
+						<?php if (($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']]) && ($this->round_number>1)){?><br /><br /><h3 style="color:grey;text-align:center">La f&aacute;brica n&uacute;mero <?php echo $factory['factory_number']?> no estar&aacute; disponible hasta el siguiente turno</h3><br /><br /><?php } ?>
+						<?php if (!((($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']])&&($this->round_number>1))||($round_constructed['factory_number_'.$factory['factory_number']]>$this->round_number))){?>
+							<div style="clear:both"></div>
+							<div class="factoryHeader" style="text-align: center; font-weight: bold;">
+							F&aacute;brica <?php echo $factory['factory_number']?>
+							</div>
+							<?php foreach ($this->products as $product){?>
+							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+							<div class="factoryContainer">	
+								<div class="fieldSubHeader" <?php if (($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']])&&($this->round_number>1)){?> style="visibility:hidden" <?php } ?> style="color:#F2610D">
+								<br />
+										<?php echo $product['name']?>
+								</div>
+								<?php if (($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']]) && ($this->round_number>1)){?> <h3 style="color:grey;text-align:center">La f&aacute;brica no estar&aacute; disponible hasta el siguiente turno</h3><?php } ?>
+								<div class="fieldDiv" <?php if ((($this->round_number<=$round_constructed['factory_number_'.$factory['factory_number']])&&($this->round_number>1))||($round_constructed['factory_number_'.$factory['factory_number']]>$this->round_number)){?> style="visibility:hidden"<?php } ?>>
+									<table align="center">
+										<thead>
+											<th class="small"></th>
+										<?php foreach ($this->regions as $region){?>
+											<th class="small"><?php echo $region['name']?></th>
+										<?php } //for region?>
+										</thead>
+										<?php foreach ($this->channels as $channel){ ?>	
+										<tr>
+											<td><?php echo $channel['name']?></td>
+											<?php foreach ($this->regions as $region){?>
+											<td><input type="text" 
+												name="production_decision[production_units][factory_number_<?php echo $factory['factory_number']?>][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]" 
+												class="small" 
+												<?php echo isset($this->unitsDecision)? 
+													  'value = "'.$this->unitsDecision['factory_number_'.$factory['factory_number']]
+																					  ['product_'.$product['product_number']]
+																					  ['channel_'.$channel['channel_number']]
+																					  ['region_'.$region['region_number']]
+															 .'"':'value = "0"'?>
+												></td>
+											<?php } //for region?>
+										</tr>
+											<?php } //for channel?>
+									</table>
+								</div>
+							</div>
+							<?php } // product?>
+						<?php } // if availability?>
+					<?php } // if?>
+				<?php } // factory?>
+				<div style="clear:both"></div>
+			</div>
+		</div>
+		<br/>
+
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="suppliersFieldButton">
+				Gesti&oacute;n de los Proveedores
+			</div>
+			<img src="/images/truck_2.gif" alt="finance" width="120" height="75" style="float:right" />
+			<div id="suppliersField" class="fieldDiv">
+				<div id="SuppliersFieldDescription" class="fieldDescription" align="center">
+						Determine la política para la gesti&oacute;n de los proveedores.
+					</div>
+				<div class="fieldHeader">
+					Número de Proveedores			
+				</div>
+				<div style="clear: both"></div>
+				<div style="width: 600px; margin-left: auto; margin-right: auto;">
+					<div id="suppliersNumberslider" style="width: 350px; float: left;"></div>	
+					<div id="suppliersNumberField" class="fieldDiv" style="width: 150px; float: left;">
+						Número:&nbsp
+						<select name="suppliers[number]" id="suppliersNumber" display="block">
+							<?php for($i=1;$i<=5;$i++){?>
+								<option value="<?php echo $i?>" <?php echo (isset($this->numberDecision) && $this->numberDecision['number']==$i)? "selected":""?>><?php echo $i?></option>
+							<?php } ?>
+						</select>
+					</div>
+				</div>
+				<div style="clear: both"></div>
+				<div class="fieldHeader">
+					Plazos de pago			
+				</div>
+				<div style="width: 600px; margin-left: auto; margin-right: auto;">
+					<div style="width: 600px;">
+						Canales de distribución:
+						<br/>
+					</div>
+					<div id="payTermsFieldslider" style="width: 350px; float: left;"></div>	
+					<div id="payTermsField" style="width: 150px; float: left;" class="fieldDiv">
+						<select name="suppliers[payterms][channel_1]" id="payTermsFieldNumber" >
+							<?php foreach ($this->channel_payterms as $payterm){?>
+								<option value="<?php echo $payterm['value']?>" <?php echo (isset($this->paytermsDecision) && $this->paytermsDecision['channel_1']==$payterm['value'])? "selected":""?>>
+								<?php echo $payterm['descriptor']?>
+								</option>
+							<?php } ?>
+						</select>
+					</div>
+				</div>
+				<div style="clear: both"></div>
+			</div>
+		</div>
+		<br/>
+		<div class="buttonsDiv">
+			<input class="button" type="submit" value="Guardar">
+		</div>
+	</form>
+	
+	<script>
+		$( "#regionFieldButton" ).click(function() {
+			$( "#regionField" ).toggle( "easeInElastic" );
+		});
+		
+		$( "#qualityFieldButton" ).click(function() {
+			$( "#qualityField" ).toggle( "easeInElastic" );
+		});
+		
+		$( "#unitsFieldsButton" ).click(function() {
+			$( "#unitsFields" ).toggle( "easeInElastic" );
+		});
+		$( "#suppliersFieldButton" ).click(function() {
+			$( "#suppliersField" ).toggle( "easeInElastic" );
+		});
+		
+		//Slider número de proveedores
+		var suppliersNumber = $('#suppliersNumber');
+		var slider = $('#suppliersNumberslider').slider({
+			min: 1,
+			max: 5,
+			value: [suppliersNumber[0].selectedIndex+1],
+			slide: function (e, ui) {
+				var r1 = $('#suppliersNumber option').eq(ui.value).text();
+				suppliersNumber.val(ui.value);
+			}
+		});
+		
+		$('#suppliersNumber').change(function() {
+			$( "#suppliersNumberslider" ).slider( "value", $(this).val() );
+		});
+			
+		$("#suppliersNumberslider").slider("pips", {
+			rest: "label"
+		});
+		$("#suppliersNumberslider").slider("float");
+		
+		//Slider aplazar el pago
+		var payTermsFieldNumber = $('#payTermsFieldNumber');
+		var slider = $('#payTermsFieldslider').slider({
+			min: 0,
+			max: 4,
+			value: [payTermsFieldNumber[0].selectedIndex],
+			slide: function (e, ui) {
+				var r1 = $('#payTermsFieldNumber option').eq(ui.value).text();
+				payTermsFieldNumber.val(ui.value);
+			}
+		});
+		var plazo = ["Inmediato", "1&nbspmes", "2&nbspmeses", "3&nbspmeses", "4&nbspmeses"];
+		$("#payTermsFieldslider").slider("pips", {
+			rest: "label",
+			labels: plazo
+		});
+		$("#payTermsFieldslider").slider("float", { 
+			labels: plazo 
+		});
+		
+		$('#payTermsFieldNumber').change(function() {
+			$( "#payTermsFieldslider" ).slider( "value", $(this).val() );
+		});
+	</script>
+</div>

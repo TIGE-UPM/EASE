@@ -1,0 +1,23 @@
+<!--Carga de las hojas de estilos-->
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+
+
+<!--Muestra mensajes relevantes en caso de ser necesario-->
+<?php if (isset($this->message)){?>
+	<div class="info_box">
+		<span class="info_ok"><?php echo $this->message;?></span>
+	</div>
+<?php } ?>
+
+<!--Carga el formulario Forms/login.php con todos sus elementos-->
+<div id="loginBox">
+	<?php echo $this->form;?>
+</div>
+
+<!--Mensaje de final de página para sugerir registrarse-->
+
+	<!--<center>
+		<p>¿No tienes cuenta? <a href="<?php echo $this->baseUrl()?>/register">regístrate</a></p>
+	</center>-->
+
+

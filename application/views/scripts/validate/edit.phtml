@@ -1,0 +1,45 @@
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+
+<div id="content">
+	<h1>Editar: <?php echo $this->company['name']?> <a href="<?php echo $this->baseUrl()?>/game/edit?game_id=<?php echo $this->company['game_id']?>">(volver a juego)</a></h1>		
+	
+	<form method="post">
+		<table>
+			<tr>
+				<td>Empresa: </td>
+				<td><input type="text" name="company[name]" value="<?php echo $this->company['name']?>"></td>
+			</tr>
+			<tr>
+				<td>Contraseña de registro: </td>
+				<td><input type="text" name="company[register_pass]" value="<?php echo $this->company['registration_password']?>"></td>
+			</tr>
+		</table>
+		<input type="submit" value="Guardar cambios">
+	</form>
+<?php if (isset($this->users) && count($this->users)){?>
+	<table>
+		<theader>
+			<th>Rol</th>
+			<th>Nombre</th>
+			<th>Apellidos</th>
+			<th>Email</th>
+			<th>Acciones</th>
+		</theader>
+		<?php foreach ($this->users as $user){?>
+		<tr>
+			<td><?php  echo $this->escape($this->roles[$user->role])?></td>
+			<td><?php  echo $this->escape($user->name)?></td>
+			<td><?php  echo $this->escape($user->surname)?></td>
+			<td><?php  echo $this->escape($user->email)?></td>
+			<td><a href='<?php echo $this->url(array('controller'=>'company', 'action'=>'edituser')) . "?user_id=".$user->id.'&company_id='.$this->company['id']?>'>editar</a> / 
+				<a href='#' onClick='confirmation("¿Está seguro de querer borrar el usuario <?php echo $this->escape($user->name)?>?", "<?php echo $this->url(array('controller'=>'user', 'action'=>'delete'))."?user_id=".$user->id?>","");'>borrar</a>
+			</td>
+		</tr>
+		<?php }//for?>
+	</table>
+<?php }
+else {?>
+<p>No hay usuarios en esta empresa.</p>
+<?php } ?>
+<a href='<?php echo $this->url(array('controller'=>'company', 'action'=>'adduser'))."?company_id=".$this->company['id']?>'>nuevo usuario</a>
+</div>

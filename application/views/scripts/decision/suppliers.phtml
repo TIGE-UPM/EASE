@@ -1,0 +1,42 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<div id='content'>
+	<img src="/images/truck_2.gif" alt="finance"  width="120" height="75" style="float:right" />
+		<form name="suppliers" method="post">
+			<div class="fieldHeader">
+				Número de Proveedores<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"suppliersNumberField")))?>			
+			</div>
+			<div id="suppliersNumberField" class="fieldDiv" style="margin-left:150px;">
+				Número:&nbsp
+				<select name="suppliers[number]" id="suppliersNumber" display="block">
+					<?php for($i=0;$i<=5;$i++){?>
+						<option value="<?php echo $i?>" <?php echo (isset($this->numberDecision) && $this->numberDecision['number']==$i)? "selected":""?>><?php echo $i?></option>
+					<?php }?>
+				</select>
+			</div>
+			<div class="fieldHeader">
+				Plazos de pago<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"payTermsField")))?>			
+			</div>
+			<div id="payTermsField" class="fieldDiv" >
+				<?php foreach ($this->channels as $channel){?>
+				<div class="fieldDiv" style="margin-right:500px;" align="right" >
+					<?php echo $channel['name']?>:
+					<select name="suppliers[payterms][channel_<?php echo $channel['channel_number']?>]" style="margin-left:10px;" >
+						<?php foreach ($this->channel_payterms as $payterm){?>
+							<option value="<?php echo $payterm['value']?>" <?php echo (isset($this->paytermsDecision) && $this->paytermsDecision['channel_'.$channel['channel_number']]==$payterm['value'])? "selected":""?>>
+							<?php echo $payterm['descriptor']?>
+							</option>
+						<?php } ?>
+					</select>
+				</div>
+				<?php } ?>
+			</div>
+			
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Guardar">
+			</div>
+		</form>
+</div>

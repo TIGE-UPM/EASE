@@ -1,0 +1,24 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php if (isset($this->games) && count($this->games)){?>
+<form method="get" action="<?php echo $this->baseUrl();?>/register">
+	<div id="pageTitle">
+		Juego
+	</div>
+		<p>Seleccione juego en el que registrarse.</p>
+	<div id="gamesField" class="fieldDiv">
+		<select name='game_id' id="game_id">
+		<?php foreach($this->games as $game){?>
+			<option value="<?php echo $this->escape($game->id)?>"><?php echo $this->escape($game->name)?></option>
+		<?php }?>
+		</select>
+		<br></br>
+		<div class="buttonsDiv">
+			<input class=button type="submit" value="Registrarse" style="float:left">
+		</div>
+		
+	</div>
+</form>
+<?php } // if  
+else {?>
+	<p>No hay juegos en la plataforma.</p>
+<?php }?>

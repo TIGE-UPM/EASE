@@ -1,0 +1,103 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+
+<div id='content'>
+	<script type="text/javascript">
+		alert("No olvidar añadir el valor umbral de nuevos \ndesarrollos en \'games_param_idi_threshold\'.\nEl sistema no lo hace automáticamente.");
+	</script>
+	<div style="width: 600px; margin-left: auto; margin-right: auto">
+		<h1>Nuevo Juego o Plantilla</h1>
+	</div>
+	
+	<?php foreach ($this->errors as $error){
+		print_r($error);
+	} ?>
+	<form action="" method="post">
+		<div style="width: 600px; margin-left: auto; margin-right: auto">
+			<div class="fieldHeader">
+				Nombre			
+			</div>	
+			<div id="nameField" class="fieldDiv">
+				<input type="text" name="newGame[name]"> 
+				<input type="radio" name="newGame[is_template]" value="0" checked> Juego
+				<input type="radio" name="newGame[is_template]" value="1"> Plantilla
+			</div>
+			<div class="fieldHeader">
+				Descripción			
+			</div>
+			<div id="descriptionField" class="fieldDiv">
+				<textarea name="newGame[description]" id="description" display="block"></textarea>
+			</div>
+			<div class="fieldHeader">
+				Plantilla			
+			</div>
+			<div id="configField" class="fieldDiv">
+				<select name="newGame[template]">
+					<option value="0">Sin plantilla</option>
+					<?php foreach ($this->templates as $template){ ?>
+					<option value="<?php echo $template['id']?>"><?php echo $template['name']?></option>
+					<?php }?>
+				</select>
+			</div>
+		</div>
+		<div style="width: 600px; margin-left: auto; margin-right: auto">
+			<div style="width: 100%;">
+				<div class="fieldHeader" style="float: left;">
+					Número de productos&nbsp&nbsp&nbsp
+				</div>
+				<div id="numberField" class="fieldDiv" style="float: right;">
+					<input type="number" name="newGame[n_products]" id="description" display="block"></input>
+				</div>
+			</div>
+			<div style="clear:both;"></div>
+			<div style="width: 100%;">
+				<div class="fieldHeader" style="float: left;">
+					Número de atributos de calidad&nbsp&nbsp&nbsp
+				</div>				
+				<div id="numberField" class="fieldDiv" style="float: right;">
+					<input type="number" name="newGame[n_qualities]" id="description" display="block"></input>
+				</div>
+			</div>
+			<div style="clear:both;"></div>
+			<div style="width: 100%;">
+				<div class="fieldHeader" style="float: left;">
+					Número de regiones&nbsp&nbsp&nbsp			
+				</div>				
+				<div id="numberField" class="fieldDiv" style="float: right;">
+					<input type="number" name="newGame[n_regions]" id="description" display="block"></input>
+				</div>
+			</div>
+			<div style="clear:both;"></div>
+			<div style="width: 100%;">
+				<div class="fieldHeader" style="float: left;">
+					Número de canales de distribución&nbsp&nbsp&nbsp			
+				</div>				
+				<div id="numberField" class="fieldDiv" style="float: right;">
+					<input type="number" name="newGame[n_channels]" id="description" display="block"></input>
+				</div>
+			</div>
+			<div style="clear:both;"></div>
+			<div style="width: 100%;">
+				<div class="fieldHeader" style="float: left;">
+					Número de medios para publicidad&nbsp&nbsp&nbsp			
+				</div>				
+				<div id="numberField" class="fieldDiv" style="float: right;">
+					<input type="number" name="newGame[n_media]" id="description" display="block"></input>
+				</div>
+			</div>
+			<div style="clear:both;"></div>
+			<div style="width: 100%;">
+				<div class="fieldHeader" style="float: left;">
+					Número de iniciativas disponibles&nbsp&nbsp&nbsp			
+				</div>				
+				<div id="numberField" class="fieldDiv" style="float: right;">
+					<input type="number" name="newGame[n_initiatives]" id="description" display="block"></input>
+				</div>
+			</div>
+			<div style="clear:both;"></div>
+		<div>
+		
+		<div id="buttons" class="buttonsDiv fieldDiv">
+			<input class="button" type="submit" value="Crear">
+		</div>
+	</form>   
+</div>

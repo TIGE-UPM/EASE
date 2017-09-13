@@ -1,0 +1,17 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+		<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+		<th class="small">Canal <?php echo $channel_number?></th>
+		<?php } //for channel?>
+	</theader>
+	<tr>
+		<td>Plazo</td>
+		<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+		<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+		<td><input type="text" name="mkChannelsIncomeTerms[channel_<?php echo $channel_number?>]" 
+			value="<?php echo $view->games->getMkChannelIncomeTerms($view->game_id, $channel_number)?>"class="small"></td>
+		<?php } //for channel?>
+	</tr>
+</table>

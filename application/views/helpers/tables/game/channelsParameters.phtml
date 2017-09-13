@@ -1,0 +1,16 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Nombre del canal</th>
+		<th class="small">% Importancia TradeMKT</th>
+	</theader>
+	<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+	<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+	<?php $channel=$view->game_channels[$channel_number-1]; ?>
+	<tr>
+		<td>Canal de distribución <?php echo $channel_number?></td>
+		<td><input type="text" name="channel_<?php echo $channel_number?>[name]" class="medium" value="<?php echo $channel['name']?>"></td>
+		<td><input type="text" name="channel_<?php echo $channel_number?>[channel_weight]" class="small" value="<?php echo $channel['channel_weight'];?>"></td>
+	</tr>
+	<?php } //for product?>
+</table>

@@ -1,0 +1,528 @@
+<table class="outcomes_table">
+				<thead>
+					<th colspan='2' class='invisible categories'>
+						<h1 style="color:#B22222">CTAS. RESULTADOS</h1>
+					</th>
+					<?php foreach ($view->companies as $company){?>					
+						<th class="vertical_group_open">
+							<strong>
+							<?php echo $company['name']?>
+							</strong>
+						</th>
+
+					<?php } ?>
+				</thead>
+				<thead>
+					<th colspan='2'class='invisible categories'>
+						<h2 style="color:#800000">VENTAS</h2>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+							<th class="<?php echo $vertical_class ?>"></th>
+				    <?php }//for company ?>
+				</thead>
+				<?php 
+				$hgroup=0;
+				$incomes_sum=array();
+				foreach($view->channels as $channel){
+			
+					$hgroup++;
+					$hor_class='hor_group_odd';
+					if ($hgroup % 2 == 0){
+						$hor_class='hor_group_even';
+					}?>
+				<tr>
+					<td class="<?php echo $hor_class?> categories"></td>
+					<td class="<?php echo $hor_class?> categories"><?php echo $channel['name']?></td>
+					<?php 
+				
+						foreach ($view->companies as $company){
+							if (!isset ($incomes_sum[$company['id']])){
+								$incomes_sum[$company['id']]=0;
+							}
+							$incomes=0;
+							foreach ($view->products as $product){
+								if($view->game_product_availability['product_number_'.$product['product_number']]==1){
+									foreach ($view->regions as $region){
+										$incomes+=$view->outcomes_sales_incomes['company_'.$company['id']]
+																	['product_'.$product['product_number']]
+																	['region_'.$region['region_number']]
+																	['channel_'.$channel['channel_number']];
+									}					
+								}
+							}
+							$incomes_sum[$company['id']]+=$incomes;
+						?>
+						<td class="<?php echo $hor_class?> vertical_group_open" nowrap><?php echo number_format($incomes, 2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+				<?php } ?>
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>
+					<th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Total Ventas</h3>
+					</th>
+					<?php foreach ($view->companies as $company){?>				
+							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($incomes_sum[$company['id']], 2, '.', ',').' €'?></strong></th>
+				    <?php }//for company ?>
+				</thead>
+				<thead>
+					<th colspan='2'class='invisible categories'>
+						<h2 style="color:#800000">GASTOS</h2>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				</thead>
+				<!-- PRODUCCIÓN -->
+				<thead>			
+					<th colspan='2' class='invisible categories'>
+						<strong><h4>Producción & Logística</h4></strong>
+					</th>
+					<?php foreach ($view->companies as $company){ ?>
+						<th></th>
+					<?php } ?>
+				</thead>
+				<tr>
+					<td class="hor_group_odd categories"></td>
+					<td class="hor_group_odd categories">Fábricas y Maquinaria</td>
+					<?php foreach ($view->companies as $company){
+						
+						$pr_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['pr_fixed_cost'];?>
+						<td class="hor_group_odd vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['pr_fixed_cost'], 2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+				<tr>
+					<td class="hor_group_even categories"></td>
+					<td class="hor_group_even categories">Fabricación de productos</td>
+					<?php foreach ($view->companies as $company){
+						$pr_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['pr_var_costs'];?>
+						
+						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['pr_var_costs'], 2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+					
+									
+				<thead>
+					<th class="hor_group_odd categories"></th>
+					<th class="hor_group_odd categories">Abastecimiento de materias primas</th>
+					<?php foreach ($view->companies as $company){ ?>
+						<th></th>
+					<?php } ?>
+				</thead>
+				<?php 
+					$hgroup=2;
+				foreach($view->channels as $channel){
+					$hgroup++;
+					$hor_class='hor_group_odd';
+					if ($hgroup % 2 == 0){
+						$hor_class='hor_group_even';
+					}?>
+				<tr>
+					<td class="<?php echo $hor_class?> categories"></td>
+					<td class="<?php echo $hor_class?> categories">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+					<?php foreach ($view->companies as $company){
+						$pr_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['pr_rawMaterials_costs'][$channel['channel_number']];
+						?>
+						<td class="<?php echo $hor_class?> vertical_group_open" nowrap><?php echo number_format( $view->outcomes_costs[$company['id']]['pr_rawMaterials_costs'][$channel['channel_number']], 2, '.', ',').' €'?>
+							</td>
+					<?php } ?>
+				</tr>
+				<?php }?>
+				<thead>
+					<th class="hor_group_odd categories"></th>
+					<th class="hor_group_odd categories">Distribución</th>
+					<?php foreach ($view->companies as $company){ ?>
+						<th></th>
+					<?php } ?>
+				</thead>
+				<tr>
+					<td class="hor_group_odd categories"></td>
+					<td class="hor_group_odd categories">&nbsp;&nbsp;&nbsp;Gastos de Distribución</td>
+					<?php foreach ($view->companies as $company){
+						$pr_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['pr_distrib_costs']?>
+						<td class="hor_group_odd vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['pr_distrib_costs'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>
+				<br/>
+					<th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<a style="color:#000000">Total Producción & Logística</a>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($pr_costs[$company['id']], 2, '.', ',').' €';?></th>
+				    <?php }//for company ?>
+				</thead>
+				<!-- MARKETING -->
+				<thead>			
+					<th></th>
+					<th class='invisible categories'>
+						<strong><h4>Marketing</h4></strong>
+					</th>
+					<?php foreach ($view->companies as $company){
+						$mk_costs[$company['id']]=0;?>
+							<th></th>
+				    <?php }//for company ?>
+				</thead>
+				<thead>
+					<th class="hor_group_odd categories"></th>
+					<th class="hor_group_odd categories">Publicidad</th>
+					<?php foreach ($view->companies as $company){ ?>
+						<th></th>
+					<?php } ?>
+				</thead>
+				<?php $hgroup=1;
+				foreach($view->media as $media){
+					$hgroup++;
+					$hor_class='hor_group_odd';
+					if ($hgroup % 2 == 0){
+						$hor_class='hor_group_even';
+					}?>
+				<tr>
+					<td class="<?php echo $hor_class?> categories"></td>
+					<td class="<?php echo $hor_class?> categories">&nbsp;&nbsp;&nbsp;<?php echo $media['name']?></td>
+					<?php foreach ($view->companies as $company){
+							$mk_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['mk_advert_costs'][$media['media_number']];
+						?>
+						<td class="<?php echo $hor_class?> vertical_group_open">
+							<?php echo number_format($view->outcomes_costs[$company['id']]['mk_advert_costs'][$media['media_number']],2, '.', ',').' €'?>
+						</td>
+					<?php } ?>
+				</tr>
+				<?php } ?>
+				<thead>
+					<th class="hor_group_odd categories"></th>
+					<th class="hor_group_odd categories">Trade MKT</th>
+					<?php foreach ($view->companies as $company){ ?>
+						<th></th>
+					<?php } ?>
+				</thead>
+				<?php $hgroup=1;
+				foreach($view->trademedia as $trademedia){
+					$hgroup++;
+					$hor_class='hor_group_odd';
+					if ($hgroup % 2 == 0){
+						$hor_class='hor_group_even';
+					}?>
+				<tr>
+					<td class="<?php echo $hor_class?> categories"></td>
+					<td class="<?php echo $hor_class?> categories">&nbsp;&nbsp;&nbsp;<?php echo $trademedia['name']?></td>
+					<?php foreach ($view->companies as $company){
+							$mk_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['mk_trade_costs'][$trademedia['trademedia_number']];
+						?>
+						<td class="<?php echo $hor_class?> vertical_group_open">
+							<?php echo number_format($view->outcomes_costs[$company['id']]['mk_trade_costs'][$trademedia['trademedia_number']],2, '.', ',').' €'?>
+						</td>
+					<?php } ?>
+				</tr>
+				<?php } ?>
+				<thead>
+					<th class="hor_group_odd categories"></th>
+					<th class="hor_group_odd categories">Gasto por ventas</th>
+					<?php foreach ($view->companies as $company){ ?>
+						<th></th>
+					<?php } ?>
+				</thead>
+				<?php 
+					$hgroup=1;
+				foreach($view->channels as $channel){
+					$hgroup++;
+					$hor_class='hor_group_odd';
+					if ($hgroup % 2 == 0){
+						$hor_class='hor_group_even';
+					}?>
+				<tr>
+					<td class="<?php echo $hor_class?> categories"></td>
+					<td class="<?php echo $hor_class?> categories">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+					<?php foreach ($view->companies as $company){
+						$mk_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['mk_sales_costs'][$channel['channel_number']];
+					?>
+					<td class="<?php echo $hor_class?> vertical_group_open">
+						<?php echo number_format($view->outcomes_costs[$company['id']]['mk_sales_costs'][$channel['channel_number']],2, '.', ',').' €'?>
+					</td>
+					<?php } ?>
+				</tr>
+				<?php }?>
+				<thead>
+					<th class="hor_group_odd categories"></th>
+					<th class="hor_group_odd categories">Gasto fijo por scanales de distribución</th>
+					<?php foreach ($view->companies as $company){ ?>
+						<th></th>
+					<?php } ?>
+				</thead>
+				<?php 
+					$hgroup=1;
+				foreach($view->channels as $channel){
+					$hgroup++;
+					$hor_class='hor_group_odd';
+					if ($hgroup % 2 == 0){
+						$hor_class='hor_group_even';
+					}?>
+				<tr>
+					<td class="<?php echo $hor_class?> categories"></td>
+					<td class="<?php echo $hor_class?> categories">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+					<?php foreach ($view->companies as $company){
+						$mk_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['mk_fixed_costs'][$channel['channel_number']];
+						?>
+						<td class="<?php echo $hor_class?> vertical_group_open" nowrap><?php echo number_format( $view->outcomes_costs[$company['id']]['mk_fixed_costs'][$channel['channel_number']],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+				<?php }?>
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>
+					<th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<a style="color:#000000">Total Marketing</a>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($mk_costs[$company['id']],2, '.', ',').' €';?></th>
+				    <?php }//for company ?>
+				</thead>
+				<!-- PERSONAL -->
+				<thead>			
+					<th></th>
+					<th class='invisible categories'>
+						<strong><h4>Recursos Humanos</h4></strong>
+					</th>
+					<?php foreach ($view->companies as $company){
+						$hr_costs[$company['id']]=0;?>
+							<th></th>
+				    <?php }//for company ?>
+				</thead>
+				<tr>
+					<td class="hor_group_odd categories"></td>
+					<td class="hor_group_odd categories">Contratación</td>
+					<?php foreach ($view->companies as $company){
+						$hr_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['hr_hiring_costs']?>
+						<td class="hor_group_odd vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['hr_hiring_costs'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+				<tr>
+					<td class="hor_group_even categories"></td>
+					<td class="hor_group_even categories">Formación</td>
+					<?php foreach ($view->companies as $company){
+						$hr_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['hr_training_costs']?>
+						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['hr_training_costs'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+				<tr>
+					<td class="hor_group_odd categories"></td>
+					<td class="hor_group_odd categories">Salarios</td>
+					<?php foreach ($view->companies as $company){
+						$hr_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['hr_wages_costs']?>
+						<td class="hor_group_odd vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['hr_wages_costs'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>
+					<th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<a style="color:#000000">Total Recursos Humanos</a>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($hr_costs[$company['id']],2, '.', ',').' €'?></th>
+				    <?php }//for company ?>
+				</thead>				
+				<!-- OTROS GASTOS -->
+				<thead>			
+					<th></th>
+					<th class='invisible categories'>
+						<strong><h4>Otros Gastos de Explotaci&oacute;n</h4></strong>
+					</th>
+					<?php foreach ($view->companies as $company){
+						$other_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['initiatives_pr_costs'];
+						$other_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['initiatives_mk_costs'];
+						$other_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['initiatives_hr_costs'];
+						$other_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['market_researches_costs'];
+						$other_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['idi_changes_costs'];
+						$other_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['idi_new_costs'];?>
+							<th></th>
+				    <?php }//for company ?>
+				</thead>
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>
+					<th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<a style="color:#000000">Total Otros gastos</a>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($other_costs[$company['id']],2, '.', ',').' €'?></th>
+				    <?php }//for company ?>
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>				
+				<thead>
+				    <th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Total Gastos</h3>
+					</th>
+					<?php foreach ($view->companies as $company){
+						$total_costs[$company['id']]=$pr_costs[$company['id']]+
+													$mk_costs[$company['id']]+
+													$hr_costs[$company['id']]+
+													$other_costs[$company['id']]?>
+							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($total_costs[$company['id']],2, '.', ',').' €'?></strong></th>
+				    <?php }//for company ?>
+				</thead>
+				<!-- BALANCE -->
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>
+				    <th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Variaci&oacute;n de Existencias</h3>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+						<?php $inventories[$company['id']]=$view->outcomes_balance_sheet[$company['id']]['stock']-$view->prev_outcomes_balance_sheet[$company['id']]['stock'];;?>
+							<th  class="vertical_group_open"nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($inventories[$company['id']],2, '.', ',').' €'?></strong></th>
+				<?php }//for company ?>
+				</thead>
+				
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>			
+					<th colspan="2" class='invisible categories'>
+						<h2 style="color:#A52A2A;margin-bottom:12px;margin-left:5px">EBITDA</h2>
+					</th>
+					<?php foreach ($view->companies as $company){
+						 	$ebitda[$company['id']]=$incomes_sum[$company['id']]-($total_costs[$company['id']]-$inventories[$company['id']])?>
+							<th nowrap style="color:#A52A2A"><strong><?php echo number_format($ebitda[$company['id']],2, '.', ',').' €'?></strong></th>
+				    <?php }//for company ?>
+				</thead>
+				<thead>
+				    <th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Amortizaciones</h3>
+					</th>
+					<?php foreach ($view->companies as $company){ 
+						$amortization[$company['id']]=$view->amortization_view[$company['id']]; /*?> */
+						/*$amortization[$company['id']]=$view->outcomes_balance_sheet[$company['id']]['amortization'];*/ ?>
+						<th class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($amortization[$company['id']],2, '.', ',').' €'?></strong></th>
+					<?php }//for company ?>
+				</thead>
+				<tr></tr>
+					<th></th>
+					<th></th>
+						<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    	<?php }//for company ?>
+				<!-- FINANCIEROS -->
+				<thead>			
+				    <th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Financieros</h3>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+							<th class='invisible categories' style="background-color:#FAFAD2"></th>
+				    <?php }//for company ?>
+				</thead>
+				<tr>
+					<td class="hor_group_even categories"></td>
+					<td class="hor_group_even categories">Intereses Financiación a C.P.</td>
+					<?php foreach ($view->companies as $company){				
+							$fi_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['fi_debt_costs_st']?>
+						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['fi_debt_costs_st'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+				<tr>
+					<td class="hor_group_even categories"></td>
+					<td class="hor_group_even categories">Intereses Financiación a L.P.</td>
+					<?php foreach ($view->companies as $company){				
+							$fi_costs[$company['id']]+=$view->outcomes_costs[$company['id']]['fi_debt_costs_lt']?>
+						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_costs[$company['id']]['fi_debt_costs_lt'],2, '.', ',').' €'?></td>
+					<?php } ?>
+				</tr>
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>
+					<th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<a style="color:#000000">Total Financieros</a>
+					</th>
+					<?php foreach ($view->companies as $company){?>
+							<th  class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><?php echo number_format($fi_costs[$company['id']],2, '.', ',').' €'?></th>
+				    <?php }//for company ?>
+				</thead>						
+				<thead>			
+					<th colspan="2" class='invisible categories'>
+						<h2 style="color:#A52A2A;margin-bottom:12px;margin-left:5px">EBT</h2>
+					</th>
+					<?php foreach ($view->companies as $company){
+						$ebt[$company['id']]=$ebitda[$company['id']]-$amortization[$company['id']]-$fi_costs[$company['id']]?>
+							<th nowrap style="color:#A52A2A"><strong><?php echo number_format($ebt[$company['id']],2, '.', ',').' €'?></strong></th>
+					<?php }//for company ?>
+				</thead>
+				<thead>
+				    <th class='invisible categories' style="background-color:#FAFAD2"></th>
+					<th class='invisible categories' style="background-color:#FAFAD2">
+						<h3 style="background-color:#FAFAD2;color:#000000;margin-bottom:15px;margin-left:5px">Impuestos (25%)</h3>
+					</th>
+					<?php foreach ($view->companies as $company){
+						if ($ebt[$company['id']]<=0) {
+								$taxes[$company['id']]=0;
+							} 
+							else{
+								$taxes[$company['id']]=($ebt[$company['id']]) *0.25;
+						}?>
+					<th class="vertical_group_open" nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($taxes[$company['id']],2, '.', ',').' €'?></strong></th>
+					<?php }//for company ?>
+				</thead>
+				<!-- BALANCE -->
+					<tr></tr>
+					<th></th>
+					<th></th>
+					<?php foreach ($view->companies as $company){?>
+							<th></th>
+				    <?php }//for company ?>
+				<thead>			
+					<th colspan="2" class='invisible categories'>
+						<h2 style="color:#A52A2A;margin-bottom:12px;margin-left:5px; font-size: 18px">RESULTADO</h2>
+					</th>
+					<?php foreach ($view->companies as $company){
+						 $result[$company['id']] = $ebt[$company['id']] - $taxes[$company['id']]?>
+							<th nowrap style="color:#A52A2A; font-size: 20px"><strong><?php echo number_format($result[$company['id']],2, '.', ',').' €'?></strong></th>
+				    <?php }//for company?>
+				</thead>
+			</table>

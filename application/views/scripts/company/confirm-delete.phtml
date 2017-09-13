@@ -1,0 +1,11 @@
+<div id="content">
+	<h1>¿Está seguro de que desea borrar la empresa  <?php echo $this->company['name']?>?</h1>
+
+	Esta acción la eliminará del juego y borrará todos los usuarios que la componen.<br><br>
+	<span style="border:1px solid #999; padding:2px; margin:2px">
+		<a href='<?php echo $this->url(array('controller'=>'game', 'action'=>'edit')) . "?game_id=".$company['game_id']?>'>cancelar</a>
+	</span>
+	<span style="border:1px solid #999; padding:2px; margin:2px">
+		<a href='<?php echo $this->url(array('controller'=>'company', 'action'=>'delete')) . "?company_id=".$this->company['id']?>'>borrar</a>
+	</span>
+</div>

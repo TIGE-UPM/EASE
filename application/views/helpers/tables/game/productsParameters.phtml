@@ -1,0 +1,41 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Nombre del producto</th>
+		<th class="small">% Precio</th>
+		<th class="small">% Calidad</th>
+		<th class="small">% Publicidad</th>
+		<th class="small">% Trade MKT</th>
+		<th class="small">&nbsp;Disponibilidad</th>
+		<th class="normal">&nbsp;Presupuesto I+D+i</th>
+	</theader>
+	<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+	<?php $option[0]=array('availability'=>0, 'descriptor'=>'Inicial'); ?>
+	<?php $option[1]=array('availability'=>1, 'descriptor'=>'I+D+i'); ?>
+	<?php $this->option=$option; ?>
+	<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+	<?php $product=$view->game_products[$product_number-1]; ?>
+	<?php $product_budget=$view->game_products_budget[$product_number-1]; ?>
+	<tr>
+		<td>Producto <?php echo $product_number?></td>
+		<td><input type="text" name="product_<?php echo $product_number?>[name]" class="medium" value="<?php echo $product['name']?>"></td>
+		<td><input type="text" name="product_<?php echo $product_number?>[price_weight]" class="small" value="<?php echo $product['price_weight'];?>"></td>
+		<td><input type="text" name="product_<?php echo $product_number?>[quality_weight]" class="small" value="<?php echo $product['quality_weight'];?>"></td>
+		<td><input type="text" name="product_<?php echo $product_number?>[media_weight]" class="small" value="<?php echo $product['media_weight'];?>"></td>
+		<td><input type="text" name="product_<?php echo $product_number?>[trade_weight]" class="small" value="<?php echo $product['trade_weight'];?>"></td>
+		<td><select name="product_<?php echo $product_number?>[availability]" id="product_<?php echo $product_number?>[availability]" display="block" onChange="Budget('product_<?php echo $product_number?>');">				
+			<?php 	foreach ($this->option as $option){?> 
+				<option id="option_avail<?php echo $product_number?>" value="<?php echo $option['availability']?>" <?php echo (isset($product) && $product['availability']==$option['availability'])? "selected":""?>>
+				 	<?php echo $option['descriptor']?>
+				</option>
+			<?php } ?>
+			</select></td>
+		<?php if ($product['availability']==1){?>
+			<td><input type="text"  id="product_<?php echo $product_number?>[budget]" name="product_<?php echo $product_number?>[budget]" class="normal" value="<?php echo $product_budget['budget'];?>"></td>
+		<?php } 
+		else {?>
+			<td><input type="text" id="product_<?php echo $product_number?>[budget]" class="normal" value="0" readonly style="background-color:#EEEEEE;"></td>
+		<?php } ?>
+	</tr>
+	<?php } //for product?>
+</table>

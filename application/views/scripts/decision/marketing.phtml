@@ -1,0 +1,632 @@
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.min.js', $type = 'text/javascript')?>
+
+
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery.toastmessage.css');?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.toastmessage.js', $type = 'text/javascript')?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/marketing.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+
+<div id='content'>
+<div id="n_productos" style="display:none;"><?php echo $this->n_products?></div>
+<div id="n_regiones_productos" style="display:none;">
+	<?php $n_regions_products=0;
+	foreach ($this->media as $media){ 
+		foreach ($this->regions as $region){
+			$n_regions_products = $n_regions_products + 1;
+		}
+	}?>
+	<?php echo $n_regions_products?>
+	
+</div>
+
+<div class="flotante">
+	<div id="image_text">&nbsp&nbspMarketing</div>
+	<img id="image" src="/images/marketing.gif" alt="finance" width="155" height="95" style="float:right" />
+</div>
+	<form name="marketing" onsubmit="return validateMarketingForm(<?php echo $this->n_products?>);" method="post">
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="pricesFieldButton">
+				Precios 
+			</div>
+			<br/>
+			<div id="pricesFieldContainer" class="fieldDiv">
+				<div id="pricesFieldDescription" class="fieldDescription">
+					Determine la política de precios de sus productos para cada región y canal:
+				</div>
+				<div id="pricesFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="pricesField" class="subFieldContainer1">
+				
+					<?php foreach ($this->products as $product){?>
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+					<div class="subFieldContainer2">
+						<div class="fieldSubHeader">
+							<?php echo $product['name']?>
+						</div>
+						<div class="fieldContent">
+							<table class="table_input">
+								<thead>
+									<th class="small"></th>
+									<?php foreach ($this->regions as $region){?>
+									<th class="small"><?php echo $region['name']?></th>
+									<?php } //for region?>
+								</thead>
+								<?php foreach ($this->channels as $channel){ ?>	
+								<tr>
+									<td><?php echo $channel['name']?></td>
+									<?php foreach ($this->regions as $region){?>
+									<td><input type="text" name="marketing[prices][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]" class="small"
+										<?php echo isset($this->pricesDecision)? 
+											  'value = "'.$this->pricesDecision['product_'.$product['product_number']]
+																			  ['channel_'.$channel['channel_number']]
+																			  ['region_'.$region['region_number']]
+													 .'"':'value = "0"'?>></input>
+										</td>
+									<?php } //for region?>
+								</tr>
+									<?php } //for channel?>
+							</table>
+						</div>
+					</div>
+					
+
+					<?php } ?>
+				<?php } // product?>
+				<div style="clear:both"><br/></div>
+				</div>
+			</div>
+		</div>
+		<br />
+		
+		<style>
+			.slider_product_container{
+				width: 800px; margin: 0 auto 0 auto;
+			}
+			.slider_product_title{
+				float: left; 
+				display: block; 
+				width: 100px; 
+				color: #F2610D
+			}
+			
+			.mkt_adv_budg_sliders{
+				width:450px; 
+				display:block; 
+				float: left; 
+				margin-top: 2px; 
+				background-color: #7eaedf; 
+				background-image: none;
+			}
+			
+			.mkt_adv_budg_input {
+				text-align:center; 
+				float:right
+			}
+
+			.mkt_adv_budg_value{
+				width: 150px;
+				float: right;
+			
+			}
+			
+			.subslider_container {
+				width: 650px; 
+				margin: 0 auto 0 auto; 
+				margin:1px;
+			}
+			
+			.subslider_product_title {
+				float: left; 
+				display: block; 
+				width: 200px;
+				font-style: italic;
+			}
+			
+			.mkt_adv_budg_subsliders{
+				width:250px; 
+				display:block; 
+				float: left; 
+				margin-top: 2px;
+			}
+			
+			.mkt_adv_budg_subinput{
+				text-align:center; float:right;
+			}
+			
+			.mkt_adv_budg_subvalue{
+				width: 100px;
+				float: right;
+			}
+			
+			
+			
+			
+			
+			
+			
+			.mkt_trade_mkt_budg_sliders{
+				width:450px; 
+				display:block; 
+				float: left; 
+				margin-top: 2px; 
+				background-color: #7eaedf; 
+				background-image: none;
+			}
+			
+			.mkt_trade_mkt_budg_input {
+				text-align:center; 
+				float:right
+			}
+
+			.mkt_trade_mkt_budg_value{
+				width: 150px;
+				float: right;
+			
+			}
+			
+			.mkt_trade_mkt_budg_subsliders{
+				width:250px; 
+				display:block; 
+				float: left; 
+				margin-top: 2px;
+			}
+			
+			.mkt_trade_mkt_budg_subinput{
+				text-align:center; float:right;
+			}
+			
+			.mkt_trade_mkt_budg_subvalue{
+				width: 100px;
+				float: right;
+			}
+		
+		</style>
+		
+		
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="advertisingbudgetFieldButton">
+				Publicidad
+			</div>
+			<br/>
+			<div id="advertisingbudgetField" class="fieldDiv">
+				<div id="advertisingbudgetFieldDescription" class="fieldDescription" align="center">
+					Determine el presupuesto asignado a Publicidad: <input type="text" name="marketing[advertising_budget]" id="advertisingBudget" display="block"
+						<?php echo isset($this->advertisingbudgetDecision)? 
+							'value = "'.$this->advertisingbudgetDecision
+							.'"':""?>></input>
+				</div>
+				<div id="advertisingbudgetFieldsErrors" class="fieldErrors">
+				</div>
+				<br />
+			</div>
+			
+				
+			<div id="advertisingbudgetDistributionField" class="fieldDiv">
+				<br />
+				<div id="advertisingbudgetDistributionFieldDescription" class="fieldDescription" align="center">
+					Determine la distribución del presupuesto de Publicidad por productos(%) y posteriormente para cada producto su distribución por canales y regiones (%):
+				</div>
+				<div id="advertisingbudgetDistributionFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="advertisingbudgetProductDistributionFieldsErrors" class="fieldErrors">
+				</div>
+				<br />
+				<div id="advertisingbudgetDistribution">
+					<?php foreach ($this->products as $product){ 
+					$number_counter=$product['product_number']-1;?>
+					<div id="advertisingbudgetDistribution_<?php echo $number_counter?>">
+						<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>	
+							<div style="clear: both"></div>
+							<div class="slider_product_container">
+								<div class="slider_product_title"><span><?php echo $product['name']?>: <span></div>
+								<div id="defaultslide_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>" class="mkt_adv_budg_sliders"></div>
+								<input type="text" id="currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>" name="marketing[advertising_budget_distribution][product_<?php echo $product['product_number']?>]" class="small mkt_adv_budg_input"
+												<?php echo isset($this->advertisingbudgetProductsDecision)?
+													'value = "'.$this->advertisingbudgetProductsDecision['product_'.$product['product_number']] 
+															.'"':'value = "0"'?>></input>
+								<span id="currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value" class="mkt_adv_budg_value"></span>
+								
+							</div>
+							
+							
+							<div style="width: 600px; margin: 0 auto 0 auto;">	
+							<br/>
+							<div id="advertisingbudgetDetailDistributionFieldsErrors_<?php echo $number_counter?>" class="fieldErrors">
+							</div>
+								<div id="advertisingbudgetDetailDistribution_<?php echo $number_counter?>">
+								<?php foreach ($this->media as $media){ ?>
+									<div style="display: block">
+										<span style="font-weight: bold;"><?php echo $media['name']?>:</span>
+									</div>
+									<?php foreach ($this->regions as $region){?>
+										<div style="clear: both"></div>
+										<div class="subslider_container">
+											<div class="subslider_product_title">
+												<span>
+													&nbsp;&nbsp;&nbsp;<?php echo $region['name']?>
+												<span>
+											</div>
+											<div id="defaultslide_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>" class="mkt_adv_perc_prod_<?php echo $product['product_number']?>_sliders mkt_adv_budg_subsliders">
+											</div>
+											<input type="text" id="currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>" name="marketing[advertising_percentage][product_<?php echo $product['product_number']?>][media_<?php echo $media['media_number']?>][region_<?php echo $region['region_number']?>]" class="small mkt_adv_budg_input_<?php echo $product['product_number']?> mkt_adv_budg_subinput"
+												<?php echo isset($this->advertisingpercentageDecision)?
+														'value = "'.$this->advertisingpercentageDecision['product_'.$product['product_number']]
+																									['media_'.$media['media_number']]
+																									['region_'.$region['region_number']] 
+																.'"':'value = "0"'?>>
+											</input>
+											<span id="currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value" class="mkt_adv_budg_subvalue"></span>
+										</div>
+
+										<br />
+									<?php }
+								}?>
+								</div>
+							</div>
+							
+							
+							<div style="clear: both"></div>
+							<br />
+							
+						<?php }?>
+						</div>
+					<?php } //for product?>
+				</div>
+				<span id="defaultPercentages"></span>
+				
+				
+				<script> 
+					//Poner borde a los input del mismo estilo en los sliders del mismo tipo al seleccionarlos
+					$( ".mkt_adv_budg_input" ).focus(function() {
+						$(".mkt_adv_budg_input").css('border','1px solid #336699');
+					});
+					$( ".mkt_adv_budg_input" ).blur(function() {
+						$(".mkt_adv_budg_input").css('border','');
+					});
+					<?php foreach ($this->products as $product){ ?>
+					$( ".mkt_adv_budg_input_<?php echo $product['product_number']?>" ).focus(function() {
+						$(".mkt_adv_budg_input_<?php echo $product['product_number']?>").css('border','1px solid #336699');
+					});
+					$( ".mkt_adv_budg_input_<?php echo $product['product_number']?>" ).blur(function() {
+						$(".mkt_adv_budg_input_<?php echo $product['product_number']?>").css('border','');
+					});
+					
+					//Pone el valor inicial a los span de los sliders
+					$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + ' €');
+						<?php foreach ($this->media as $media){ ?>
+							<?php foreach ($this->regions as $region){?>
+						$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+
+					<?php }}}?>
+					
+					$(function(){
+						<?php foreach ($this->products as $product){ ?>
+							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+								
+								//Para actualizar el valor de los spans de los sliders de publicidad al cambiar el presupuesto de publicidad
+								$("#advertisingBudget").keyup(function() {
+									$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>").val())/100).toFixed(0)).toString() + ' €');
+									<?php foreach ($this->media as $media){ ?>
+										<?php foreach ($this->regions as $region){?>
+										$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+									<?php }}?>
+								})
+								
+								
+								//Cambios en los sliders y spans e input generales de publicidad al mover el slider de productos
+								$('#defaultslide_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').slider({ 
+									max: 100,
+									min: 0,
+									value: <?php if(isset($this->advertisingbudgetProductsDecision)){ 
+												echo($this->advertisingbudgetProductsDecision['product_'.$product['product_number']]);
+											} else {
+												echo ("0");
+											}?>,
+									slide: function(e,ui) {
+										$('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val(ui.value);
+										$(ui.value).val($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val());
+										$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + ' €');
+										<?php foreach ($this->media as $media){ ?>
+											<?php foreach ($this->regions as $region){?>
+												$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+										<?php }}?>
+									}
+								});
+								//Cambios en los sliders y spans e input generales de publicidad al introducir un valor en el input
+								$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>").keyup(function() {
+									if($(this).val() > 100){
+										$(this).val(100);
+									}
+									if($(this).val() < 0){
+										$(this).val(0);
+									}
+									$('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val($(this).val());
+									$("#defaultslide_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>").slider("value" , $(this).val());
+									$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($(this).val())/100).toFixed(0)).toString() + ' €');
+									<?php foreach ($this->media as $media){ ?>
+										<?php foreach ($this->regions as $region){?>
+										$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($(this).val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+									<?php }}?>
+								})
+							
+								<?php foreach ($this->media as $media){ ?>
+									<?php foreach ($this->regions as $region){?>
+										//Cambios en los sliders y spans e input de publicidad al mover un slider que no sea de productos
+										$('#defaultslide_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').slider({ 
+											max: 100,
+											min: 0,
+											value: <?php if(isset($this->advertisingpercentageDecision)){
+														echo($this->advertisingpercentageDecision['product_'.$product['product_number']]
+																							['media_'.$media['media_number']]
+																							['region_'.$region['region_number']]);
+														} else {
+															echo ("0");
+														}?>
+														,
+											slide: function(e,ui) {
+												$('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val(ui.value);
+												$(ui.value).val($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val());
+												$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+											}
+										});	
+										//Cambios en los sliders y spans e input de publicidad al introducir un valor en el input que no sea de productos
+										$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>").keyup(function() {
+											if($(this).val() > 100){
+												$(this).val(100);
+											}
+											if($(this).val() < 0){
+												$(this).val(0);
+											}
+											$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>").val($(this).val());
+											$("#defaultslide_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>").slider("value" , $(this).val())
+											$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text((((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($(this).val())/10000)).toFixed(0)).toString() + ' €');
+										})
+								<?php }
+								}?>
+							<?php }
+						}?>
+					});
+
+				</script>
+			</div>
+		</div>
+		<br/>
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="tradeFieldButton">
+				Trade MKT 
+			</div>
+			<br/>
+			<div id="trademktField" class="fieldDiv">
+				<div id="trademktFieldDescription" class="fieldDescription">
+				Determine el presupuesto asignado a Trade MKT: <input type="text" name="marketing[trademkt_budget]" id="trademkt" class="normal"
+									<?php echo isset($this->trademktbudgetDecision)? 
+										'value = "'.$this->trademktbudgetDecision
+										.'"':""?>></input>
+				</div>
+				<div id="trademktbudgetFieldsErrors" class="fieldErrors">
+				</div>
+				</br>
+			</div>
+			
+			
+			<div id="trademktbudgetDistributionField" class="fieldDiv">
+				<br />
+				<div id="trademktbudgetDistributionFieldDescription" class="fieldDescription">
+					Determine la distriuci&oacute;n del presupuesto de Trade Mkt por productos (%) y posteriormente para cada producto su distribución por canales y trade media (%):
+				</div>
+				<div id="trademktbudgetDistributionFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="trademktbudgetProductDistributionFieldsErrors" class="fieldErrors">
+				</div>
+				</br>
+				<div id="trademktbudgetDistribution">
+				<?php foreach ($this->products as $product){
+					$number_counter=$product['product_number']-1;?>
+					<div id="trademktbudgetDistribution_<?php echo $number_counter?>">
+						<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>	
+						<div style="clear: both"></div>
+						
+						<div class="slider_product_container">
+							<div class="slider_product_title"><span><?php echo $product['name']?>: <span></div>
+							<div id="defaultslide_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>" class="mkt_trade_mkt_budg_sliders"></div>
+							<input style="text-align:center; float:right;" type="text" id="currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>" name="marketing[trademkt_budget_distribution][product_<?php echo $product['product_number']?>]" class="small mkt_trade_mkt_budg_input"
+								<?php echo isset($this->trademktbudgetProductsDecision)?
+									'value = "'.$this->trademktbudgetProductsDecision['product_'.$product['product_number']]
+										.'"':'value = "0"'?>></input>
+							<span id="currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value" class="mkt_trade_mkt_budg_value"></span>
+						
+						</div>
+						
+						<div style="width: 600px; margin: 0 auto 0 auto;">
+						<br/>
+						<div id="tradeMktbudgetDetailDistributionFieldsErrors_<?php echo $number_counter?>" class="fieldErrors">
+							</div>
+								<div id="tradeMktbudgetDetailDistribution_<?php echo $number_counter?>">
+								<?php foreach ($this->trademedia as $trademedia){ ?>
+									<div style="display: block">
+										<span style="font-weight: bold;"><?php echo $trademedia['name']?>:</span>
+									</div>
+									<?php foreach ($this->channels as $channel){?>
+										<div style="clear: both"></div>
+										<div class="subslider_container">
+											<div class="subslider_product_title">
+												<span>
+													&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?>
+												<span>
+											</div>
+											<div id="defaultslide_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>" class="mkt_trade_mkt_perc_prod_<?php echo $product['product_number']?>_sliders mkt_trade_mkt_budg_subsliders">
+											</div>
+											<input type="text" id="currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>" name="marketing[trademkt_percentage][product_<?php echo $product['product_number']?>][trademedia_<?php echo $trademedia['trademedia_number']?>][channel_<?php echo $channel['channel_number']?>]" class="small mkt_trade_mkt_budg_input_<?php echo $product['product_number']?> mkt_trade_mkt_budg_subinput"
+													   <?php echo isset($this->trademktpercentageDecision)? 
+													   'value = "'.$this->trademktpercentageDecision['product_'.$product['product_number']]
+																									['trademedia_'.$trademedia['trademedia_number']]
+																									['channel_'.$channel['channel_number']]
+														.'"':'value = "0"'?>>
+												</input>
+											<span id="currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value" class="mkt_trade_mkt_budg_subvalue"></span>
+										</div>
+
+										<br />
+									<?php }
+								}?>
+								</div>
+							</div>
+							
+							
+							<div style="clear: both"></div>
+							<br />
+							
+						<?php }?>
+					</div>
+				<?php } ?>
+				</div>
+				
+				<script>
+					//Poner borde a los input del mismo estilo en los sliders del mismo tipo al seleccionarlos
+					$( ".mkt_trade_mkt_budg_input" ).focus(function() {
+						$(".mkt_trade_mkt_budg_input").css('border','1px solid #336699');
+					});
+					$( ".mkt_trade_mkt_budg_input" ).blur(function() {
+						$(".mkt_trade_mkt_budg_input").css('border','');
+					});
+					<?php foreach ($this->products as $product){ ?>
+					$( ".mkt_trade_mkt_budg_input_<?php echo $product['product_number']?>" ).focus(function() {
+						$(".mkt_trade_mkt_budg_input_<?php echo $product['product_number']?>").css('border','1px solid #336699');
+					});
+					$( ".mkt_trade_mkt_budg_input_<?php echo $product['product_number']?>" ).blur(function() {
+						$(".mkt_trade_mkt_budg_input_<?php echo $product['product_number']?>").css('border','');
+					});
+					
+					//Pone el valor inicial a los span de los sliders
+					$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + ' €');
+						<?php foreach ($this->trademedia as $trademedia){ ?>
+							<?php foreach ($this->channels as $channel){?>
+						$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+
+					<?php }}}?>
+					
+					$(function(){
+						<?php foreach ($this->products as $product){ ?>
+							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+								
+								//Para actualizar el valor de los spans de los sliders de publicidad al cambiar el presupuesto de publicidad
+								$("#trademkt").keyup(function() {
+									$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>").val())/100).toFixed(0)).toString() + ' €');
+									<?php foreach ($this->trademedia as $trademedia){ ?>
+										<?php foreach ($this->channels as $channel){?>
+										$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+									<?php }}?>
+								})
+								
+								
+								//Cambios en los sliders y spans e input generales de publicidad al mover el slider de productos
+								$('#defaultslide_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').slider({ 
+									max: 100,
+									min: 0,
+									value: <?php if(isset($this->trademktbudgetProductsDecision)){ 
+												echo($this->trademktbudgetProductsDecision['product_'.$product['product_number']]);
+											} else {
+												echo ("0");
+											}?>,
+									slide: function(e,ui) {
+										$('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val(ui.value);
+										$(ui.value).val($('#currentval_trade_mkt_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val());
+										$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + ' €');
+										<?php foreach ($this->trademedia as $trademedia){ ?>
+										<?php foreach ($this->channels as $channel){?>
+												$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+										<?php }}?>
+									}
+								});
+								//Cambios en los sliders y spans e input generales de publicidad al introducir un valor en el input
+								$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>").keyup(function() {
+									if($(this).val() > 100){
+										$(this).val(100);
+									}
+									if($(this).val() < 0){
+										$(this).val(0);
+									}
+									$('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val($(this).val());
+									$("#defaultslide_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>").slider("value" , $(this).val());
+									$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($(this).val())/100).toFixed(0)).toString() + ' €');
+									<?php foreach ($this->trademedia as $trademedia){ ?>
+										<?php foreach ($this->channels as $channel){?>
+										$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($(this).val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+									<?php }}?>
+								})
+							
+								<?php foreach ($this->trademedia as $trademedia){ ?>
+									<?php foreach ($this->channels as $channel){?>
+										//Cambios en los sliders y spans e input de publicidad al mover un slider que no sea de productos
+										$('#defaultslide_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').slider({ 
+											max: 100,
+											min: 0,
+											value: <?php if(isset($this->trademktpercentageDecision)){
+														echo($this->trademktpercentageDecision['product_'.$product['product_number']]
+																					['trademedia_'.$trademedia['trademedia_number']]
+																					['channel_'.$channel['channel_number']]);
+														} else {
+															echo ("0");
+														}?>
+														,
+											slide: function(e,ui) {
+												$('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val(ui.value);
+												$(ui.value).val($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val());
+												$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
+											}
+										});	
+										//Cambios en los sliders y spans e input de publicidad al introducir un valor en el input que no sea de productos
+										$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>").keyup(function() {
+											if($(this).val() > 100){
+												$(this).val(100);
+											}
+											if($(this).val() < 0){
+												$(this).val(0);
+											}
+											$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>").val($(this).val());
+											$("#defaultslide_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>").slider("value" , $(this).val())
+											$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text((((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($(this).val())/10000)).toFixed(0)).toString() + ' €');
+										})
+								<?php }
+								}?>
+							<?php }
+						}?>
+					});
+				</script>
+				
+				
+			</div>
+			
+			
+			<script>
+				$( "#pricesFieldButton" ).click(function() {
+					$( "#pricesFieldContainer" ).toggle( "easeInElastic" );
+				});
+				$( "#advertisingbudgetFieldButton" ).click(function() {
+					$( "#advertisingbudgetField" ).toggle( "easeInElastic" );
+					$( "#advertisingbudgetDistributionField" ).toggle( "easeInElastic" );
+					
+				});
+				$( "#tradeFieldButton" ).click(function() {
+					$( "#trademktField" ).toggle( "easeInElastic" );
+					$( "#trademktbudgetDistributionField" ).toggle( "easeInElastic" );
+					$( "#trademediaField" ).toggle( "easeInElastic" );
+				});
+			</script>
+		</div>
+		<br/>
+		<div class="buttonsDiv">
+			<input class="button" type="submit" value="Guardar">
+		</div>
+	</form>
+</div>
+
+
+	

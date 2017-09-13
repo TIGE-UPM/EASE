@@ -1,0 +1,2494 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/display.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/bar.css');?>	
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui-outcomes-theme/jquery-ui-1.10.3.custom.css');?>
+
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-1.9.1.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui-1.10.3.custom.min.js', $type = 'text/javascript')?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.progressbar.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.progressbar.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/outcomes_user.js', $type = 'text/javascript')?>
+
+<script type="text/javascript" src="//www.google.com/jsapi"></script>
+<script type="text/javascript">
+	//carga de los paquetes necesarios de la api de google charts
+	
+    google.load('visualization', '1', {packages: ['table', 'controls']});
+</script>
+
+
+
+<div id='content'>
+
+<?php if (isset($this->round_number)){ ?>
+	<div id="image_and_button">
+		<img src="/images/outcomes_2.gif" alt="i+d" width="90" height="110"/>
+		<div>
+			<form method="post" style="float:right">					
+				<input type="button" name="export" onclick="location.href='<?php echo $this->url(array('controller'=>'outcomes', 'action'=>'download')) . "?game_id=".$this->game['id']."&round_number=".$this->round_number?>'" value="Exportar">				
+			</form>				
+		</div>
+	</div>
+	<div class="outcomes_header1">
+		<div>
+			<div>
+				<div style="float: left"><strong>Juego:</strong> <?php echo $this->game['name'];?></div>
+				<div style="float: right"><strong>Ronda:</strong> <?php echo $this->round_number?></div>
+				</br></br>
+			</div>
+			<div id="outcomes_nav">
+				<ul>
+					<li><a id='pr_tab' class="outcomes_nav_menu isActive" href=#>Producci&oacute;n</a></li>
+					<li><a id='sales_tab' class="outcomes_nav_menu" href=#>Ventas</a></li>
+					<li><a id='graphics_tab' class="outcomes_nav_menu" href=#>Cuotas de mercado</a></li>
+					<li><a id='stocks_tab' class="outcomes_nav_menu" href=#>Stocks</a></li>
+					<li><a id='display_tab' class="outcomes_nav_menu" href=#>Indicadores internos</a></li>
+					<li><a id='res_tab' class="outcomes_nav_menu" href=#>Ctas. Resultados</a></li>
+					<li><a id='balance_sheet_tab' class="outcomes_nav_menu" href=#>Balance</a></li>
+					<li><a id='performance_tab' class="outcomes_nav_menu" href=#>Ratios financieros</a></li>
+					<li><a id='market_researches_tab' class="outcomes_nav_menu" href=#>Estudios de mercado</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>	
+
+	<div id="outcomes_container">
+		<!--PRODUCCIÓN-->
+		<div id="production_outcomes" class="tab">
+			
+			<script type="text/javascript">
+				//Script para obtener las tablas y gráficas
+			
+				//Definición de variables para comprobar si se han ejecutado las funciones anteriormente o no
+				var productionMainTableIsDrawn = false;
+				var productionByRegionIsDrawn = false;
+				var productionByChannelAndRegionIsDrawn = false;
+				var productionByProductAndChannelIsDrawn = false;
+				
+				<?php
+				$n_regiones = 0;
+				foreach ($this->regions as $region) {
+					$n_regiones = $n_regiones + 1;
+				 }
+				?>
+				
+				//Llamada a la función que genera el array general de trabajo de producción (productos, canales y paises)
+				
+				var dt = google.visualization.arrayToDataTable(<?php echo($this->array_production_general);?>);
+				
+				//Función que dibuja la tabla inicial de producción en caso de que no se haya pintado todavía. 
+				//Se ejecuta al terminar de cargar la página por defecto por ser la primera vista a mostrar
+				function drawProductionMainTable() {
+					if (productionMainTableIsDrawn == false){
+						//Formateo de los números para que tengan separadores de miles en la tabla general
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->regions as $region) { 
+							$valor = $region['region_number'] + 1;
+						echo('formatter.format(dt,'.$valor.');');
+						}
+						echo('formatter.format(dt,'.($n_regiones + 2).');');
+						?>
+						
+						//dibujar la tabla general
+						var production_table = new google.visualization.Table(document.getElementById('production_table'));
+						production_table.draw(dt, null);
+						
+						// Define a category picker control for the Product column
+						var categoryPicker = new google.visualization.ControlWrapper({
+						  'controlType': 'CategoryFilter',
+						  'containerId': 'production_graph_country_control',
+						  'options': {
+							'filterColumnLabel': 'Producto',
+							'ui': {
+							'labelStacking': 'vertical',
+							  'allowTyping': false,
+							  'allowMultiple': false,
+							  'allowNone': false
+							}
+						  }
+						});
+						
+						// Define a Column chart
+						var column = new google.visualization.ChartWrapper({
+							  'chartType': 'ColumnChart',
+							  'containerId': 'production_graph',
+							  'options': {
+								'width': 630,
+								'height': 350,
+								'title': 'Producción',
+								'chartArea': {left: 70, top: 40, width: "90%", height: "70%"},
+								'pieSliceText': 'Canal',
+								'legend':{position: 'bottom'}
+							  },
+							  // Instruct the columnChart to use columns 1 (Channel), countries and Total
+							  // from the 'data' DataTable.
+							  'view': {'columns': [1 <?php foreach ($this->regions as $region) { echo (", ".($region['region_number'] + 1)); }?>, 6]}
+							  /*'view': {'columns': [1, 2 <?php foreach ($this->regions as $region) { echo (", ".($region['region_number'] + 1)); }?>]}*/ //Error: no pinta bien.
+							  
+							});
+							
+							// Create a dashboard
+							new google.visualization.Dashboard(document.getElementById('production_dashboard')).
+								// Establish bindings, declaring the both the slider and the category
+								// picker will drive both charts.
+								bind([categoryPicker], [column]).
+								// Draw the entire dashboard.
+								draw(dt);
+					
+					productionMainTableIsDrawn = true;
+						
+
+					}
+				}
+				
+				
+				
+				//Función que calcula y dibuja la tabla de producción por producto y región en caso de que no se haya pintado todavía
+				//También dibuja el gráfico asociado a la misma
+				//Se ejecuta con un evento onclick
+				function drawproductionByRegion() {
+					if (productionByRegionIsDrawn == false){
+						// Creación de la tabla de producción por productos en paises y totales
+						var productionByRegion = google.visualization.data.group(
+							dt, [0], 
+								[<?php foreach ($this->regions as $region) {
+									$valor = $region['region_number'] + 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								}
+								echo("{'column':".($n_regiones + 2).", 'aggregation': google.visualization.data.sum, 'type': 'number'},");?>
+								]);	
+						
+						//Formateo de los números para que tengan separadores de miles en las tablas agrupadas
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->regions as $region) {
+							$valor = $region['region_number'];
+							echo('formatter.format(productionByRegion,'.$valor.');');
+						}
+						echo('formatter.format(productionByRegion,'.($n_regiones + 1).');');
+						?>
+
+						//dibujar la tabla por productos y paises
+						var production_product_and_region_table = new google.visualization.Table(document.getElementById('production_product_and_region_table'));
+						production_product_and_region_table.draw(productionByRegion, null);
+						
+						//grafica de columna por productos y paises
+						new google.visualization.ColumnChart(document.getElementById('production_product_and_region_graph')).
+							draw(productionByRegion,
+								 {title:"Producción por Productos",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+					
+						productionByRegionIsDrawn	= true;		
+					}
+				}
+				
+				//Función que calcula y dibuja la tabla de producción por canal y región en caso de que no se haya pintado todavía
+				//También dibuja el gráfico asociado a la misma
+				//Se ejecuta con un evento onclick
+				function drawproductionByChannelAndRegion() {
+					if (productionByChannelAndRegionIsDrawn == false){
+						// Creación de la tabla de producción por canales en paises y totales
+						var productionByChannelAndRegion = google.visualization.data.group(
+							dt, [1], 
+								[<?php foreach ($this->regions as $region) {
+									$valor = $region['region_number'] + 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								}
+								echo("{'column':".($n_regiones + 2).", 'aggregation': google.visualization.data.sum, 'type': 'number'},");?>
+								]);	
+							
+						//Formateo de los números para que tengan separadores de miles en las tablas agrupadas
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->regions as $region) {
+							$valor = $region['region_number'];
+						echo('formatter.format(productionByChannelAndRegion,'.$valor.');');
+						}
+						echo('formatter.format(productionByChannelAndRegion,'.($n_regiones + 1).');');
+						?>
+						
+						//dibujar la tabla por canales y paises
+						var production_channel_and_region_table = new google.visualization.Table(document.getElementById('production_channel_and_region_table'));
+						production_channel_and_region_table.draw(productionByChannelAndRegion, null);
+						
+						//grafica de columna por canales y paises
+						new google.visualization.ColumnChart(document.getElementById('production_channel_and_region_graph')).
+							draw(productionByChannelAndRegion,
+								 {title:"Producción por Canales",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+						productionByChannelAndRegionIsDrawn	= true;
+					}
+				}
+				
+				//Función que calcula y dibuja la tabla de producción por producto y canal en caso de que no se haya pintado todavía
+				//También dibuja el gráfico asociado a la misma
+				//Se ejecuta con un evento onclick
+				function drawproductionByProductAndChannel() {
+					if (productionByProductAndChannelIsDrawn == false){
+						// Creación de la tabla de producción por producto y canal	
+						var productionByProductAndChanne = google.visualization.arrayToDataTable(<?php echo($this->array_production_productoYcanal);?>);
+						
+						//Formateo de los números para que tengan separadores de miles en la tabla general
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->channels as $channel) { 
+							$valor = $channel['channel_number'];
+						echo('formatter.format(productionByProductAndChanne,'.$valor.');');
+						}
+						?>	
+							
+						//dibujar la tabla de producción por canales y paises
+						var production_product_and_channel_table = new google.visualization.Table(document.getElementById('production_product_and_channel_table'));
+						production_product_and_channel_table.draw(productionByProductAndChanne, null);
+						
+						//grafica de columnas de producción por canales y paises
+						new google.visualization.ColumnChart(document.getElementById('production_product_and_channel_graph')).
+							draw(productionByProductAndChanne,
+								 {title:"Producción por Producto y Canal",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+						productionByProductAndChannelIsDrawn	= true;
+					}
+				}
+				
+				//llamada al menú con las diferentes visualizaciones de producción (Producto por región,Canal y región y Producto por canal
+				$(function() {
+				$( "#datos_produccion" ).tabs();
+				});
+			</script>
+
+			<div id="datos_produccion" style="display:block; width: 800px; margin-left: auto; margin-right: auto;">
+				<div class="section_title">
+					PRODUCCIÓN
+				</div>
+				<div id="menu_produccion">
+					<ul>
+						<li><a href="#productionMainTableDiv">Producto, canal y región</a></li>
+						<li><a href="#productionByRegion" onclick="drawproductionByRegion();">Producto y región</a></li>
+						<li><a href="#productionByChannelAndRegion" onclick="drawproductionByChannelAndRegion();">Canal y región</a></li>
+						<li><a href="#productionByProductAndChannel" onclick="drawproductionByProductAndChannel();">Producto y canal</a></li>
+						
+					</ul>
+				</div>
+				<!-- Producción por Producto y canal por región-->
+				<div id='productionMainTableDiv'>
+					<div id="production_table"></div>
+					<br/>
+					<div id="production_dashboard">
+						<div id="production_graph_country_control" style="float: left;"></div>
+						<div id="production_graph" style="float: left"></div>
+					</div>
+					
+				</div>
+				<!-- Producción por producto por región-->
+				<div id='productionByRegion'>
+					<div id="production_product_and_region_table"> </div>
+					<br/>
+					<br/>
+					<div id="production_product_and_region_graph"></div>
+				</div>
+				<!-- Producción por Canal y región-->
+				<div id='productionByChannelAndRegion'>
+					<div id="production_channel_and_region_table"></div>
+					<br/>
+					<br/>
+					<div id="production_channel_and_region_graph"></div>
+				</div>
+				<!-- Producción por Producto por canal-->
+				<div id='productionByProductAndChannel'>
+					<div id="production_product_and_channel_table"></div>
+					<br/>
+					<br/>
+					<div id="production_product_and_channel_graph"></div>
+				</div>
+			</div>
+		</div>	
+			
+		<!--VENTAS-->
+		<div id="sales_outcomes" class="tab">
+			<script>
+				
+				<?php
+				$n_regiones = 0;
+				foreach ($this->regions as $region) {
+					$n_regiones = $n_regiones + 1;
+				 }
+				?>
+
+				var salesMainTableIsDrawn = false;
+				var salesByRegionIsDrawn = false;
+				var salesByChannelAndRegionIsDrawn = false;
+				var salesByProductAndChannelIsDrawn = false;
+				
+				
+				//Llamada a la función que genera el array general de trabajo de producción (productos, canales y paises)
+				var sales_data = google.visualization.arrayToDataTable(<?php echo($this->array_ventas_general);?>);
+				
+				var formatterZeroDigits = new google.visualization.NumberFormat({fractionDigits:0});
+				var formatterTwoDigits = new google.visualization.NumberFormat({fractionDigits:2});
+				for (i=1; i<= <?php echo($n_regiones);?>; i++){
+				  formatterZeroDigits.format(sales_data,3*i-1);
+				  formatterTwoDigits.format(sales_data,3*i);
+				  formatterTwoDigits.format(sales_data,3*i+1);
+				}
+				
+				function drawSalesMainTable() {
+					if(salesMainTableIsDrawn == false) {
+						//Dataview de ventas principal por unidades
+						// Set columns in a data view.
+						var dataView1 = new google.visualization.DataView(sales_data);
+						dataView1.setColumns([0, 1 <?php $n_regiones = 0;foreach ($this->regions as $region) {$n_regiones = $n_regiones + 1;echo (', '.(3*$n_regiones-1));};?>]);
+					  
+						var table_unidades = new google.visualization.Table(document.getElementById('sales_main_unidades_table'));
+						table_unidades.draw(dataView1, null);
+						
+						// Define a category picker control for the Product column
+						var categoryPicker_sales_main_unidades = new google.visualization.ControlWrapper({
+						  'controlType': 'CategoryFilter',
+						  'containerId': 'sales_main_unidades_graph_country_control',
+						  'options': {
+							'filterColumnLabel': 'Producto',
+							'ui': {
+							'labelStacking': 'vertical',
+							  'allowTyping': false,
+							  'allowMultiple': false,
+							  'allowNone': false
+							}
+						  }
+						});
+						
+						// Define a Column chart
+						var column_sales_main_unidades = new google.visualization.ChartWrapper({
+							  'chartType': 'ColumnChart',
+							  'containerId': 'sales_main_unidades_graph',
+							  'options': {
+								'width': 790,
+								'height': 350,
+								'title': 'Ventas',
+								'legend':{position: 'right'}
+							  },
+							  // Instruct the piechart to use colums 1 (Channel) and countries
+							  // from the 'data' DataTable.
+							  'view': {'columns': [1 <?php foreach ($this->regions as $region) { echo (", ".($region['region_number'] + 1)); }?>]}
+							});
+						
+						// Create a dashboard
+						new google.visualization.Dashboard(document.getElementById('sales_main_unidades_graph_dashboard')).
+						// Establish bindings
+						bind([categoryPicker_sales_main_unidades], [column_sales_main_unidades]).
+						// Draw the entire dashboard.
+						draw(dataView1);
+
+						//Dataview de ventas principal por precio por unidad
+						// Set rows in a data view.
+						var dataView2 = new google.visualization.DataView(sales_data);
+						dataView2.setColumns([0, 1 <?php $n_regiones = 0;foreach ($this->regions as $region) {$n_regiones = $n_regiones + 1;echo (', '.(3*$n_regiones));};?>]);
+					  
+						var table_precios = new google.visualization.Table(document.getElementById('sales_main_precioUnidad_table'));
+						table_precios.draw(dataView2, null);
+						
+						// Define a category picker control for the Product column
+						var categoryPicker_sales_main_precioUnidad = new google.visualization.ControlWrapper({
+						  'controlType': 'CategoryFilter',
+						  'containerId': 'sales_main_precioUnidad_graph_country_control',
+						  'options': {
+							'filterColumnLabel': 'Producto',
+							'ui': {
+							'labelStacking': 'vertical',
+							  'allowTyping': false,
+							  'allowMultiple': false,
+							  'allowNone': false
+							}
+						  }
+						});
+						
+						// Define a Column chart
+						var column_sales_main_precioUnidad = new google.visualization.ChartWrapper({
+							  'chartType': 'ColumnChart',
+							  'containerId': 'sales_main_precioUnidad_graph',
+							  'options': {
+								'width': 790,
+								'height': 350,
+								'title': 'Ventas',
+								'legend':{position: 'right'}
+							  },
+							  // Instruct the piechart to use colums 1 (Channel) and countries
+							  // from the 'data' DataTable.
+							  'view': {'columns': [1 <?php foreach ($this->regions as $region) { echo (", ".($region['region_number'] + 1)); }?>]}
+							});
+						// Create a dashboard
+						new google.visualization.Dashboard(document.getElementById('sales_main_precioUnidad_graph_dashboard')).
+						// Establish bindings
+						bind([categoryPicker_sales_main_precioUnidad], [column_sales_main_precioUnidad]).
+						// Draw the entire dashboard.
+						draw(dataView2);
+
+						//Dataview de ventas principal por ventas
+						// Set rows in a data view.
+						var dataView3 = new google.visualization.DataView(sales_data);
+						dataView3.setColumns([0, 1 <?php $n_regiones = 0;foreach ($this->regions as $region) {$n_regiones = $n_regiones + 1;echo (', '.(3*$n_regiones+1));};?>]);
+					  
+						var table_ingresos = new google.visualization.Table(document.getElementById('sales_main_ventas_table'));
+						table_ingresos.draw(dataView3, null);
+						
+						// Define a category picker control for the Product column
+						var categoryPicker_sales_main_ventas = new google.visualization.ControlWrapper({
+						  'controlType': 'CategoryFilter',
+						  'containerId': 'sales_main_ventas_graph_country_control',
+						  'options': {
+							'filterColumnLabel': 'Producto',
+							'ui': {
+							'labelStacking': 'vertical',
+							  'allowTyping': false,
+							  'allowMultiple': false,
+							  'allowNone': false
+							}
+						  }
+						});
+						
+						// Define a Column chart
+						var column_sales_main_ventas = new google.visualization.ChartWrapper({
+							  'chartType': 'ColumnChart',
+							  'containerId': 'sales_main_ventas_graph',
+							  'options': {
+								'width': 790,
+								'height': 350,
+								'title': 'Ventas',
+								'legend':{position: 'right'}
+							  },
+							  // Instruct the piechart to use colums 1 (Channel) and countries
+							  // from the 'data' DataTable.
+							  'view': {'columns': [1 <?php foreach ($this->regions as $region) { echo (", ".($region['region_number'] + 1)); }?>]}
+							});
+						
+						// Create a dashboard
+						new google.visualization.Dashboard(document.getElementById('sales_main_ventas_graph_dashboard')).
+						// Establish bindings
+						bind([categoryPicker_sales_main_ventas], [column_sales_main_ventas]).
+						// Draw the entire dashboard.
+						draw(dataView3);
+						salesMainTableIsDrawn = true;
+					}
+				}
+				
+				//Función que calcula y dibuja la tabla de producción por producto y región en caso de que no se haya pintado todavía
+				//También dibuja el gráfico asociado a la misma
+				//Se ejecuta con un evento onclick
+				function drawSalesByRegion() {
+					if (salesByRegionIsDrawn == false){
+						// Creación de la tabla de ventas (unidades) por productos en paises
+						var salesByRegionUnits = google.visualization.data.group(
+							sales_data, [0], 
+								[<?php foreach ($this->regions as $region) {
+									$valor = ($region['region_number']*3) - 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								};?>
+								]);	
+						
+						//Formateo de los números para que tengan separadores de miles en las tablas agrupadas
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->regions as $region) {
+							$valor = $region['region_number'];
+							echo('formatter.format(salesByRegionUnits,'.$valor.');');
+						};
+						?>
+
+						//dibujar la tabla (unidades) por productos y paises
+						var salesByRegion_unidades_table = new google.visualization.Table(document.getElementById('salesByRegion_unidades_table'));
+						salesByRegion_unidades_table.draw(salesByRegionUnits, null);
+						
+						//grafica de columna (unidades) por productos y paises
+						new google.visualization.ColumnChart(document.getElementById('salesByRegion_unidades_graph')).
+							draw(salesByRegionUnits,
+								 {title:"Ventas por Productos (unidades)",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+							
+						
+						// Creación de la tabla de ventas (importe total) por productos en paises
+						var salesByRegionVentas = google.visualization.data.group(
+							sales_data, [0], 
+								[<?php foreach ($this->regions as $region) {
+									$valor = ($region['region_number']*3) + 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								};?>
+								]);	
+						
+						//Formateo de los números para que tengan separadores de miles en las tablas agrupadas
+						var formatter2 = new google.visualization.NumberFormat({fractionDigits:2});
+						<?php foreach ($this->regions as $region) {
+							$valor = $region['region_number'];
+							echo('formatter2.format(salesByRegionVentas,'.$valor.');');
+						};
+						?>
+
+						//dibujar la tabla (importe total) por productos y paises
+						var salesByRegion_ventas_table = new google.visualization.Table(document.getElementById('salesByRegion_ventas_table'));
+						salesByRegion_ventas_table.draw(salesByRegionVentas, null);
+						
+						//grafica de columna (importe total) por productos y paises
+						new google.visualization.ColumnChart(document.getElementById('salesByRegion_ventas_graph')).
+							draw(salesByRegionVentas,
+								 {title:"Ventas por Productos (importe total)",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+					
+						salesByRegionIsDrawn = true;		
+					}
+				}
+				
+				function drawSalesByChannelAndRegion() {
+					if (salesByChannelAndRegionIsDrawn == false){
+						// Creación de la tabla de ventas (unidades) por productos en paises
+						var salesByChannelAndRegionUnits = google.visualization.data.group(
+							sales_data, [1], 
+								[<?php foreach ($this->regions as $region) {
+									$valor = ($region['region_number']*3) - 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								};?>
+								]);	
+						
+						//Formateo de los números para que tengan separadores de miles en las tablas agrupadas
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->regions as $region) {
+							$valor = $region['region_number'];
+							echo('formatter.format(salesByChannelAndRegionUnits,'.$valor.');');
+						};
+						?>
+
+						//dibujar la tabla (unidades) por productos y paises
+						var salesByChannelAndRegion_unidades_table = new google.visualization.Table(document.getElementById('salesByChannelAndRegion_unidades_table'));
+						salesByChannelAndRegion_unidades_table.draw(salesByChannelAndRegionUnits, null);
+						
+						//grafica de columna (unidades) por productos y paises
+						new google.visualization.ColumnChart(document.getElementById('salesByChannelAndRegion_unidades_graph')).
+							draw(salesByChannelAndRegionUnits,
+								 {title:"Ventas por Canal y Región (unidades)",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+							
+						
+						// Creación de la tabla de ventas (importe total) por productos en paises
+						var salesByChannelAndRegionVentas = google.visualization.data.group(
+							sales_data, [1], 
+								[<?php foreach ($this->regions as $region) {
+									$valor = ($region['region_number']*3) + 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								};?>
+								]);	
+						
+						//Formateo de los números para que tengan separadores de miles en las tablas agrupadas
+						var formatter2 = new google.visualization.NumberFormat({fractionDigits:2});
+						<?php foreach ($this->regions as $region) {
+							$valor = $region['region_number'];
+							echo('formatter2.format(salesByChannelAndRegionVentas,'.$valor.');');
+						};
+						?>
+
+						//dibujar la tabla (importe total) por productos y paises
+						var salesByChannelAndRegion_ventas_table = new google.visualization.Table(document.getElementById('salesByChannelAndRegion_ventas_table'));
+						salesByChannelAndRegion_ventas_table.draw(salesByChannelAndRegionVentas, null);
+						
+						//grafica de columna (importe total) por productos y paises
+						new google.visualization.ColumnChart(document.getElementById('salesByChannelAndRegion_ventas_graph')).
+							draw(salesByChannelAndRegionVentas,
+								 {title:"Ventas por Canal y Región (importe total)",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+					
+						salesByRegionIsDrawn = true;		
+					}
+				
+				}
+				
+				function drawSalesByProductAndChannel() {
+					if (salesByProductAndChannelIsDrawn == false) {
+						// Creación de la tabla de producción por producto y canal	
+						var salesByProductAndChannel = google.visualization.arrayToDataTable(<?php echo($this->array_ventas_productoYcanal);?>);
+						
+						var salesByProductAndChannelUnits = google.visualization.data.group(
+							salesByProductAndChannel, [0], 
+								[<?php foreach ($this->channels as $channel) {
+									$valor = ($channel['channel_number']*2) - 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								};?>
+								]);	
+						
+						//Formateo de los números para que tengan separadores de miles en la tabla general
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->channels as $channel) { 
+							$valor = $channel['channel_number'];
+						echo('formatter.format(salesByProductAndChannelUnits,'.$valor.');');
+						}
+						?>
+						
+						//dibujar la tabla (unidades) por productos y paises
+						var salesByProductAndChannel_unidades_table = new google.visualization.Table(document.getElementById('salesByProductAndChannel_unidades_table'));
+						salesByProductAndChannel_unidades_table.draw(salesByProductAndChannelUnits, null);
+						
+						//grafica de columna (unidades) por productos y paises
+						new google.visualization.ColumnChart(document.getElementById('salesByProductAndChannel_unidades_graph')).
+							draw(salesByProductAndChannelUnits,
+								 {title:"Ventas por Producto y Región (unidades)",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+							
+						var salesByProductAndChannelImporte = google.visualization.data.group(
+							salesByProductAndChannel, [0], 
+								[<?php foreach ($this->channels as $channel) {
+									$valor = $channel['channel_number']*2;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								};?>
+								]);	
+						
+						//Formateo de los números para que tengan separadores de miles en la tabla general
+						var formatter2 = new google.visualization.NumberFormat({fractionDigits:2});
+						<?php foreach ($this->channels as $channel) { 
+							$valor = $channel['channel_number'];
+						echo('formatter2.format(salesByProductAndChannelImporte,'.$valor.');');
+						}
+						?>
+						
+						//dibujar la tabla (unidades) por productos y paises
+						var salesByProductAndChannel_ventas_table = new google.visualization.Table(document.getElementById('salesByProductAndChannel_ventas_table'));
+						salesByProductAndChannel_ventas_table.draw(salesByProductAndChannelImporte, null);
+						
+						//grafica de columna (unidades) por productos y paises
+						new google.visualization.ColumnChart(document.getElementById('salesByProductAndChannel_ventas_graph')).
+							draw(salesByProductAndChannelImporte,
+								 {title:"Ventas por Producto y Región (importe)",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+						
+
+						salesByProductAndChannelIsDrawn = true;
+					}
+				
+				}
+
+				//llamada al menú con las diferentes visualizaciones de producción (Producto por región, Canal y región y Producto por canal
+				$(function() {
+				$( "#datos_ventas" ).tabs();
+				});
+				
+				
+				$(function() {
+				$( "#salesMain").tabs();
+				});
+				
+				$(function() {
+				$( "#salesByRegion").tabs();
+				});
+				
+				$(function() {
+				$( "#salesByChannelAndRegion").tabs();
+				});
+				
+				$(function() {
+				$( "#salesByProductAndChannel").tabs();
+				});
+			</script>
+
+			<div id="datos_ventas" style="display:block; width: 800px; margin-left: auto; margin-right: auto;">
+				<div class="section_title">
+					VENTAS
+				</div>
+				<div id="menu_ventas">
+					<ul>
+						<li><a href="#salesMain">Producto, canal y región</a></li>
+						<li><a href="#salesByRegion" onclick="drawSalesByRegion();">Producto y región</a></li>
+						<li><a href="#salesByChannelAndRegion" onclick="drawSalesByChannelAndRegion();">Canal y región</a></li>
+						<li><a href="#salesByProductAndChannel" onclick="drawSalesByProductAndChannel();">Producto y canal</a></li>
+						
+					</ul>
+				</div>
+				<!-- Ventas por Producto y canal por región-->
+				<div id='salesMain'>
+					<div id="menu_salesMain">
+						<ul>
+							<li><a href="#sales_main_unidades">Unidades</a></li>
+							<li><a href="#sales_main_precioUnidad">Precio por unidad(€)</a></li>
+							<li><a href="#sales_main_ventas">Importe total(€)</a></li>
+						</ul>
+					</div>
+					<div id="sales_main_unidades">
+						<div id="sales_main_unidades_table"></div>
+						<div id="sales_main_unidades_graph_dashboard">
+							<div id="sales_main_unidades_graph_country_control"></div>
+							<div id="sales_main_unidades_graph"></div>
+						</div>
+					</div>
+					<div id="sales_main_precioUnidad">
+						<div id="sales_main_precioUnidad_table"></div>
+						<div id="sales_main_precioUnidad_graph_dashboard">
+							<div id="sales_main_precioUnidad_graph_country_control"></div>
+							<div id="sales_main_precioUnidad_graph"></div>
+						</div>
+					</div>
+					<div id="sales_main_ventas">
+						<div id="sales_main_ventas_table"></div>
+						<div id="sales_main_ventas_graph_dashboard">
+							<div id="sales_main_ventas_graph_country_control"></div>
+							<div id="sales_main_ventas_graph"></div>
+						</div>
+					</div>
+				</div>
+				<!-- Producción por producto por región-->
+				<div id='salesByRegion'>
+					<div id="menu_salesByRegion">
+						<ul>
+							<li><a href="#salesByRegion_unidades">Unidades</a></li>
+							<li><a href="#salesByRegion_ventas">Importe total(€)</a></li>
+						</ul>
+					</div>
+					<div id="salesByRegion_unidades">
+						<div id="salesByRegion_unidades_table"></div>
+						<div id="salesByRegion_unidades_graph"></div>
+					</div>
+					<div id="salesByRegion_ventas">
+						<div id="salesByRegion_ventas_table"> </div>
+						<div id="salesByRegion_ventas_graph"></div>
+					</div>
+				</div>
+				<!-- Producción por Canal y región-->
+				<div id='salesByChannelAndRegion'>
+					<div id="menu_salesByChannelAndRegion">
+						<ul>
+							<li><a href="#salesByChannelAndRegion_unidades">Unidades</a></li>
+							<li><a href="#salesByChannelAndRegion_ventas">Importe total(€)</a></li>
+						</ul>
+					</div>
+					<div id="salesByChannelAndRegion_unidades">
+						<div id="salesByChannelAndRegion_unidades_table"></div>
+						<div id="salesByChannelAndRegion_unidades_graph"></div>
+					</div>
+					<div id="salesByChannelAndRegion_ventas">
+						<div id="salesByChannelAndRegion_ventas_table"></div>
+						<div id="salesByChannelAndRegion_ventas_graph"></div>
+					</div>
+				</div>
+				<!-- Producción por Producto por canal-->
+				<div id='salesByProductAndChannel'>
+					<div id="menu_salesByProductAndChannel">
+						<ul>
+							<li><a href="#salesByProductAndChannel_unidades">Unidades</a></li>
+							<li><a href="#salesByProductAndChannel_ventas">Importe total(€)</a></li>
+						</ul>
+					</div>
+					<div id="salesByProductAndChannel_unidades">
+						<div id="salesByProductAndChannel_unidades_table"></div>
+						<div id="salesByProductAndChannel_unidades_graph"></div>
+					</div>
+					<div id="salesByProductAndChannel_ventas">
+						<div id="salesByProductAndChannel_ventas_table"></div>
+						<div id="salesByProductAndChannel_ventas_graph"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+			
+		<!--STOCKS-->
+		<div id="stock_outcomes" class="tab">
+			<script>
+				//Script para obtener las tablas y gráficas
+			
+				//Definición de variables para comprobar si se han ejecutado las funciones anteriormente o no
+				var stocksMainTableIsDrawn = false;
+				var stocksByRegionIsDrawn = false;
+				var stocksByChannelAndRegionIsDrawn = false;
+				var stocksByProductAndChannelIsDrawn = false;
+				
+				//Llamada a la función que genera el array general de trabajo de producción (productos, canales y paises)
+				
+				var dt_stocks = google.visualization.arrayToDataTable(<?php echo($this->array_stocks_general);?>);
+				
+				//Función que dibuja la tabla inicial de producción en caso de que no se haya pintado todavía. 
+				//Se ejecuta al terminar de cargar la página por defecto por ser la primera vista a mostrar
+				function drawStocksMainTable() {
+					if (stocksMainTableIsDrawn == false){
+						//Formateo de los números para que tengan separadores de miles en la tabla general
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->regions as $region) { 
+							$valor = $region['region_number'] + 1;
+						echo('formatter.format(dt_stocks,'.$valor.');');
+						}
+						echo('formatter.format(dt_stocks,'.($n_regiones + 2).');');
+						?>
+						
+						//dibujar la tabla general
+						var stocks_table = new google.visualization.Table(document.getElementById('stocks_table'));
+						stocks_table.draw(dt_stocks, null);
+						
+						// Define a category picker control for the Product column
+						var categoryPicker = new google.visualization.ControlWrapper({
+						  'controlType': 'CategoryFilter',
+						  'containerId': 'stocks_graph_country_control',
+						  'options': {
+							'filterColumnLabel': 'Producto',
+							'ui': {
+							'labelStacking': 'vertical',
+							  'allowTyping': false,
+							  'allowMultiple': false,
+							  'allowNone': false
+							}
+						  }
+						});
+						
+						// Define a Column chart
+						var column = new google.visualization.ChartWrapper({
+							  'chartType': 'ColumnChart',
+							  'containerId': 'stocks_graph',
+							  'options': {
+								'width': 630,
+								'height': 350,
+								'title': 'Producción',
+								'chartArea': {left: 70, top: 40, width: "90%", height: "70%"},
+								'pieSliceText': 'Canal',
+								'legend':{position: 'bottom'}
+							  },
+							  // Instruct the columnChart to use colums 1 (Channel), countries and Total
+							  // from the 'data' DataTable.
+							  'view': {'columns': [1 <?php foreach ($this->regions as $region) { echo (", ".($region['region_number'] + 1)); }?>, 6]}
+							});
+						
+							// Create a dashboard
+							new google.visualization.Dashboard(document.getElementById('stocks_dashboard')).
+								// Establish bindings, declaring the both the slider and the category
+								// picker will drive both charts.
+								bind([categoryPicker], [column]).
+								// Draw the entire dashboard.
+								draw(dt_stocks);
+						productionMainTableIsDrawn = true;
+					}
+				}
+				
+				//Función que calcula y dibuja la tabla de producción por producto y región en caso de que no se haya pintado todavía
+				//También dibuja el gráfico asociado a la misma
+				//Se ejecuta con un evento onclick
+				function drawStocksByRegion() {
+					if (stocksByRegionIsDrawn == false){
+						// Creación de la tabla de producción por productos en paises y totales
+						var stocksByRegion = google.visualization.data.group(
+							dt_stocks, [0], 
+								[<?php foreach ($this->regions as $region) {
+									$valor = $region['region_number'] + 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								}
+								echo("{'column':".($n_regiones + 2).", 'aggregation': google.visualization.data.sum, 'type': 'number'},");?>
+								]);	
+						
+						//Formateo de los números para que tengan separadores de miles en las tablas agrupadas
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->regions as $region) {
+							$valor = $region['region_number'];
+							echo('formatter.format(stocksByRegion,'.$valor.');');
+						}
+						echo('formatter.format(stocksByRegion,'.($n_regiones + 1).');');
+						?>
+
+						//dibujar la tabla por productos y paises
+						var stocks_product_and_region_table = new google.visualization.Table(document.getElementById('stocks_product_and_region_table'));
+						stocks_product_and_region_table.draw(stocksByRegion, null);
+						
+						//grafica de columna por productos y paises
+						new google.visualization.ColumnChart(document.getElementById('stocks_product_and_region_graph')).
+							draw(stocksByRegion,
+								 {title:"Stocks por Producto y región",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+					
+						stocksByRegionIsDrawn	= true;		
+					}
+				}
+				
+				//Función que calcula y dibuja la tabla de producción por canal y región en caso de que no se haya pintado todavía
+				//También dibuja el gráfico asociado a la misma
+				//Se ejecuta con un evento onclick
+				function drawStocksByChannelAndRegion() {
+					if (stocksByChannelAndRegionIsDrawn == false){
+						// Creación de la tabla de producción por canales en paises y totales
+						var stocksByChannelAndRegion = google.visualization.data.group(
+							dt_stocks, [1], 
+								[<?php foreach ($this->regions as $region) {
+									$valor = $region['region_number'] + 1;
+								echo("{'column':".$valor.", 'aggregation': google.visualization.data.sum, 'type': 'number'},");
+								}
+								echo("{'column':".($n_regiones + 2).", 'aggregation': google.visualization.data.sum, 'type': 'number'},");?>
+								]);	
+							
+						//Formateo de los números para que tengan separadores de miles en las tablas agrupadas
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->regions as $region) {
+							$valor = $region['region_number'];
+						echo('formatter.format(stocksByChannelAndRegion,'.$valor.');');
+						}
+						echo('formatter.format(stocksByChannelAndRegion,'.($n_regiones + 1).');');
+						?>
+						
+						//dibujar la tabla por canales y paises
+						var stocks_channel_and_region_table = new google.visualization.Table(document.getElementById('stocks_channel_and_region_table'));
+						stocks_channel_and_region_table.draw(stocksByChannelAndRegion, null);
+						
+						//grafica de columna por canales y paises
+						new google.visualization.ColumnChart(document.getElementById('stocks_channel_and_region_graph')).
+							draw(stocksByChannelAndRegion,
+								 {title:"Stocks por canal y región",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+						stocksByChannelAndRegionIsDrawn	= true;
+					}
+				}
+				
+				//Función que calcula y dibuja la tabla de producción por producto y canal en caso de que no se haya pintado todavía
+				//También dibuja el gráfico asociado a la misma
+				//Se ejecuta con un evento onclick
+				function drawStocksByProductAndChannel() {
+					if (stocksByProductAndChannelIsDrawn == false){
+						// Creación de la tabla de producción por producto y canal	
+						var stocksByProductAndChannel = google.visualization.arrayToDataTable(<?php echo($this->array_stocks_productoYcanal);?>);
+						
+						//Formateo de los números para que tengan separadores de miles en la tabla general
+						var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						<?php foreach ($this->channels as $channel) { 
+							$valor = $channel['channel_number'];
+						echo('formatter.format(stocksByProductAndChannel,'.$valor.');');
+						}
+						?>	
+							
+						//dibujar la tabla de producción por canales y paises
+						var stocks_product_and_channel_table = new google.visualization.Table(document.getElementById('stocks_product_and_channel_table'));
+						stocks_product_and_channel_table.draw(stocksByProductAndChannel, null);
+						
+						//grafica de columnas de producción por canales y paises
+						new google.visualization.ColumnChart(document.getElementById('stocks_product_and_channel_graph')).
+							draw(stocksByProductAndChannel,
+								 {title:"Stocks por Producto y Canal",
+								 width: 800,
+								 height: 400,
+								 chartArea: {'left': 100, 'top': 15, 'right': 70, 'bottom': 15}}
+							);
+						stocksByProductAndChannelIsDrawn = true;
+					}
+				}
+				
+				//llamada al menú con las diferentes visualizaciones de producción (Producto por región,Canal y región y Producto por canal
+				$(function() {
+				$( "#datos_stocks" ).tabs();
+				});
+			</script>
+			<div id="datos_stocks" style="display:block; width: 800px; margin-left: auto; margin-right: auto;">
+				<div class="section_title">
+					STOCKS
+				</div>
+				<div id="menu_stocks">
+					<ul>
+						<li ><a href="#stocksMainTableDiv">Producto, canal y región</a></li>
+						<li><a href="#stocksByRegion" onclick="drawStocksByRegion();">Producto y región</a></li>
+						<li><a href="#stocksByChannelAndRegion" onclick="drawStocksByChannelAndRegion();">Canal y región</a></li>
+						<li><a href="#stocksByProductAndChannel" onclick="drawStocksByProductAndChannel();">Producto y canal</a></li>
+						
+					</ul>
+				</div>
+				<!-- Ventas por Producto y canal por región-->
+				<div id='stocksMainTableDiv'>
+					<div id="stocks_table"></div>
+					<div id="stocks_dashboard">
+						<div id="stocks_graph_country_control" style="float: left;"></div>
+						<div id="stocks_graph" style="float: left"></div>
+					</div>
+				</div>
+				<!-- Producción por producto por región-->
+				<div id='stocksByRegion'>
+					<div id="stocks_product_and_region_table"> </div>
+					<br/>
+					<br/>
+					<div id="stocks_product_and_region_graph"></div>
+				</div>
+				<!-- Producción por Canal y región-->
+				<div id='stocksByChannelAndRegion'>
+					<div id="stocks_channel_and_region_table"></div>
+					<br/>
+					<br/>
+					<div id="stocks_channel_and_region_graph"></div>
+				</div>
+				<!-- Producción por Producto por canal-->
+				<div id='stocksByProductAndChannel'>
+					<div id="stocks_product_and_channel_table"></div>
+					<br/>
+					<br/>
+					<div id="stocks_product_and_channel_graph"></div>
+				</div>
+			</div>
+		</div>
+
+		<!--CUENTAS DE RESULTADOS-->
+		<div id="results_outcomes" class="tab">
+			<div  class="tabla_cuentas_resultados">
+				<div class="section_title">CUENTAS DE RESULTADOS <?php echo $this->company['name']?></div>
+			</div>
+			</br>
+			<!--INGRESOS-->
+			<div  class="tabla_cuentas_resultados">	
+				<script type="text/javascript">
+
+
+					// Callback that creates and populates a data table,
+					// instantiates the pie chart, passes in the data and
+					// draws it.
+					var chartIngresosIsDrawn = false;
+					// Create the data table.
+					
+					//Array para hacer gráfico de columnas
+					var dataColumna = google.visualization.arrayToDataTable([
+						['Concepto' <?php foreach($this->channels as $channel) { echo ','."'".$channel['name']."'"; } ?>, 'TOTAL'],
+						['Ingresos' <?php
+										$incomes_sum=array();
+										foreach($this->channels as $channel){
+											if (!isset ($incomes_sum[$this->company['id']])){
+												$incomes_sum[$this->company['id']]=0;
+											}
+											$incomes=0;
+											foreach ($this->products as $product){
+												if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+													foreach ($this->regions as $region){
+														$incomes+=$this->outcomes_sales_incomes['company_'.$this->company['id']]
+																					['product_'.$product['product_number']]
+																					['region_'.$region['region_number']]
+																					['channel_'.$channel['channel_number']];
+													}					
+												}
+											}
+											$incomes_sum[$this->company['id']]+=$incomes;
+											echo ','.number_format($incomes, 0, '', '');
+											}
+											echo ','.number_format($incomes_sum[$this->company['id']], 0, '', '');
+											?>
+											]]);
+											
+					//Array para gráfico de tarta
+					var dataIngresos = google.visualization.arrayToDataTable([
+						['Canal', 'Ingresos']
+						<?php foreach ($this->channels as $channel){
+							$incomes=0;
+							foreach ($this->products as $product){
+								if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+									foreach ($this->regions as $region){
+										$incomes+=$this->outcomes_sales_incomes['company_'.$this->company['id']]
+																			['product_'.$product['product_number']]
+																			['region_'.$region['region_number']]
+																			['channel_'.$channel['channel_number']];
+									}
+								}
+							}
+							echo (',["'.$channel['name'].'",'.$incomes.']');
+						}?>
+						]);
+						
+					var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						formatter.format(dataIngresos,1)
+						
+					function drawChartIngresos() {
+						// Set chart options
+						var options = {'width':600,
+									   'height':300,
+									   'title': "Ingresos",
+									   chartArea: {  width: "90%"}
+									   };
+
+						// Instantiate and draw our chart, passing in some options.
+						var chart = new google.visualization.PieChart(document.getElementById('chart_div_ingresos'));
+						chart.draw(dataIngresos, options);
+					}
+				</script>
+				<div class="titulo_cuenta_resultados invisible categories">
+					INGRESOS <a href = "javascript:void(0)" onclick = "document.getElementById('light1').style.display='block'; document.getElementById('fade1').style.display='block'; document.getElementById('chart_div_gastos').style.display='none';document.getElementById('chart_div_ingresos').style.display='block';drawChartIngresos();">Mostrar Gráfico</a>
+				</div>
+				<div>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto" >
+						<?php 
+						$hgroup=0;
+						$incomes_sum=array();
+						foreach($this->channels as $channel){
+							$hgroup++;
+							$hor_class='hor_group_odd';
+							if ($hgroup % 2 == 0){
+								$hor_class='hor_group_even';
+							}?>
+						<tr>
+							<td class="<?php echo $hor_class?> categories col1"></td>
+							<td class="<?php echo $hor_class?> categories col2"><?php echo $channel['name']?></td>
+							<?php 
+								if (!isset ($incomes_sum[$this->company['id']])){
+										$incomes_sum[$this->company['id']]=0;
+									}
+									$incomes=0;
+									foreach ($this->products as $product){
+										if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+											foreach ($this->regions as $region){
+												$incomes+=$this->outcomes_sales_incomes['company_'.$this->company['id']]
+																			['product_'.$product['product_number']]
+																			['region_'.$region['region_number']]
+																			['channel_'.$channel['channel_number']];
+											}					
+										}
+									}
+									$incomes_sum[$this->company['id']]+=$incomes;
+								?>
+								<td class="<?php echo $hor_class?> vertical_group_open col3"nowrap><?php echo number_format($incomes, 2, '.', ',').' €'?></td>
+						</tr>
+						<?php } ?>
+					</table>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr class="resultados_total">
+							<td class="col1"></th>
+							<td class="col2">
+								TOTAL INGRESOS:
+							</td>			
+							<td class="col3"><?php echo number_format($incomes_sum[$this->company['id']], 2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>			
+			</div>
+			</br>
+			
+			<!--GASTOS-->
+			<div  class="tabla_cuentas_resultados">
+				<div class="titulo_cuenta_resultados invisible categories">
+					GASTOS <a href = "javascript:void(0)" onclick = "document.getElementById('light1').style.display='block'; document.getElementById('fade1').style.display='block'; document.getElementById('chart_div_gastos').style.display='block';document.getElementById('chart_div_ingresos').style.display='none'; drawChartGastos();">Mostrar Gráfico</a>
+				</div>
+				<div id="productionAndLogistics" style="float:left">
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Producción & Logística
+					</div>
+					<table class="resultados_parcial">
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Fábricas y Maquinaria</td>
+							<?php 
+								$pr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['pr_fixed_cost'];?>
+								<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['pr_fixed_cost'], 2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Fabricación de productos</td>
+							<?php 
+								$pr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['pr_var_costs'];?>
+								<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['pr_var_costs'], 2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+					<div class="titulo_cuenta_resultados3 invisible categories">
+						Abastecimiento de materias primas
+					</div>
+					<table class="resultados_parcial">
+						<?php 
+							$hgroup=2;
+						foreach($this->channels as $channel){
+							$hgroup++;
+							$hor_class='hor_group_odd';
+							if ($hgroup % 2 == 0){
+								$hor_class='hor_group_even';
+							}?>
+						<tr>
+							<td class="<?php echo $hor_class?> categories col1"></td>
+							<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+							<?php $pr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['pr_rawMaterials_costs'][$channel['channel_number']];?>
+								<td class="<?php echo $hor_class?> vertical_group_open col3"nowrap><?php echo number_format( $this->outcomes_costs[$this->company['id']]['pr_rawMaterials_costs'][$channel['channel_number']], 2, '.', ',').' €'?>
+								</td>
+						</tr>
+						<?php }?>
+					</table>
+					<div class="titulo_cuenta_resultados3 invisible categories">
+						Distribución
+					</div>
+					<table class="resultados_parcial">
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">&nbsp;&nbsp;&nbsp;Gastos de Distribuci&oacute;n</td>
+							<?php $pr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['pr_distrib_costs']?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['pr_distrib_costs'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+					<table class="resultados_parcial">
+						
+						<tr class="resultados_subtotal">
+							<td class="col1"></th>
+							<td class="col2">
+								Total producción & logísitca:
+							</td>			
+							<td class="col3"><?php echo number_format($pr_costs[$this->company['id']], 2, '.', ',').' €';?></td>
+						</tr>
+					</table>
+				</div>
+				<div id="Marketing" style="float:right">
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Márketing
+					</div>
+					
+					<div class="titulo_cuenta_resultados3 invisible categories">
+					Publicidad
+					</div>
+					<table class="resultados_parcial">
+						<?php $hgroup=1;
+						foreach($this->media as $media){
+							$hgroup++;
+							$hor_class='hor_group_odd';
+							if ($hgroup % 2 == 0){
+								$hor_class='hor_group_even';
+							}?>
+						<tr>
+							<td class="<?php echo $hor_class?> categories col1"></td>
+							<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $media['name']?></td>
+							<?php $mk_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['mk_advert_costs'][$media['media_number']];?>
+								<td class="<?php echo $hor_class?> vertical_group_open col3">
+									<?php echo number_format($this->outcomes_costs[$this->company['id']]['mk_advert_costs'][$media['media_number']],2, '.', ',').' €'?>
+								</td>
+						</tr>
+						<?php } ?>
+					</table>
+					
+					<div class="titulo_cuenta_resultados3 invisible categories">
+						Trade MKT
+					</div>
+					<table class="resultados_parcial">
+						<?php $hgroup=1;
+							foreach($this->trademedia as $trademedia){
+								$hgroup++;
+								$hor_class='hor_group_odd';
+								if ($hgroup % 2 == 0){
+									$hor_class='hor_group_even';
+								}?>
+							<tr>
+								<td class="<?php echo $hor_class?> categories col1"></td>
+								<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $trademedia['name']?></td>
+								<?php $mk_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['mk_trade_costs'][$trademedia['trademedia_number']];?>
+									<td class="<?php echo $hor_class?> vertical_group_open col3">
+										<?php echo number_format($this->outcomes_costs[$this->company['id']]['mk_trade_costs'][$trademedia['trademedia_number']],2, '.', ',').' €'?>
+									</td>
+							</tr>
+						<?php } ?>
+					</table>
+					
+					<div class="titulo_cuenta_resultados3 invisible categories">
+						Gasto por venta
+					</div>
+					<table class="resultados_parcial">
+						<?php $hgroup=1;
+							foreach($this->channels as $channel){
+								$hgroup++;
+								$hor_class='hor_group_odd';
+								if ($hgroup % 2 == 0){
+									$hor_class='hor_group_even';
+								}?>
+							<tr>
+								<td class="<?php echo $hor_class?> categories col1"></td>
+								<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+								<?php $mk_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['mk_sales_costs'][$channel['channel_number']];?>
+								<td class="<?php echo $hor_class?> vertical_group_open col3">
+									<?php echo number_format($this->outcomes_costs[$this->company['id']]['mk_sales_costs'][$channel['channel_number']],2, '.', ',').' €'?>
+								</td>
+							</tr>
+						<?php }?>
+					</table>
+					
+					<div class="titulo_cuenta_resultados3 invisible categories">
+						Gasto fijo por canales de distribución
+					</div>
+					<table class="resultados_parcial">
+						<?php $hgroup=1;
+							foreach($this->channels as $channel){
+								$hgroup++;
+								$hor_class='hor_group_odd';
+								if ($hgroup % 2 == 0){
+									$hor_class='hor_group_even';
+								}?>
+							<tr>
+								<td class="<?php echo $hor_class?> categories col1"></td>
+								<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+								<?php $mk_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['mk_fixed_costs'][$channel['channel_number']];?>
+									<td class="<?php echo $hor_class?> vertical_group_open col3"nowrap><?php echo number_format( $this->outcomes_costs[$this->company['id']]['mk_fixed_costs'][$channel['channel_number']],2, '.', ',').' €'?></td>
+							</tr>
+						<?php }?>
+					</table>
+					<table class="resultados_parcial">
+						<tr class="resultados_subtotal">
+							<td class="col1"></th>
+							<td class="col2">
+								Total marketing:
+							</td>			
+							<td class="col3"><?php echo number_format($mk_costs[$this->company['id']],2, '.', ',').' €';?></td>
+						</tr>
+					</table>					
+				</div>
+				
+				<div style="clear: both"></div>
+				
+				<div id="Recursos_Humanos" style="float:left">
+					</br>
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Recursos Humanos
+					</div>
+					<table class="resultados_parcial">
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Contrataci&oacute;n</td>
+							<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_hiring_costs']?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_hiring_costs'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Formaci&oacute;n</td>
+							<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_training_costs']?>
+								<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_training_costs'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Salarios</td>
+							<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_wages_costs']?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_wages_costs'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+					
+					<table class="resultados_parcial">
+						
+						<tr class="resultados_subtotal">
+							<td class="col1"></th>
+							<td class="col2">
+								Total Recursos  Humanos:
+							</td>			
+							<td class="col3"><?php echo number_format($hr_costs[$this->company['id']],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>
+				
+				<div id="Iniciativas" style="float:right">
+					</br>
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Iniciativas
+					</div>
+				
+					<table class="resultados_parcial">
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Iniciativas de Producción</td>
+							<?php $in_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['initiatives_pr_costs'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['initiatives_pr_costs'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Iniciativas de Marketing</td>
+							<?php $in_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['initiatives_mk_costs'];?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['initiatives_mk_costs'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Iniciativas de Recursos Humanos</td>
+							<?php $in_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['initiatives_hr_costs'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['initiatives_hr_costs'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+					<table class="resultados_parcial">	
+						<tr class="resultados_subtotal">
+							<td class="col1"></th>
+							<td class="col2">
+								Total Iniciativas:
+							</td>			
+							<td class="col3"><?php echo number_format($in_costs[$this->company['id']],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>
+				
+				<div style="clear: both"></div>
+				
+				<div id="estudios_mercado" style="float:left">
+					</br>
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Estudios de Mercado
+					</div>
+					<table class="resultados_parcial">
+						<tr>
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Coste de los Estudios contratados</td>
+							<?php $research_costs[$this->company['id']]=$this->outcomes_costs[$this->company['id']]['market_researches_costs'];?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['market_researches_costs'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+					<table class="resultados_parcial">
+						<tr class="resultados_subtotal">
+							<td class="col1"></th>
+							<td class="col2">
+								Total Estudios de Mercado:
+							</td>			
+							<td class="col3"><?php echo number_format($this->outcomes_costs[$this->company['id']]['market_researches_costs'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>
+				
+				<div id="idi" style="float:right">
+					</br>
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						I+D+i
+					</div>
+				
+					<table class="resultados_parcial">
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Modificaci&oacute;n de Productos</td>
+							<?php $idi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['idi_changes_costs'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['idi_changes_costs'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Nuevos Productos</td>
+							<?php $idi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['idi_new_costs'];?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['idi_new_costs'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+					<table class="resultados_parcial">	
+						<tr class="resultados_subtotal">
+							<td class="col1"></th>
+							<td class="col2">
+								Total I+D+i:
+							</td>			
+							<td class="col3"><?php echo number_format($this->outcomes_costs[$this->company['id']]['idi_new_costs'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>
+				<div style="clear: both"></div>
+				</br>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1"></th>
+						<td class="col2">
+							TOTAL GASTOS:
+						</td>
+						<?php $total_costs[$this->company['id']]=$pr_costs[$this->company['id']]+
+														$mk_costs[$this->company['id']]+
+														$hr_costs[$this->company['id']]+
+														$in_costs[$this->company['id']]+
+														$research_costs[$this->company['id']]+
+														$idi_costs[$this->company['id']];?>					
+						<td class="col3"><?php echo number_format($total_costs[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+					<tr class="resultados_total">
+						<td class="col1"></th>
+						<td class="col2">
+							 Variación de existencias:
+						</td>	
+						<?php $inventories[$this->company['id']]=$this->outcomes_balance_sheet[$this->company['id']]['stock']-$this->prev_outcomes_balance_sheet[$this->company['id']]['stock'];?>
+						<td class="col3"><?php echo number_format($inventories[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				<script type="text/javascript">
+					// Callback that creates and populates a data table,
+					// instantiates the pie chart, passes in the data and
+					// draws it.
+					var chartGastosIsDrawn = false;
+					// Create the data table.
+											
+					//Array para gráfico de tarta
+					var dataGastos = google.visualization.arrayToDataTable([
+						['Canal', 'Gastos'],
+						['Producción & Logística', <?php echo($pr_costs[$this->company['id']])?>],
+						['Marketing', <?php echo($mk_costs[$this->company['id']])?>],
+						['Recursos Humanos', <?php echo($hr_costs[$this->company['id']])?>],
+						['Iniciativas', <?php echo($in_costs[$this->company['id']])?>],
+						['Estudios de Mercado', <?php echo($this->outcomes_costs[$this->company['id']]['market_researches_costs'])?>],
+						['I+D+i', <?php echo($this->outcomes_costs[$this->company['id']]['idi_new_costs'])?>]
+						]);
+						
+					var formatter = new google.visualization.NumberFormat({fractionDigits:0});
+						formatter.format(dataGastos,1)
+						
+					function drawChartGastos() {
+						// Set chart options
+						var options = {'width':600,
+									   'height':300,
+									   'title': "Gastos",
+									   chartArea: {  width: "90%"}
+									   };
+
+						// Instantiate and draw our chart, passing in some options.
+						var chart = new google.visualization.PieChart(document.getElementById('chart_div_gastos'));
+						chart.draw(dataGastos, options);
+					}
+				</script>
+			</div>
+			</br>
+			
+			<div id="light1" style="display: none;position: fixed;top: 25%;left: 25%;width: 50%;height: 50%;border: 16px solid #336699;background-color: white;z-index:1002;overflow: auto;">
+				<div style="position: fixed; top: 28%; right: 25%; z-index:500" onclick = "document.getElementById('light1').style.display='none';document.getElementById('fade1').style.display='none'">
+					<img src="/images/close.png" alt="close">
+				</div>
+				<div id="chart_div_ingresos"></div>
+				<div id="chart_div_gastos"></div> 
+			</div>
+			<div id="fade1" style="display: none; position: fixed;top: 0%;left: 0%;width: 100%;height: 100%;background-color: black;z-index:1001;-moz-opacity: 0.8;opacity:.80;filter: alpha(opacity=80);" onclick = "document.getElementById('light1').style.display='none';document.getElementById('fade1').style.display='none'">
+			</div>
+			
+			<!--EBITDA-->
+			<div  class="tabla_cuentas_resultados">	
+				<div class="titulo_cuenta_resultados invisible categories">
+					EBITDA:&nbsp;&nbsp;&nbsp;
+						<?php $ebitda[$this->company['id']]=$incomes_sum[$this->company['id']]-($total_costs[$this->company['id']]-$inventories[$this->company['id']])?>
+					<span id="ebitda" style="font-weight: bold; color: black"><?php echo number_format($ebitda[$this->company['id']],2, '.', ',').' €'?></span>
+				</div>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1"></th>
+						<td class="col2">
+							 Amortizaciones:
+						</td>
+							<?php $amortization[$this->company['id']]=$this->amortization_view[$this->company['id']]?>
+						<td class="col3"><?php echo number_format($amortization[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Financieros
+				</div>
+			
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Intereses Financiación a C.P.</td>
+							<?php $fi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['fi_debt_costs_st']?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['fi_debt_costs_st'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Intereses Financiación a L.P.</td>
+							<?php $fi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['fi_debt_costs_lt']?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['fi_debt_costs_lt'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1"></th>
+						<td class="col2">
+							 Total Financieros:
+						</td>
+							<?php $ebitda[$this->company['id']]=$incomes_sum[$this->company['id']]-($total_costs[$this->company['id']]-$inventories[$this->company['id']])?>
+						<td class="col3"><?php echo number_format($fi_costs[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				
+			</div>	
+			</br>
+			<!--EBT-->
+			<div  class="tabla_cuentas_resultados">	
+				<div class="titulo_cuenta_resultados invisible categories">
+					EBT:
+					<?php $ebt[$this->company['id']]=$ebitda[$this->company['id']]-$amortization[$this->company['id']]-$fi_costs[$this->company['id']]?>
+					<span id="ebt" style="font-weight: bold; color: black"><?php echo number_format($ebt[$this->company['id']],2, '.', ',').' €'?></span>
+				</div>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1"></th>
+						<td class="col2">
+							 Impuestos (25%):
+						</td>
+							<?php if ($ebt[$this->company['id']]<=0) {
+								$taxes[$this->company['id']]=0;
+							} 
+							else{
+								$taxes[$this->company['id']]=($ebt[$this->company['id']]) *0.25;
+							}?>
+						<td class="col3"><?php echo number_format($taxes[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+			</div>
+			
+			<div style="clear: both"></div>
+			</br>
+			<!--RESULTADO-->
+			<div  class="tabla_cuentas_resultados">
+				<div class="titulo_cuenta_resultados invisible categories" style="font-size: 35px;">
+					RESULTADO:
+					<?php $result[$this->company['id']] = $ebt[$this->company['id']] - $taxes[$this->company['id']]?>
+					<span id="resultado" style="font-weight: bold; color: black"><?php echo number_format($result[$this->company['id']],2, '.', ',').' €'?></span>
+				</div>
+			</div>
+			<!--Script para cambiar los colores de los resultados en caso de que sean negativos-->
+			<script>
+			
+				//EBITDA
+				if (<?php echo ($ebitda[$this->company['id']])?> < 0){
+					document.getElementById("ebitda").style.color= "red";
+				}
+				//EBT
+				if (<?php echo ($ebt[$this->company['id']]) ?> < 0){
+					document.getElementById("ebt").style.color= "red";
+				}
+				//resultado
+				if (<?php echo ($result[$this->company['id']]) ?> < 0){
+					document.getElementById("resultado").style.color= "red";
+				}
+			</script>
+			</br>	
+		</div>
+
+		<!--RATIOS FINANCIEROS-->
+		<div id="performance_outcomes" class="tab">
+			<div class="tabla_cuentas_resultados">
+				<div class="section_title">RATIOS FINANCIEROS <?php echo $this->company['name']?></div>
+
+				<div>
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Ratios Anuales
+					</div>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr>	
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Margen de operación</td>
+							<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['margin'],2, '.', ',')?>&nbsp;%</td>
+						</tr>
+						<tr>	
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Endeudamiento&nbsp;&nbsp;</td>
+							<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['indebtedness'],2, '.', ',')?>&nbsp;%</td>
+						</tr>
+						<tr>	
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Liquidez&nbsp;&nbsp;</td>
+							<?php if($this->outcomes_performance[$this->company['id']]['liquidity']==-1.00){?>
+							<td class="hor_group_odd categories vertical_group_open col3"nowrap>n/a</td>
+							<?php } else { ?>
+							<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['liquidity'],2, '.', ',')?>&nbsp;%</td>
+							<?php } ?>
+						</tr>
+						<tr>	
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Solvencia&nbsp;&nbsp;</td>
+							<?php if($this->outcomes_performance[$this->company['id']]['solvency']==-1.00){?>
+							<td class="hor_group_even categories vertical_group_open col3"nowrap>n/a</td>
+							<?php } else { ?>
+							<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['solvency'],2, '.', ',')?>&nbsp;%</td>
+							<?php } ?>
+						</tr>
+						<tr>	
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
+							<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['roa'],2, '.', ',')?>&nbsp;%</td>
+						</tr>
+						<tr>	
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Payout Ratio&nbsp;&nbsp;</td>
+							<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['payout_ratio'],2, '.', ',')?>&nbsp;%</td>
+						</tr>
+					</table>
+				</div>
+				</br>
+				<div>
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Ratios Acumulados
+					</div>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr>	
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
+							<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['ac_roa'],2, '.', ',')?>&nbsp;%</td>
+						</tr>
+						<tr>	
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Rentabilidad para el accionista&nbsp;&nbsp;</td>
+							<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['roe'],2, '.', ',')?>&nbsp;%</td>
+						</tr>
+					</table>
+				</div>
+				</br>
+				<div>
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Evaluación del desempeño
+					</div>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr>	
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Indicador de actividad</td>
+							<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['performance_index'],2, '.', ',')?>&nbsp;</td>
+						</tr>
+					</table>
+				</div>
+				</br>
+				<div>
+					<div class="titulo_cuenta_resultados2 invisible categories">
+						Valoración bursátil
+					</div>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr>	
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">Indicador de cotización bursátil</td>
+							<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['exchange_index'],2, '.', ',')?>&nbsp;</td>
+						</tr>
+					</table>
+				</div>
+				</br>
+			</div>
+		</div>
+		
+		<!--BALANCE-->
+		<div id="balance_sheet_outcomes" class="tab">	
+			<div class="tabla_cuentas_resultados">
+				<div class="section_title">BALANCE <?php echo $this->company['name']?></div>
+				</br>
+				<!--ACTIVO-->
+				<div style="float:left;">
+					<div class="titulo_cuenta_resultados invisible categories">
+						ACTIVO
+					</div>
+					<?php $asset_no_current_sum[$this->company['id']]=0;?>
+					<?php $asset_no_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['tied_up'];
+						  $asset_no_current_sum[$this->company['id']]-=$this->outcomes_balance_sheet[$this->company['id']]['amortization'];?>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr class="resultados_total">
+							<td class="col1">A)</th>
+							<td class="col2">
+								Activo no corriente (I+II)
+							</td>				
+							<td class="col3"><?php echo number_format($asset_no_current_sum[$this->company['id']], 2, '.', ',').' €'?></td>
+						</tr>
+						<tr>	
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">I. Inmovilizado</td>
+							<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['tied_up'];?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['tied_up'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">II. Amortización de inmovilizado</td>
+							<?php $asset_sum[$this->company['id']]-=$this->outcomes_balance_sheet[$this->company['id']]['amortization'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['amortization'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+					
+					<?php $asset_current_sum[$this->company['id']]=0;?>
+					<?php $asset_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['stock'];
+						  $asset_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['trade_debtors'];
+						  $asset_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['liquid_assets'];?>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr class="resultados_total">
+							<td class="col1">B)</th>
+							<td class="col2">
+								Activo corriente (I+II+III)
+							</td>				
+							<td class="col3"><?php echo number_format($asset_current_sum[$this->company['id']], 2, '.', ',').' €'?></td>
+						</tr>
+						<tr>	
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">I. Existencias</td>
+							<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['stock'];?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['stock'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">II. Deudores comerciales</td>
+							<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['trade_debtors'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['trade_debtors'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">III. Tesorería</td>
+							<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['liquid_assets'];?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['liquid_assets'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>
+				
+				<!--PASIVO-->
+				<div style="float:right;  border-left: 1px solid #336699; padding-left: 10px;">
+					<div class="titulo_cuenta_resultados invisible categories">
+						PASIVO Y PATRIMONIO NETO
+					</div>
+					<?php $shareholders_funds[$this->company['id']]=0;?>
+					<?php $shareholders_funds[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['capital'];
+						$shareholders_funds[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['reserves'];
+						$shareholders_funds[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['year_result'];?>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr class="resultados_total">
+							<td class="col1">A)</th>
+							<td class="col2">
+								Patrimonio Neto (I+II+III)
+							</td>				
+							<td class="col3"><?php echo number_format($shareholders_funds[$this->company['id']], 2, '.', ',').' €'?></td>
+						</tr>
+						<tr>	
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">I. Capital</td>
+							<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['capital'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['capital'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">II. Resultados ejercicios anteriores</td>
+							<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['reserves'];?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['reserves'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">III. Resultado del ejercicio</td>
+							<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['year_result'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['year_result'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+					
+					<?php $liabilities_no_current[$this->company['id']]=0;?>
+					<?php $liabilities_no_current[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['long_term_debts'];?>
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr class="resultados_total">
+							<td class="col1">B)</th>
+							<td class="col2">
+								Pasivo no corriente (I)
+							</td>				
+							<td class="col3"><?php echo number_format($liabilities_no_current[$this->company['id']],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>	
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">I. Deudas a largo plazo</td>
+							<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['long_term_debts']?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['long_term_debts'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+
+					<?php $liabilities_current[$this->company['id']]=0;?>
+					<?php $liabilities_current[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['short_term_debts'];
+						  $liabilities_current[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['creditors'];?>					
+					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+						<tr class="resultados_total">
+							<td class="col1">C)</th>
+							<td class="col2">
+								Pasivo corriente (I+II)
+							</td>				
+							<td class="col3"><?php echo number_format($liabilities_current[$this->company['id']],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">I. Deudas a corto plazo</td>
+							<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['short_term_debts']?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['short_term_debts'],2, '.', ',').' €'?></td>
+						</tr>
+						<tr>
+							<td class="hor_group_even categories col1"></td>
+							<td class="hor_group_even categories col2">II. Acreedores comerciales</td>
+							<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['creditors']?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['creditors'],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>
+				<div style="clear:both"></div>
+				
+				<!--TOTALES-->
+				<div>
+					<div style="float:left">
+					
+						<table class="resultados_parcial">
+							<tr class="resultados_total">
+								<td class="col1"></th>
+								<td class="col2">
+								Total ACTIVO (A+B)
+								</td>
+								<td class="col3"><?php echo number_format($asset_sum[$this->company['id']], 2, '.', ',').' €'?></td>
+							</tr>
+						</table>
+					</div>
+					<div style="float:right;  border-left: 1px solid #336699; padding-left: 24px;">
+						<table class="resultados_parcial">
+							<tr class="resultados_total">
+								<td class="col1"></th>
+								<td class="col2">
+									Total PASIVO Y PATRIMONIO NETO (A+B+C)
+								</td>
+								<td class="col3"><?php echo number_format($liabilities_total[$this->company['id']],2, '.', ',').' €'?></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div style="clear:both"></div>
+			</div>
+		</div>
+
+		<!--INDICADORES INTERNOS-->
+		<div id="display_outcomes" class="tab">
+			<div class="section_title">INDICADORES INTERNOS <?php   echo $this->company['name'];?></div>
+			<div class="titulo_display_outcomes">
+				<?php $atmosphere=3*($this->atmosphere[$this->company['id']]);?>
+			</div>
+			
+			<div class="display_outcomes_results">
+				<div class="titulo_display_outcomes">
+					Atmósfera de trabajo
+				</div>
+				<div style="display:block; margin-left: auto; margin-right: auto;">
+					<div class="barra_resultado_texto_izquierda">
+						Mala atmósfera
+					</div>
+					<div class="barra_resultado">
+						<div id="atmosphere_bar">
+						</div>
+					</div>
+					<div class="barra_resultado_texto_derecha">
+						Buena atmósfera
+					</div>
+				</div>
+				<script>
+					var valor_atmosfera = <?php echo $atmosphere?>;
+					if (valor_atmosfera<1) {
+						valor_atmosfera = 1;
+					}
+					
+					$("#atmosphere_bar").progressbar({
+						value: valor_atmosfera,
+						max: 300
+					});
+					
+					
+					if ( valor_atmosfera < 100){
+						$('#atmosphere_bar .ui-widget-header').css('background-color', '#FF0000');
+					}
+					if ( valor_atmosfera > 200) {
+						$('#atmosphere_bar .ui-widget-header').css('background-color', '#00FF00');
+					}
+					
+				</script>
+				<div style="clear:both"></div>	
+			</div>	
+			
+			<div class="display_outcomes_results">
+				<?php $qualification=3*($this->qualification[$this->company['id']]);?>
+				<div class="titulo_display_outcomes">
+					Cualificación de la plantilla
+				</div>
+				<div style="display:block; margin-left: auto; margin-right: auto;">
+					<div class="barra_resultado_texto_izquierda">
+						Baja cualificación
+					</div>
+					<div class="barra_resultado">
+						<div id="qualification_bar">
+						</div>
+					</div>
+					<div class="barra_resultado_texto_derecha">
+						Alta cualificación
+					</div>
+				</div>
+				
+				<script>
+					var valor_cualificacion = <?php echo $qualification?>;
+					if (valor_cualificacion<1) {
+						valor_cualificacion = 1;
+					}
+					$("#qualification_bar").progressbar({
+						value: valor_cualificacion,
+						max: 300
+					});
+					
+					if (valor_cualificacion < 100){
+						$('#qualification_bar .ui-widget-header').css('background-color', '#FF0000');
+					}
+					if (valor_cualificacion > 200) {
+						$('#qualification_bar .ui-widget-header').css('background-color', '#00FF00');
+					}
+				</script>
+				<div style="clear: both"></div>
+			</div>
+			<div class="display_outcomes_results">
+				<?php foreach ($this->game_factories[$this->company['id']] as $factory){
+					$constructed=$this->lastFactory;
+					$round_constructed=$this->roundFactory;
+					if ($factory_number<$constructed && (($this->round_number>$round_constructed['factory_number_'.$factory['factory_number']])||($round_constructed['factory_number_'.$factory['factory_number']]==1))){
+					$deterioro=3*($this->deterioration[$this->company['id']]['factory_number_'.$factory['factory_number']]);?>
+				<div class="titulo_display_outcomes">
+					Grado de deterioro Fabrica <?php echo $factory['factory_number']?><br/>
+				</div>
+				
+				<div style="display:block; margin-left: auto; margin-right: auto;">
+					<div class="barra_resultado_texto_izquierda">
+						Bajo deterioro
+					</div>
+					<div class="barra_resultado">
+						<div id="deterioration_bar_<?php echo $factory['factory_number']?>">
+						</div>
+					</div>
+					<div class="barra_resultado_texto_derecha">
+						Alto deterioro
+					</div>
+				</div>
+
+				<script>
+					
+					var valor_deterioro =  <?php echo $deterioro?>;
+					if(valor_deterioro < 1){
+						valor_deterioro = 1;
+					}
+					
+				
+					$("#deterioration_bar_<?php echo $factory['factory_number']?>").progressbar({
+						value: valor_deterioro,
+						max: 300
+					});
+					
+					if (valor_deterioro < 100){
+						$('#deterioration_bar_<?php echo $factory['factory_number']?> .ui-widget-header').css('background-color', '#00FF00');
+					}
+					if (valor_deterioro > 200) {
+						$('#deterioration_bar_<?php echo $factory['factory_number']?> .ui-widget-header').css('background-color', '#FF0000');
+					}
+					
+				</script>
+				<?php }
+				}?>
+				<div style="clear: both"></div>
+			</div>
+			
+			<div class="display_outcomes_results">				
+				<?php 
+				$tituloImpreso = false;
+				
+				foreach ($this->products as $product){
+					$success=3*($this->success[$this->company['id']]['product_number_'.$product['product_number']]);
+					
+					if($success>0){
+						if($tituloImpreso == false) {?>
+							<div class="titulo_display_outcomes">Grado de desarrollo de nuevos productos</div>
+							
+							<?php $tituloImpreso = true;
+						}
+					?>		
+						
+						<div class="titulo_display_outcomes">
+							Producto  <?php echo $product['product_number']?><br/>
+						</div>
+						<div style="display:block; margin-left: auto; margin-right: auto;">
+							<div class="barra_resultado_texto_izquierda">
+								Bajo
+							</div>
+							<div class="barra_resultado">
+								<div id="development_success_bar_<?php echo $product['product_number']?>">
+								</div>
+							</div>
+							<div class="barra_resultado_texto_derecha">
+								Alto
+							</div>
+						</div>
+						
+						<script>
+							var valor_development_success = <?php echo $success?>;
+							if(valor_development_success < 1){
+								valor_development_success = 1;
+							}
+							
+							$("#development_success_bar_<?php echo $product['product_number']?>").progressbar({
+								value: valor_development_success,
+								max: 300
+							});
+							
+							if (valor_development_success < 100){
+								$('#development_success_bar_<?php echo $product['product_number']?> .ui-widget-header').css('background-color', '#FF0000');
+							}
+							if (valor_development_success > 200) {
+								$('#development_success_bar_<?php echo $product['product_number']?> .ui-widget-header').css('background-color', '#00FF00');
+							}
+						</script>
+					<?php }?>
+			<?php }?>
+			<div style="clear: both"></div>
+			</div>
+		</div>
+		
+		<!--CUOTAS DE MERCADO-->
+		<div id="graphic_outcomes" class="tab tabla_cuentas_resultados">
+			<script>
+				function drawMarketShareGraphs() {
+				// Prepare the data
+				var mktSharedata = google.visualization.arrayToDataTable(<?php echo($this->array_cuotas_mercado);?>);
+			  
+				// Define a category picker control for the Gender column
+				var marketShareProductPicker = new google.visualization.ControlWrapper({
+				  'controlType': 'CategoryFilter',
+				  'containerId': 'marketShareProductPickerControl',
+				  'options': {
+					'filterColumnLabel': 'Producto',
+					'ui': {
+					'labelStacking': 'vertical',
+					  'allowTyping': false,
+					  'allowMultiple': false,
+					  'allowNone': false
+					}
+				  }
+				});
+				
+				var marketShareRegionPicker = new google.visualization.ControlWrapper({
+				  'controlType': 'CategoryFilter',
+				  'containerId': 'marketShareRegionPickerControl',
+				  'options': {
+					'filterColumnLabel': 'Pais',
+					'ui': {
+					'labelStacking': 'vertical',
+					  'allowTyping': false,
+					  'allowMultiple': false,
+					  'allowNone': false
+					}
+				  }
+				});
+				var marketShareChannelPicker = new google.visualization.ControlWrapper({
+				  'controlType': 'CategoryFilter',
+				  'containerId': 'marketShareChannelPickerControl',
+				  'options': {
+					'filterColumnLabel': 'Canal',
+					'ui': {
+					'labelStacking': 'vertical',
+					  'allowTyping': false,
+					  'allowMultiple': false,
+					  'allowNone': false
+					}
+				  }
+				});
+			  
+				// Define a Pie chart
+				var marketSharePieGraph = new google.visualization.ChartWrapper({
+				  'chartType': 'PieChart',
+				  'containerId': 'marketSharePieGraph',
+				  'options': {
+					'width': 850,
+					'height': 270,
+					'title': 'Cuotas de mercado',
+					'chartArea': {'height': "90%", 'width': "80%"},
+					'pieSliceText': 'percentage',
+					'tooltip': {'text': 'percentage'}
+				  },
+				  // Instruct the piechart to use colums 0 (Name) and 3 (Donuts Eaten)
+				  // from the 'data' DataTable.
+				  'view': {'columns': [3, 4]}
+				});
+
+
+			  
+				// Create a dashboard
+				new google.visualization.Dashboard(document.getElementById('marketShareDashboard')).
+					// Establish bindings, declaring the both the slider and the category
+					// picker will drive both charts.
+					bind([marketShareProductPicker, marketShareRegionPicker, marketShareChannelPicker], [marketSharePieGraph]).
+					// Draw the entire dashboard.
+					draw(mktSharedata);
+			  }
+
+		  
+		  </script>
+			<div class="section_title">
+					CUOTAS DE MERCADO 
+			</div>
+			</br>
+			<div id="marketShareDashboard">
+				<div>Seleccione el producto, región y canal a visualizar:</br></div>
+				<div style="margin-left: auto; margin-right: auto; width: 350px;">
+					<div id="marketShareProductPickerControl" style="float:left"></div>
+					<div id="marketShareRegionPickerControl" style="float:left"></div>
+					<div id="marketShareChannelPickerControl" style="float:left"></div>
+				</div>
+				<div style="clear:both"></div>
+				<br/>
+				<div style="float: left;" id="marketSharePieGraph"></div>
+			</div>
+		</div>
+		
+		<!--ESTUDIOS DE MERCADO-->
+		<div id="market_researches_outcomes" class="tab">
+			<script>
+				//llamada al menú de estudios de mercado
+				$(function() {
+				$( "#datos_mkt_research" ).tabs();
+				});
+			</script>
+			
+			<!--MENU MKT RESEARCH-->
+			<div id="datos_mkt_research" style="display:block; width: 940px; margin-left: auto; margin-right: auto;">
+				<div class="section_title">
+					ESTUDIOS DE MERCADO
+				</div>
+				<div id="menu_mkt_research">
+					<ul>
+						<li><a href="#channelResearch_tab">Variaci&oacute;n Demanda Estimada</a></li>
+						<li><a href="#pricesReseach_tab">Comparativa Precios</a></li>
+						<li><a href="#mktReseach_tab">Comparativa Marketing</a></li>
+						<li><a href="#spectedResearch_tab">Lanzamientos Esperados</a></li>
+						<li><a href="#accountResearch_tab">Ctas. Anuales</a></li>
+						
+					</ul>
+				</div>
+				<!-- Crecimiento de Canales-->
+				<div id='channelResearch_tab'>
+					<?php if($this->market_researches['channelResearch']==1){
+						$this->gameTables($this, "outcomesChannels");
+					}
+					else {
+						echo('<h3>No ha decidido contratar el estudio de Crecimiento de Canales</h3>');
+					}?>
+				</div>
+				<!--COMPARATIVA DE PRECIOS-->
+				<div id='pricesReseach_tab'>
+					<?php if($this->market_researches['pricesResearch']==1){?>
+						<script>
+							  function drawPrizesResearchVisualization() {
+							  var data_prices_research = google.visualization.arrayToDataTable([
+									['Producto', 'Pais', 'Canal', 'min', 'actual', 'max']
+										<?php foreach ($this->products as $product){
+											if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+												foreach ($this->regions as $region){
+													foreach ($this->channels as $channel){
+														$situation=$this->prices_research;
+														$max=$this->prices_max;
+														$min=$this->prices_min;
+														$precio_minimo_producto_region_canal = $min['product_number_'.$product['product_number']]['region_number_'.$region['region_number']]['channel_number_'.$channel['channel_number']];
+
+														$precio_actual_producto_region_canal = $this->outcomes_prices['company_'.$this->company['id']]
+																		['product_'.$product['product_number']]
+																		['channel_'.$channel['channel_number']]
+																		['region_'.$region['region_number']];
+														
+														$precio_maximo_producto_region_canal = $max['product_number_'.$product['product_number']]['region_number_'.$region['region_number']]['channel_number_'.$channel['channel_number']];
+														if (is_null($precio_minimo_producto_region_canal)){
+															$precio_minimo_producto_region_canal = 0;
+														}
+														if (is_null($precio_actual_producto_region_canal)){
+															$precio_actual_producto_region_canal = 0;
+														}
+														if (is_null($precio_maximo_producto_region_canal)){
+															$precio_maximo_producto_region_canal = 0;
+														}
+														echo (",['".$product['name']."', '".$region['name']."', '".$channel['name']."', ".$precio_minimo_producto_region_canal.", ".$precio_actual_producto_region_canal.", ".$precio_maximo_producto_region_canal."]");
+													
+													}
+												}
+											}	
+										}?>
+									
+								  ]);
+								  // Define a slider control for the Age column.
+								  var product_picker_prizes_research = new google.visualization.ControlWrapper({
+									'controlType': 'CategoryFilter',
+									'containerId': 'product_picker_prizes_research',
+									'options': {
+									  'filterColumnLabel': 'Producto',
+									'ui': {
+									  'labelStacking': 'vertical',
+										'allowTyping': false,
+										'allowMultiple': false,
+										'allowNone': false
+									  }
+									}
+								  });
+
+								  // Define a category picker control for the Gender column
+								  var region_picker_prizes_research = new google.visualization.ControlWrapper({
+									'controlType': 'CategoryFilter',
+									'containerId': 'region_picker_prizes_research',
+									'options': {
+									  'filterColumnLabel': 'Pais',
+									  'ui': {
+									  'labelStacking': 'vertical',
+										'allowTyping': false,
+										'allowMultiple': false,
+										'allowNone': false
+									  }
+									}
+								  });
+
+								  // Define a column chart
+								  var prizes_research_column_chart = new google.visualization.ChartWrapper({
+									'chartType': 'ColumnChart',
+									'containerId': 'prizes_research_column_chart',
+									'options': {
+									  'width': 700,
+									  'height': 300,
+									   'colors' : ["#00b50d","#336699", "#C20000"]
+									},
+									// Instruct the piechart to use colums 0 (Name) and 3 (Donuts Eaten)
+									// from the 'data_prices_research' DataTable.
+									'view': {'columns': [2, 3, 4, 5]}
+								  });
+
+								  // Define a table
+								  var prizes_research_table = new google.visualization.ChartWrapper({
+									'chartType': 'Table',
+									'containerId': 'prizes_research_table',
+									'options': {
+									  'width': '340px'
+									},
+									'view': {'columns': [2,3,4,5]}
+								  });
+
+								  // Create a dashboard
+								  new google.visualization.Dashboard(document.getElementById('prizes_research_dashboard')).
+									  // Establish bindings, declaring the both the slider and the category
+									  // picker will drive both charts.
+									  bind([product_picker_prizes_research, region_picker_prizes_research], [prizes_research_column_chart, prizes_research_table]).
+									  // Draw the entire dashboard.
+									  draw(data_prices_research);
+								}
+								
+						</script>
+						
+						<div id="prizes_research_dashboard">
+							<div class="titulo_display_outcomes">
+								Situación del precio de sus productos respecto al mercado
+							</div>
+								<div style="width: 200px; margin-right: auto; margin-left: auto">
+									<div style="float: left" id="product_picker_prizes_research"></div>
+									<div style="float: left" id="region_picker_prizes_research"></div>
+								</div>
+								<div style="clear: both"></div>
+								<div style="width: 800px">
+									<div style="width: 710px; margin-right: auto; margin-left: auto" id="prizes_research_column_chart"></div>
+									<div style="width: 350px; margin-right: auto; margin-left: auto" id="prizes_research_table"></div>
+								</div>
+						</div>
+						</br>
+						<?php 
+						}
+						else {
+				
+							echo('<h3>No ha decidido contratar el estudio de Comparativa de Precios</h3>');
+					 }?>
+				</div>
+				<!--COMPARATIVA DE MARKETING-->
+				<div id='mktReseach_tab'>
+					<?php if($this->market_researches['mktResearch']==1){?>
+						<div class="display_outcomes_results">	
+							<div class="titulo_display_outcomes">
+								Situación del presupuesto de Publicidad y Trade Mkt respecto al mercado
+							</div>
+						</div>
+						<div class="display_outcomes_results">
+							<div class="titulo_display_outcomes">
+								Publicidad
+							</div>
+							<div style="display:block; margin-left: auto; margin-right: auto;">
+								<div class="barra_resultado_texto_izquierda">
+									Presupuesto Min <?php echo (number_format(($this->mkt_advertising_research['min']),2, '.', ',').' €'); ?>
+								</div>	
+								<div class="barra_resultado">
+									<div id="mkt_research_bar">
+									</div>
+								</div>
+								<div class="barra_resultado_texto_derecha">
+									Presupuesto Max <?php echo (number_format(($this->mkt_advertising_research['max']),2, '.', ',').' €'); ?>
+								</div>
+								<script>
+								var valor_mkt_research = <?php echo (number_format(($this->mkt_advertising_research['situation']),2, '.', ',')); ?>;
+								if (valor_mkt_research<1) {
+									valor_mkt_research = 1;
+								}
+								$("#mkt_research_bar").progressbar({
+									value: valor_mkt_research,
+									max: 100
+								});
+								$('#mkt_research_bar .ui-widget-header ').css('background', 'none');
+								$('#mkt_research_bar .ui-widget-header ').css('background-color', '#336699');
+								
+								</script>
+							</div>
+						</div>
+						<div style="clear: both"></div>
+						<div class="display_outcomes_results">
+							</br>
+							<?php $mkt_research=3*($this->mkt_trade_research['situation'])?>
+							<div class="titulo_display_outcomes">
+								Trade MKT
+							</div>
+							<div style="display:block; margin-left: auto; margin-right: auto;">
+								<div class="barra_resultado_texto_izquierda">
+									Presupuesto Min <?php echo number_format(($this->mkt_trade_research['min']),2, '.', ',').' €' ?>
+								</div>	
+								<div class="barra_resultado">
+									<div id="mkt_trade_research_bar">
+									</div>
+								</div>
+								<div class="barra_resultado_texto_derecha">
+									Presupuesto Max <?php echo number_format(($this->mkt_trade_research['max']),2, '.', ',').' €' ?>
+								</div>
+								<script>
+								var valor_mkt_trade_research = <?php echo (number_format(($this->mkt_trade_research['situation']),2, '.', ','))?>;
+								if (valor_mkt_trade_research<1) {
+									valor_mkt_trade_research = 1;
+								}
+								
+								
+								$("#mkt_trade_research_bar").progressbar({
+									value: valor_mkt_trade_research,
+									max: 100
+								});
+								$('#mkt_trade_research_bar .ui-widget-header ').css('background', 'none');
+								$('#mkt_trade_research_bar .ui-widget-header ').css('background-color', '#336699');
+								
+								</script>
+							</div>
+						</div>
+					<?php }
+						else {?>
+							<h3>No ha decidido contratar el estudio de Comparativa de Márketing</h3>
+						<?php }?>
+				</div>
+				<!--LANZAMIENTOS ESPERADOS-->
+				<div id='spectedResearch_tab'>
+					<?php if($this->market_researches['spectedResearch']==1){
+							$this->gameTables($this, "outcomesSpectedLaunch");
+					}
+					else {?>
+						<h3>No ha decidido contratar el estudio de Lanzamientos esperados</h3>
+					<?php }?>
+				</div>
+				<!--ESTUDIO DE CUENTAS ANUALES-->
+				<div id='accountResearch_tab'>
+					<?php if($this->market_researches['accountResearch']==1){
+						if($this->round_number<3){
+							$this->gameTables($this, "outcomesAccounts");
+						} else {
+							$this->gameTables($this, "outcomesAccountsStudy");						
+						}
+					}
+					else {?>
+						<h3>No ha decidido contratar el estudio de Cuentas Anuales</h3>
+					<?php }?>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php }
+	else{?>
+		<h1>No hay ningún resultado aún.</h1> 
+	<?php } ?>
+
+</div>
+
+
+<script>
+// Set a callback to run when the Google Visualization API is loaded.
+		
+		google.setOnLoadCallback(drawProductionMainTable);
+		google.setOnLoadCallback(drawStocksMainTable);
+		google.setOnLoadCallback(drawSalesMainTable);
+		google.setOnLoadCallback(drawMarketShareGraphs);
+		google.setOnLoadCallback(drawPrizesResearchVisualization);
+		
+</script>

@@ -1,0 +1,33 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<div id='content'>
+	<h1> Turno actual: Turno <?php echo $this->active_round['round_number']?></h1>
+		<h2> (Del <?php echo date('d/m/Y', strtotime($this->active_round['opening_date']))?> 
+			   al <?php echo date('d/m/Y', strtotime($this->active_round['closing_date']))?>) </h2>
+			   <h2 style="text-align:right"> Cargo: <?php echo $this->role_profile[$this->user['role']]['name']?></h2>
+	<form name="validate" method="post">
+	<?php if($this->decision_validate==1){?>
+			<div class="buttonsDiv">
+				<input name="validated" type="hidden" value="<?php echo $this->decisionValidated=$this->decision_validate?>">
+				<input  <?php if ($this->validate_aux==1){ ?> style="color:green" <?php } else { ?> style="color:red"<?php }?> type="submit" value="Validar Decisiones" onclick="window.location.href='<?php echo $this->baseUrl().'/decision'?>'">
+			</div>
+			<br /><br />
+			<div class="fieldOptions" >
+					<a href="<?php echo $this->baseUrl().'/decision'?>">&nbsp;&nbsp;&nbsp; Volver a Decisiones </a>
+			</div>
+			<?php }
+			else {?>
+			<div class="buttonsDiv">
+			<br /><br />
+			No dispone de liquidez suficiente para llevar a cabo las decisiones tomadas. Por favor, revise sus decisiones.
+			<br /><br /><br />
+				<input name="validated" type="hidden" value="<?php echo $this->decisionValidated=$this->decision_validate?>">
+				<input style="color:red" type="button" value="Volver a Decisiones" onclick="window.location.href='<?php echo $this->baseUrl().'/decision'?>'">
+			</div>
+			<?php }?>
+	</form>
+</div>

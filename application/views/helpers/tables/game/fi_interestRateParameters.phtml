@@ -1,0 +1,18 @@
+<table>
+	<theader>
+		<th class="small">Duraci&oacute;n</th>
+		<th class="small">Inter&eacute;s Base (%) </th>
+	</theader>
+	<tr>
+		<td>Dos a&ntilde;os </td>
+		<td><input type="text" name="interestRateParameters[interest_rate][two]" class="small" value="<?php echo $view->games->getInterestRateParameter($view->game_id, 'interest_rate', 2)?>"></td>
+	</tr>
+	<tr>
+		<td>Tres a&ntilde;os </td>
+		<td><input type="text" name="interestRateParameters[interest_rate][tree]" class="small" value="<?php echo $view->games->getInterestRateParameter($view->game_id, 'interest_rate', 3)?>"></td>
+	</tr>
+	<tr>
+		<td>Cuatro a&ntilde;os </td>
+		<td><input type="text" name="interestRateParameters[interest_rate][four]" class="small" value="<?php echo $view->games->getInterestRateParameter($view->game_id, 'interest_rate', 4)?>"></td>
+	</tr>
+</table>

@@ -1,0 +1,25 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<th class="small">Producto <?php echo $product_number?></th>
+		<?php } //for product?>
+	</theader>
+	<tr>
+		<td>Precio Base</td>
+		<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+			<?php $cost=$view->games->getRawMaterialCost($view->game_id, 1, $product_number, 'base');?>
+		<td><input type="text" name="prRawMaterialsCosts[round_1][product_<?php echo $product_number?>][basePrice]" value="<?php echo $cost?>" class="small"></td>
+		<?php } //for product?>
+	</tr>
+	<tr>
+		<td>Incremento por proveedor adicional</td>
+		<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+		<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+			<?php $cost=$view->games->getRawMaterialCost($view->game_id, 1, $product_number, 'increment_per_supplier');?>
+		<td><input type="text" name="prRawMaterialsCosts[round_1][product_<?php echo $product_number?>][incrementPerSupplier]" value="<?php echo $cost?>" class="small"></td>
+		<?php } //for product?>
+	</tr>
+</table>

@@ -1,0 +1,24 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<div id='content'>
+<?php if (isset($this->rounds)){?>
+	<h1>Histórico de decisiones</h1>
+		<ul>
+	<?php foreach($this->rounds as $round){ ?>
+			<li>
+				<h2>
+					Turno <?php echo $round['round_number']?>
+					(Del <?php echo date('d/m/Y', strtotime($round['opening_date']))?> 
+					al <?php echo date('d/m/Y', strtotime($round['closing_date']))?>) 
+					<a href="<?php echo $this->baseUrl().'/decision/view?&round_number='.$round['round_number']?>"> (ver decisión)</a>
+				</h2>							
+			</li>
+	<?php }?>
+		</ul>
+<?php }
+else{?>
+		<h1> No hay ningún turno anterior.</h1> 
+<?php } ?>
+</div>

@@ -1,0 +1,143 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/display.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/interestRate.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.min.js', $type = 'text/javascript')?>
+<div id='content'>
+<img src="/images/finance.gif" alt="finance" width="75" height="85" style="float:right" />
+		<form name="finance" method="post">
+			<?php if($this->round_number==1){?><br /><br /><h3 style="color:grey;text-align:center">Esta secci&oacute;n no est&aacute; disponible para esta ronda</h3><br /><br /><?php } ?>
+			<?php if(($this->round_number>1) || ($this->round_number==6)){?>
+			<div class="fieldContainer">	
+				<div class="fieldHeader" id="financePatrimonyFieldButton">
+					Oficina del accionista
+				</div>
+				<div id="financePatrimonyField" class="fieldDiv" align="center">
+					<div id="patrimonyFieldDescription" class="fieldDescription" align="center">
+						Indique la cuant&iacute;a porcentual sobre beneficios que desea retribuir a los accionistas en concepto de dividendos tras el ejercicio de su compa&ntildeía en la &uacute;litima ronda.
+						Tenga en cuenta que es necesario un resultado positivo para llevar a cabo esta acci&oacute;n.
+					</div>
+					<br />
+					<table align="center">
+						<thead>
+							<th class="small"></th>
+							<th class="small">&nbsp;&nbsp;Dividendos</th>
+						</thead>
+						<tr>
+							<td>Payout (%)</td>
+							<td><input type="text" name="finance[patrimony]" id="patrimony" class="small"
+									<?php echo isset($this->patrimonyDecision)? 'value = "'.$this->patrimonyDecision['dividends'].'"':'value = "0"'?>
+								</input>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<br/>
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Guardar">
+			</div>
+			<br />
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="financeButton">
+					Financiación: 			
+				</div>
+				<div id="financeAmountField" class="fieldDiv" align="center">
+					<div id="amountFieldDescription" class="fieldDescription" align="center">
+						Cuantía: Seleccione la cuantía que desea financiar mediante cr&eacute;dito para su compa&ntildeía.
+					</div>
+					<br />
+					<table align="center">
+					<thead>Opciones</thead>
+					<br />
+					<br />
+					<?php if (isset($this->amountDecision)) {
+						foreach ($this->amount as $amount){?>
+							<tr>
+								<td style="text-align:left">
+									<input type="radio" name="finance[amount]" value="<?php echo $amount['value']?>" <?php echo (isset($this->amountDecision) && $this->amountDecision['amount']==$amount['value'])? "checked":""?> />
+										<?php echo $amount['descriptor']?>
+								</td>
+							</tr>
+						<?php } //for
+					} else { 
+						foreach ($this->amount as $amount){?> 
+							<tr>
+								<td style="text-align:left">
+									<input type="radio" name="finance[amount]" value="<?php echo $amount['value']?>" <?php echo ($amount['value']==0? "checked":"")?>> 
+									<?php echo $amount['descriptor']?>
+								</td>
+							</tr>
+						<?php } //for, amount?>				
+				<?php }//else?>	
+					</table>
+				</div>
+
+			<br/>
+
+
+				<div id="financeTermField" class="fieldDiv" align="center">
+					<div id="termFieldDescription" class="fieldDescription" align="center">
+						Plazo de amortización: Seleccione el plazo de amortización para el cr&eacute;dito que solicita su compa&ntildeía.
+					</div>
+					<br />
+					Opciones: <br />				
+					<br />
+						<?php $number_term=2;
+						foreach ($this->term as $term){
+								$number_term++;
+						}?>
+						<?php 
+						if (isset($this->termDecision)) { 
+						$term_counter=2;
+						foreach ($this->term as $term){?>
+							<input id="term_<?php echo $term_counter?>" onClick="updateInterest(<?php echo $this->interest_adjustment ?>,<?php echo ($number_term) ?>);" type="radio" name="finance[term]" value="<?php echo $term['value']?>" <?php echo (isset($this->termDecision) && $this->termDecision['term']==$term['value'])? "checked":""?>>
+								<?php echo $term['descriptor']?> &nbsp;&nbsp;&nbsp;&nbsp;
+						<?php $term_counter++;
+						} } else { $term_counter=2;?>
+									<?php foreach ($this->term as $term){?> 
+										<input id="term_<?php echo $term_counter?>" onClick="updateInterest(<?php echo $this->interest_adjustment ?>,<?php echo ($number_term) ?>);" type="radio" name="finance[term]" value="<?php echo $term['value']?>" <?php echo ($term['value']==2? "checked":"")?>> 
+										<?php echo $term['descriptor']?> &nbsp;&nbsp;&nbsp;&nbsp;
+									<?php $term_counter++; 
+									} //term?>				
+							<?php }//else?>	
+				
+			
+				<?php 	$interest_counter=2;
+						foreach ($this->interest_aux as $interest){
+							$valueInterest[$interest_counter]=$interest['value'];?>
+							<input type="hidden" value="<?php echo $valueInterest[$interest_counter]?>" id="interestRate_<?php echo $interest_counter?>" />
+							<?php $interest_counter++;
+						} ?>
+				</div>
+				<div id="financeInterestField">
+				</div>
+				<div id="calculateInterest" class="fieldOptions">
+						<a href="" OnClick="calculateInterest(<?php echo $this->interest_adjustment ?>,<?php echo ($number_term) ?>);return false;">(+) Calcular el inter&eacute;s de la opci&oacute;n elegida.</a>
+				</div>
+			</div>
+			<br/>
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Solicitar">
+			</div>
+			<?php } ?>
+		</form>
+		<script>
+			$( "#financePatrimonyFieldButton" ).click(function() {
+				$( "#financePatrimonyField" ).toggle( "easeInElastic" );
+			});
+			
+			$( "#financeButton" ).click(function() {
+				$( "#financeAmountField" ).toggle( "easeInElastic" );
+				$( "#financeTermField" ).toggle( "easeInElastic" );
+				$( "#financeInterestField" ).toggle( "easeInElastic" );
+				$( "#calculateInterest" ).toggle( "easeInElastic" );
+			});
+		</script>
+</div>

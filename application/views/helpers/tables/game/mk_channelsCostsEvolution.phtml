@@ -1,0 +1,41 @@
+<div id="channelsCostsEvolutionFieldDescription" class="fieldDescription"  style="background-color:white">
+	Configure de forma porcentual (%) la evolución temporal de los costes de los distintos canales en cada ronda.
+</div>
+<?php $n_rounds=$view->games->getNumberOfRounds($view->game_id); ?>
+	<?php if ($n_rounds>1) {?>
+		<?php for ($round_number=2;$round_number<=$n_rounds;$round_number++){ ?>
+			<div style="float: left; margin-right: 15px;">	
+				Ronda <?php echo $round_number?>
+				<table>
+					<theader>
+						<th class="small"></th>
+						<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+						<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+						<th class="small">Región <?php echo $region_number?></th>
+						<?php } //for region?>
+					</theader>
+					<tr>
+						<td></td>
+						<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+						<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+							<td class="inCellFieldHeader">Variación (%)</td>
+						<?php } //for region?>
+					</tr>
+					<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+					<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+					<tr>
+						<td>Canal <?php echo $channel_number?></td>
+						<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+						<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+						<td><input type="text" name="mkChannelsCostsEvolution[round_<?php echo $round_number?>][channel_<?php echo $channel_number?>][region_<?php echo $region_number?>][evolution]" 
+							value="<?php echo $view->games->getMkChannelCostEvolution($view->game_id, $round_number, $channel_number, $region_number, 'evolution')?>" class="small"></td>
+						<?php } //for region?>
+					</tr>
+					<?php }?>
+				</table>
+			</div>
+		<?php }?>
+	<?php } else {?>
+	Sólo se ha configurado una ronda para este juego de simulación
+	<?php }?>
+<div style="clear:both"></div>

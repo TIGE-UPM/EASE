@@ -1,0 +1,1369 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/display.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/bar.css');?>	
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.progressbar.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery.progressbar.min.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/outcomes_user.js', $type = 'text/javascript')?>
+
+
+<div id='content'>
+
+<?php if (isset($this->round_number)){ ?>
+	<div id="image_and_button">
+		<img src="/images/outcomes_2.gif" alt="i+d" width="90" height="110"/>
+		<div>
+			<form method="post" style="float:right">					
+				<input type="button" name="export" onclick="location.href='<?php echo $this->url(array('controller'=>'outcomes', 'action'=>'download')) . "?game_id=".$this->game['id']."&round_number=".$this->round_number?>'" value="Exportar">				
+			</form>				
+		</div>
+	</div>
+	<div class="outcomes_header1">
+		<div>
+			<div>
+				<div style="float: left"><strong>Juego:</strong> <?php echo $this->game['name'];?></div>
+				<div style="float: right"><strong>Ronda:</strong> <?php echo $this->round_number?></div>
+				</br></br>
+			</div>
+			<div id="outcomes_nav">
+				<ul>
+					<li><a id='pr_tab' href=#>Producci&oacute;n</a></li>
+					<li><a id='sales_tab' href=#>Ventas</a></li>
+					<li><a id='stocks_tab' href=#>Stocks</a></li>
+					<li><a id='display_tab' href=#>Indicadores internos</a></li>
+					<li><a id='res_tab' href=#>Ctas. Resultados</a></li>
+					<li><a id='balance_sheet_tab' href=#>Balance</a></li>
+					<li><a id='performance_tab' href=#>Ratios financieros</a></li>
+					<li><a id='graphics_tab' href=#>Resultados gr&aacute;ficos</a></li>
+					<li><a id='market_researches_tab' href=#>Estudios de mercado</a></li>
+				</ul>
+			</div>
+		</div>
+		</br>
+	</div>	
+	
+	<!--MENU MKT RESEARCH-->
+	<div id="mkt_reasearch_tab" class="outcomes_header1">			
+		<div class="outcomes_header2">
+		
+			<div id="outcomes_nav">
+				<ul>
+					<li><a id='channelResearch_tab' href=#>Crecimiento de Canales</a></li>
+					<li><a id='pricesReseach_tab' href=#>Comparativa de Precios</a></li>
+					<li><a id='mktReseach_tab' href=#>Comparativa de Marketing</a></li>
+					<li><a id='spectedResearch_tab' href=#>Lanzamientos Esperados</a></li>
+					<li><a id='accountResearch_tab' href=#>Ctas. Anuales</a></li>
+				</ul>
+			</div>
+		</div>	
+	</div>
+
+	<!--PRODUCCIÓN-->
+	<div id="production_outcomes" class="tab">	
+		<table class="outcomes_table">
+			<thead class="outcomes_table_header">
+				<th colspan='2' class='invisible'>
+					PRODUCCIÓN
+				</th>
+				<?php $counter=0;
+					foreach ($this->regions as $region){
+						$counter++;    
+					}?>
+				<th colspan='<?php echo ($counter)?>' class="vertical_group_open">
+					Unidades producidas
+				</th>
+			</thead>
+			<thead class="outcomes_table_header2">
+				<th colspan='2' class='invisible'></th>				
+					<?php $newVGroup=true;
+						foreach ($this->regions as $region){
+							if ($newVGroup){
+								$vertical_class='vertical_group_open';
+								$newVGroup=false;
+							}else{
+								$vertical_class='';
+							}?>
+				<th class="<?php echo $vertical_class ?>">
+					<?php echo ($region['name'])?>
+				</th>
+				    <?php }//for region ?>
+			</thead>
+			<?php 
+				$hgroup=0;
+				foreach ($this->products as $product){
+					if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+						$hgroup++;
+						$hor_class='hor_group_odd';
+						if ($hgroup % 2 == 0){
+							$hor_class='hor_group_even';
+						}
+						foreach ($this->channels as $channel){?>					
+						<tr>
+							<td class="<?php echo $hor_class?>">
+								<?php if ($channel['channel_number']==1){
+									echo ('Producto: '.$product['name']);
+								}?>
+							</td>
+							<td class="<?php echo $hor_class?>">
+								<?php echo ('Canal: '.$channel['name'])?>
+							</td>						
+							<?php $newVGroup=true;
+							foreach ($this->regions as $region){
+								if ($newVGroup){
+									$vertical_class='vertical_group_open';
+									$newVGroup=false;
+								}else{
+									$vertical_class='';
+								}?>
+							<td class="<?php echo $hor_class.' '.$vertical_class?>">
+								<?php echo number_format($this->outcomes_production_units['company_'.$this->company['id']]
+									['product_'.$product['product_number']]
+							  		['region_'.$region['region_number']]
+							  		['channel_'.$channel['channel_number']],0, '.', ',')?>
+							</td>
+							<?php }//for region ?>			
+						</tr>
+				<?php }//for channel
+					}//availability
+				}//for product
+					?>
+		</table>
+		
+	</div>	
+		
+	<!--VENTAS-->
+	<div id="sales_outcomes" class="tab">	
+		<table class="outcomes_table">
+			<thead class="outcomes_table_header">
+				<th colspan='2' class='invisible'>
+					VENTAS
+				</th>
+						<?php $counter=0;
+							  foreach ($this->regions as $region){
+								$counter++;    
+							  }
+						?>
+					<th colspan='<?php echo (2*$counter)?>' class="vertical_group_open">	
+						<strong>Unidades vendidas</strong>
+					</th>
+			</thead>
+			<thead class="outcomes_table_header2">
+				<th colspan='2' class='invisible'>
+				</th>					
+					<?php $newVGroup=true;
+					foreach ($this->regions as $region){
+						if ($newVGroup){
+							$vertical_class='vertical_group_open';
+							$newVGroup=false;
+						}else{
+							$vertical_class='';
+						}?>
+						<th colspan='2' class="<?php echo $vertical_class ?>">
+							<?php echo ($region['name'])?>
+						</th>
+				    <?php }//for region ?>
+			</thead>
+			<thead class="outcomes_table_header3">
+				<th colspan='2' class='invisible'>
+				</th>
+				<?php
+					$newVGroup=true;
+					foreach ($this->regions as $region){
+						if ($newVGroup){
+							$vertical_class='vertical_group_open';
+							$newVGroup=false;
+						}else{
+							$vertical_class='';
+						}?>
+						<th class="<?php echo $vertical_class ?>">
+							Ventas
+						</th>
+						<th>
+							Precio
+						</th>
+				    <?php }//for region ?>
+			</thead>
+			<?php 
+			$hgroup=0;
+			foreach ($this->products as $product){
+				if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+					$hgroup++;
+					$hor_class='hor_group_odd';
+					if ($hgroup % 2 == 0){
+						$hor_class='hor_group_even';
+					}
+					foreach ($this->channels as $channel){
+						?>					
+						<tr>
+							<td class="<?php echo $hor_class?>">
+								<?php if ($channel['channel_number']==1){
+									echo ('Producto: '.$product['name']);
+								}?>
+							</td>
+							<td class="<?php echo $hor_class?>">
+								<?php echo ('Canal: '.$channel['name'])?>
+							</td>
+						<?php $newVGroup=true;
+						foreach ($this->regions as $region){
+							if ($newVGroup){
+								$vertical_class='vertical_group_open';
+								$newVGroup=false;
+							}else{
+								$vertical_class='';
+							}?>
+							<td class="<?php echo $hor_class.' '.$vertical_class?>">
+								<?php $total_sales['product_'.$product['product_number']]['region_'.$region['region_number']]+=$this->outcomes_sales_units['company_'.$this->company['id']]['product_'.$product['product_number']]['region_'.$region['region_number']]['channel_'.$channel['channel_number']];
+														echo number_format($this->outcomes_sales_units['company_'.$this->company['id']]
+																			['product_'.$product['product_number']]
+																	  		['region_'.$region['region_number']]
+																	  		['channel_'.$channel['channel_number']],0, '.', ',')?>
+							</td>
+							<td nowrap class="<?php echo $hor_class.' '?>">
+								<?php echo number_format($this->outcomes_prices['company_'.$this->company['id']]
+																			['product_'.$product['product_number']]
+																	  		['channel_'.$channel['channel_number']]
+																	  		['region_'.$region['region_number']],
+														  2, '.', ',').' €'?>
+							</td>
+						<?php }//for region ?>			
+					</tr>
+			<?php }//for channel
+				}//availability
+			}//for product
+				?>
+			</table>
+			<br/>
+	</div>
+		
+	<!--STOCKS-->
+	<div id="stock_outcomes" class="tab">			
+			<table class="outcomes_table">
+				<thead class="outcomes_table_header">
+					<th colspan='2' class='invisible'>
+						STOCKS
+					</th>
+					<?php $counter=0;
+							  foreach ($this->regions as $region){
+								$counter++;    
+							  }
+						?>
+					<th colspan='<?php echo ($counter)?>' class="vertical_group_open">
+							<strong>Unidades en Stock</strong>
+						</th>
+				</thead>
+				<thead class="outcomes_table_header2">
+					<th colspan='2' class='invisible'>
+					</th>
+					<?php $newVGroup=true;
+						 foreach ($this->regions as $region){
+							if ($newVGroup){
+								$vertical_class='vertical_group_open';
+								$newVGroup=false;
+							}else{
+								$vertical_class='';
+							}?>
+							<th class="<?php echo $vertical_class ?>">
+								<?php echo ($region['name'])?>
+							</th>
+						<?php }//for region ?>
+				</thead>
+				<?php 
+				$hgroup=0;
+				foreach ($this->products as $product){
+					if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+						$hgroup++;
+						$hor_class='hor_group_odd';
+						if ($hgroup % 2 == 0){
+							$hor_class='hor_group_even';
+						}
+						foreach ($this->channels as $channel){
+							?>					
+							<tr>
+								<td class="<?php echo $hor_class?>">
+									<?php if ($channel['channel_number']==1){
+										echo ('Producto: '.$product['name']);
+									}?>
+								</td>
+								<td class="<?php echo $hor_class?>">
+									<?php echo ('Canal: '.$channel['name'])?>
+								</td>
+							<?php $newVGroup=true;
+								foreach ($this->regions as $region){
+									if ($newVGroup){
+										$vertical_class='vertical_group_open';
+										$newVGroup=false;
+									}else{
+										$vertical_class='';
+									}?>
+									<td class="<?php echo $hor_class.' '.$vertical_class?>">
+										<?php echo number_format($this->outcomes_stocks_units['company_'.$this->company['id']]
+																				['product_'.$product['product_number']]
+																				['region_'.$region['region_number']]
+																				['channel_'.$channel['channel_number']],0, '.', ',')?>
+									</td>
+								<?php }//for region?>			
+						</tr>
+				<?php }//for channel
+					}//availability
+				}//for product
+					?>
+				</table>
+	</div>
+
+	<!--CUENTAS DE RESULTADOS-->
+	<div id="results_outcomes" class="tab">
+		<div id="titulo_cuentas_resultados">
+			<ul>
+				<li>CUENTAS DE RESULTADOS</li>
+				<li><?php echo $this->company['name']?></li>
+			</ul>
+		</div>
+		</br>
+		<!--INGRESOS-->
+		<div  class="tabla_cuentas_resultados">	
+			<div class="titulo_cuenta_resultados invisible categories">
+				INGRESOS <a href = "javascript:void(0)" onclick = "document.getElementById('light1').style.display='block';document.getElementById('fade1').style.display='block'">Mostrar Gráfico</a>
+			</div>
+			<div>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto" >
+					<?php 
+					$hgroup=0;
+					$incomes_sum=array();
+					foreach($this->channels as $channel){
+						$hgroup++;
+						$hor_class='hor_group_odd';
+						if ($hgroup % 2 == 0){
+							$hor_class='hor_group_even';
+						}?>
+					<tr>
+						<td class="<?php echo $hor_class?> categories col1"></td>
+						<td class="<?php echo $hor_class?> categories col2"><?php echo $channel['name']?></td>
+						<?php 
+							if (!isset ($incomes_sum[$this->company['id']])){
+									$incomes_sum[$this->company['id']]=0;
+								}
+								$incomes=0;
+								foreach ($this->products as $product){
+									if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+										foreach ($this->regions as $region){
+											$incomes+=$this->outcomes_sales_incomes['company_'.$this->company['id']]
+																		['product_'.$product['product_number']]
+																		['region_'.$region['region_number']]
+																		['channel_'.$channel['channel_number']];
+										}					
+									}
+								}
+								$incomes_sum[$this->company['id']]+=$incomes;
+							?>
+							<td class="<?php echo $hor_class?> vertical_group_open col3"nowrap><?php echo number_format($incomes, 2, '.', ',').' €'?></td>
+					</tr>
+					<?php } ?>
+				</table>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1"></th>
+						<td class="col2">
+							TOTAL INGRESOS:
+						</td>			
+						<td class="col3"><?php echo number_format($incomes_sum[$this->company['id']], 2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+			</div>			
+			
+			
+			<div id="light1" style="display: none;position: fixed;top: 25%;left: 25%;width: 50%;height: 50%;border: 16px solid #336699;background-color: white;z-index:1002;overflow: auto;">
+				<div id="chart_div_ingresos"></div> 
+			</div>
+			<div id="fade1" style="display: none; position: fixed;top: 0%;left: 0%;width: 100%;height: 100%;background-color: black;z-index:1001;-moz-opacity: 0.8;opacity:.80;filter: alpha(opacity=80);" onclick = "document.getElementById('light1').style.display='none';document.getElementById('fade1').style.display='none'"></div>
+
+		</div>
+		</br>
+		
+		<!--GASTOS-->
+		<div  class="tabla_cuentas_resultados">	
+			<div class="titulo_cuenta_resultados invisible categories">
+				GASTOS
+			</div>
+			<div id="productionAndLogistics" style="float:left">
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Producción & Logística
+				</div>
+				<table class="resultados_parcial">
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Fábricas y Maquinaria</td>
+						<?php 
+							$pr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['pr_fixed_cost'];?>
+							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['pr_fixed_cost'], 2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Fabricación de productos</td>
+						<?php 
+							$pr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['pr_var_costs'];?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['pr_var_costs'], 2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				<div class="titulo_cuenta_resultados3 invisible categories">
+					Abastecimiento de materias primas
+				</div>
+				<table class="resultados_parcial">
+					<?php 
+						$hgroup=2;
+					foreach($this->channels as $channel){
+						$hgroup++;
+						$hor_class='hor_group_odd';
+						if ($hgroup % 2 == 0){
+							$hor_class='hor_group_even';
+						}?>
+					<tr>
+						<td class="<?php echo $hor_class?> categories col1"></td>
+						<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+						<?php $pr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['pr_rawMaterials_costs'][$channel['channel_number']];?>
+							<td class="<?php echo $hor_class?> vertical_group_open col3"nowrap><?php echo number_format( $this->outcomes_costs[$this->company['id']]['pr_rawMaterials_costs'][$channel['channel_number']], 2, '.', ',').' €'?>
+							</td>
+					</tr>
+					<?php }?>
+				</table>
+				<div class="titulo_cuenta_resultados3 invisible categories">
+					Distribución
+				</div>
+				<table class="resultados_parcial">
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">&nbsp;&nbsp;&nbsp;Gastos de Distribuci&oacute;n</td>
+						<?php $pr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['pr_distrib_costs']?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['pr_distrib_costs'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				<table class="resultados_parcial">
+					
+					<tr class="resultados_subtotal">
+						<td class="col1"></th>
+						<td class="col2">
+							Total producción & logísitca:
+						</td>			
+						<td class="col3"><?php echo number_format($pr_costs[$this->company['id']], 2, '.', ',').' €';?></td>
+					</tr>
+				</table>
+			</div>
+			<div id="Marketing" style="float:right">
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Márketing
+				</div>
+				
+				<div class="titulo_cuenta_resultados3 invisible categories">
+				Publicidad
+				</div>
+				<table class="resultados_parcial">
+					<?php $hgroup=1;
+					foreach($this->media as $media){
+						$hgroup++;
+						$hor_class='hor_group_odd';
+						if ($hgroup % 2 == 0){
+							$hor_class='hor_group_even';
+						}?>
+					<tr>
+						<td class="<?php echo $hor_class?> categories col1"></td>
+						<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $media['name']?></td>
+						<?php $mk_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['mk_advert_costs'][$media['media_number']];?>
+							<td class="<?php echo $hor_class?> vertical_group_open col3">
+								<?php echo number_format($this->outcomes_costs[$this->company['id']]['mk_advert_costs'][$media['media_number']],2, '.', ',').' €'?>
+							</td>
+					</tr>
+					<?php } ?>
+				</table>
+				
+				<div class="titulo_cuenta_resultados3 invisible categories">
+					Trade MKT
+				</div>
+				<table class="resultados_parcial">
+					<?php $hgroup=1;
+						foreach($this->trademedia as $trademedia){
+							$hgroup++;
+							$hor_class='hor_group_odd';
+							if ($hgroup % 2 == 0){
+								$hor_class='hor_group_even';
+							}?>
+						<tr>
+							<td class="<?php echo $hor_class?> categories col1"></td>
+							<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $trademedia['name']?></td>
+							<?php $mk_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['mk_trade_costs'][$trademedia['trademedia_number']];?>
+								<td class="<?php echo $hor_class?> vertical_group_open col3">
+									<?php echo number_format($this->outcomes_costs[$this->company['id']]['mk_trade_costs'][$trademedia['trademedia_number']],2, '.', ',').' €'?>
+								</td>
+						</tr>
+					<?php } ?>
+				</table>
+				
+				<div class="titulo_cuenta_resultados3 invisible categories">
+					Gasto por venta
+				</div>
+				<table class="resultados_parcial">
+					<?php $hgroup=1;
+						foreach($this->channels as $channel){
+							$hgroup++;
+							$hor_class='hor_group_odd';
+							if ($hgroup % 2 == 0){
+								$hor_class='hor_group_even';
+							}?>
+						<tr>
+							<td class="<?php echo $hor_class?> categories col1"></td>
+							<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+							<?php $mk_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['mk_sales_costs'][$channel['channel_number']];?>
+							<td class="<?php echo $hor_class?> vertical_group_open col3">
+								<?php echo number_format($this->outcomes_costs[$this->company['id']]['mk_sales_costs'][$channel['channel_number']],2, '.', ',').' €'?>
+							</td>
+						</tr>
+					<?php }?>
+				</table>
+				
+				<div class="titulo_cuenta_resultados3 invisible categories">
+					Gasto fijo por canales de distribución
+				</div>
+				<table class="resultados_parcial">
+					<?php $hgroup=1;
+						foreach($this->channels as $channel){
+							$hgroup++;
+							$hor_class='hor_group_odd';
+							if ($hgroup % 2 == 0){
+								$hor_class='hor_group_even';
+							}?>
+						<tr>
+							<td class="<?php echo $hor_class?> categories col1"></td>
+							<td class="<?php echo $hor_class?> categories col2">&nbsp;&nbsp;&nbsp;<?php echo $channel['name']?></td>
+							<?php $mk_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['mk_fixed_costs'][$channel['channel_number']];?>
+								<td class="<?php echo $hor_class?> vertical_group_open col3"nowrap><?php echo number_format( $this->outcomes_costs[$this->company['id']]['mk_fixed_costs'][$channel['channel_number']],2, '.', ',').' €'?></td>
+						</tr>
+					<?php }?>
+				</table>
+				<table class="resultados_parcial">
+					<tr class="resultados_subtotal">
+						<td class="col1"></th>
+						<td class="col2">
+							Total marketing:
+						</td>			
+						<td class="col3"><?php echo number_format($mk_costs[$this->company['id']],2, '.', ',').' €';?></td>
+					</tr>
+				</table>					
+			</div>
+			
+			<div style="clear: both"></div>
+			
+			<div id="Recursos_Humanos" style="float:left">
+				</br>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Recursos Humanos
+				</div>
+				<table class="resultados_parcial">
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Contrataci&oacute;n</td>
+						<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_hiring_costs']?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_hiring_costs'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Formaci&oacute;n</td>
+						<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_training_costs']?>
+							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_training_costs'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Salarios</td>
+						<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_wages_costs']?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_wages_costs'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				
+				<table class="resultados_parcial">
+					
+					<tr class="resultados_subtotal">
+						<td class="col1"></th>
+						<td class="col2">
+							Total Recursos  Humanos:
+						</td>			
+						<td class="col3"><?php echo number_format($hr_costs[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+			</div>
+			
+			<div id="Iniciativas" style="float:right">
+				</br>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Iniciativas
+				</div>
+			
+				<table class="resultados_parcial">
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Iniciativas de Producción</td>
+						<?php $in_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['initiatives_pr_costs'];?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['initiatives_pr_costs'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Iniciativas de Marketing</td>
+						<?php $in_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['initiatives_mk_costs'];?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['initiatives_mk_costs'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Iniciativas de Recursos Humanos</td>
+						<?php $in_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['initiatives_hr_costs'];?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['initiatives_hr_costs'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				<table class="resultados_parcial">	
+					<tr class="resultados_subtotal">
+						<td class="col1"></th>
+						<td class="col2">
+							Total Iniciativas:
+						</td>			
+						<td class="col3"><?php echo number_format($in_costs[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+			</div>
+			
+			<div style="clear: both"></div>
+			
+			<div id="estudios_mercado" style="float:left">
+				</br>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Estudios de Mercado
+				</div>
+				<table class="resultados_parcial">
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Coste de los Estudios contratados</td>
+						<?php $research_costs[$this->company['id']]=$this->outcomes_costs[$this->company['id']]['market_researches_costs'];?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['market_researches_costs'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				<table class="resultados_parcial">
+					<tr class="resultados_subtotal">
+						<td class="col1"></th>
+						<td class="col2">
+							Total Estudios de Mercado:
+						</td>			
+						<td class="col3"><?php echo number_format($this->outcomes_costs[$this->company['id']]['market_researches_costs'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+			</div>
+			
+			<div id="idi" style="float:right">
+				</br>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					I+D+i
+				</div>
+			
+				<table class="resultados_parcial">
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Modificaci&oacute;n de Productos</td>
+						<?php $idi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['idi_changes_costs'];?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['idi_changes_costs'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Nuevos Productos</td>
+						<?php $idi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['idi_new_costs'];?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['idi_new_costs'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				<table class="resultados_parcial">	
+					<tr class="resultados_subtotal">
+						<td class="col1"></th>
+						<td class="col2">
+							Total I+D+i:
+						</td>			
+						<td class="col3"><?php echo number_format($this->outcomes_costs[$this->company['id']]['idi_new_costs'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+			</div>
+			<div style="clear: both"></div>
+			</br>
+			<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+				<tr class="resultados_total">
+					<td class="col1"></th>
+					<td class="col2">
+						TOTAL GASTOS:
+					</td>
+					<?php $total_costs[$this->company['id']]=$pr_costs[$this->company['id']]+
+													$mk_costs[$this->company['id']]+
+													$hr_costs[$this->company['id']]+
+													$fi_costs[$this->company['id']]+
+													$in_costs[$this->company['id']]+
+													$research_costs[$this->company['id']]+
+													$idi_costs[$this->company['id']];?>					
+					<td class="col3"><?php echo number_format($total_costs[$this->company['id']],2, '.', ',').' €'?></td>
+				</tr>
+				<tr class="resultados_total">
+					<td class="col1"></th>
+					<td class="col2">
+						 Variación de existencias:
+					</td>	
+					<?php $inventories[$this->company['id']]=$this->outcomes_balance_sheet[$this->company['id']]['stock']-$this->prev_outcomes_balance_sheet[$this->company['id']]['stock'];?>
+					<td class="col3"><?php echo number_format($inventories[$this->company['id']],2, '.', ',').' €'?></td>
+				</tr>
+			</table>
+		</div>
+		</br>
+		
+		<!--EBITDA-->
+		<div  class="tabla_cuentas_resultados" style="float:left">	
+			<div class="titulo_cuenta_resultados invisible categories">
+				EBITDA:&nbsp;&nbsp;&nbsp;
+					<?php $ebitda[$this->company['id']]=$incomes_sum[$this->company['id']]-($total_costs[$this->company['id']]-$inventories[$this->company['id']])?>
+				<b style="color: black"><?php echo number_format($ebitda[$this->company['id']],2, '.', ',').' €'?></b>
+			</div>
+			<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+				<tr class="resultados_total">
+					<td class="col1"></th>
+					<td class="col2">
+						 Amortizaciones:
+					</td>
+						<?php $amortization[$this->company['id']]=$this->amortization_view[$this->company['id']]?>
+					<td class="col3"><?php echo number_format($amortization[$this->company['id']],2, '.', ',').' €'?></td>
+				</tr>
+			</table>
+			<div class="titulo_cuenta_resultados2 invisible categories">
+				Financieros
+			</div>
+		
+			<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+				<tr>
+					<td class="hor_group_odd categories col1"></td>
+					<td class="hor_group_odd categories col2">Intereses Financiación a C.P.</td>
+						<?php $fi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['fi_debt_costs_st']?>
+					<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['fi_debt_costs_st'],2, '.', ',').' €'?></td>
+				</tr>
+				<tr>
+					<td class="hor_group_even categories col1"></td>
+					<td class="hor_group_even categories col2">Intereses Financiación a L.P.</td>
+						<?php $fi_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['fi_debt_costs_lt']?>
+					<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['fi_debt_costs_lt'],2, '.', ',').' €'?></td>
+				</tr>
+			</table>
+			
+			<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+				<tr class="resultados_total">
+					<td class="col1"></th>
+					<td class="col2">
+						 Total Financieros:
+					</td>
+						<?php $ebitda[$this->company['id']]=$incomes_sum[$this->company['id']]-($total_costs[$this->company['id']]-$inventories[$this->company['id']])?>
+					<td class="col3"><?php echo number_format($fi_costs[$this->company['id']],2, '.', ',').' €'?></td>
+				</tr>
+			</table>
+			
+		</div>	
+		<!--EBT-->
+		<div  class="tabla_cuentas_resultados" style="float:right">	
+			<div class="titulo_cuenta_resultados invisible categories">
+				EBT:
+					<?php $ebt[$this->company['id']]=$ebitda[$this->company['id']]-$amortization[$this->company['id']]-$fi_costs[$this->company['id']]?>
+				<b style="color: black"><?php echo number_format($ebt[$this->company['id']],2, '.', ',').' €'?></b>
+			</div>
+			<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+				<tr class="resultados_total">
+					<td class="col1"></th>
+					<td class="col2">
+						 Impuestos (25%):
+					</td>
+						<?php if ($ebt[$this->company['id']]<=0) {
+							$taxes[$this->company['id']]=0;
+						} 
+						else{
+							$taxes[$this->company['id']]=($ebt[$this->company['id']]) *0.25;
+						}?>
+					<td class="col3"><?php echo number_format($taxes[$this->company['id']],2, '.', ',').' €'?></td>
+				</tr>
+			</table>
+		</div>
+		
+		<div style="clear: both"></div>
+		</br>
+		<!--BALANCE-->
+		<div  class="tabla_cuentas_resultados" style="	border:3px solid #000">
+
+			<div class="titulo_cuenta_resultados invisible categories">
+				RESULTADO:
+				<?php $result[$this->company['id']] = $ebt[$this->company['id']] - $taxes[$this->company['id']]?>
+				<b style="color: black"><?php echo number_format($result[$this->company['id']],2, '.', ',').' €'?></b>
+			</div>
+		</div>
+		</br>	
+	</div>
+
+	<!--RATIOS FINANCIEROS-->
+	<div id="performance_outcomes" class="tab">
+		<div class="tabla_cuentas_resultados">
+			<div class="titulo_cuenta_resultados invisible categories">
+				Indicadores <?php echo $this->company['name']?>
+			</div>
+			</br>
+			<div>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Ratios Anuales
+				</div>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr>	
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Margen de operación</td>
+						<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['margin'],2, '.', ',')?>&nbsp;%</td>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Endeudamiento&nbsp;&nbsp;</td>
+						<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['indebtedness'],2, '.', ',')?>&nbsp;%</td>
+					</tr>
+					<tr>	
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Liquidez&nbsp;&nbsp;</td>
+						<?php if($this->outcomes_performance[$this->company['id']]['liquidity']==-1.00){?>
+						<td class="hor_group_odd categories vertical_group_open col3"nowrap>n/a</td>
+						<?php } else { ?>
+						<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['liquidity'],2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Solvencia&nbsp;&nbsp;</td>
+						<?php if($this->outcomes_performance[$this->company['id']]['solvency']==-1.00){?>
+						<td class="hor_group_even categories vertical_group_open col3"nowrap>n/a</td>
+						<?php } else { ?>
+						<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['solvency'],2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
+					<tr>	
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
+						<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['roa'],2, '.', ',')?>&nbsp;%</td>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Payout Ratio&nbsp;&nbsp;</td>
+						<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['payout_ratio'],2, '.', ',')?>&nbsp;%</td>
+					</tr>
+				</table>
+			</div>
+			</br>
+			<div>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Ratios Acumulados
+				</div>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr>	
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
+						<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['ac_roa'],2, '.', ',')?>&nbsp;%</td>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Rentabilidad para el accionista&nbsp;&nbsp;</td>
+						<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['roe'],2, '.', ',')?>&nbsp;%</td>
+					</tr>
+				</table>
+			</div>
+			</br>
+			<div>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Evaluación del desempeño
+				</div>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr>	
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Indicador de actividad</td>
+						<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['performance_index'],2, '.', ',')?>&nbsp;</td>
+					</tr>
+				</table>
+			</div>
+			</br>
+			<div>
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					Valoración bursátil
+				</div>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr>	
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">Indicador de cotización bursátil</td>
+						<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['exchange_index'],2, '.', ',')?>&nbsp;</td>
+					</tr>
+				</table>
+			</div>
+			</br>
+		</div>
+	</div>
+	
+	<!--BALANCES-->
+	<div id="balance_sheet_outcomes" class="tab">	
+		<div class="tabla_cuentas_resultados">
+			<div class="titulo_cuenta_resultados invisible categories">
+				BALANCES <?php echo $this->company['name']?>
+			</div>
+			</br>
+			<!--ACTIVO-->
+			<div style="float:left">
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					ACTIVO
+				</div>
+				<?php $asset_no_current_sum[$this->company['id']]=0;?>
+				<?php $asset_no_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['tied_up'];
+					  $asset_no_current_sum[$this->company['id']]-=$this->outcomes_balance_sheet[$this->company['id']]['amortization'];?>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1">A)</th>
+						<td class="col2">
+							Activo no corriente (I+II)
+						</td>				
+						<td class="col3"><?php echo number_format($asset_no_current_sum[$this->company['id']], 2, '.', ',').' €'?></td>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">I. Inmovilizado</td>
+						<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['tied_up'];?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['tied_up'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">II. Amortización de inmovilizado</td>
+						<?php $asset_sum[$this->company['id']]-=$this->outcomes_balance_sheet[$this->company['id']]['amortization'];?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['amortization'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				
+				<?php $asset_current_sum[$this->company['id']]=0;?>
+				<?php $asset_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['stock'];
+					  $asset_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['trade_debtors'];
+					  $asset_current_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['liquid_assets'];?>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1">B)</th>
+						<td class="col2">
+							Activo corriente (I+II+III)
+						</td>				
+						<td class="col3"><?php echo number_format($asset_current_sum[$this->company['id']], 2, '.', ',').' €'?></td>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">I. Existencias</td>
+						<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['stock'];?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['stock'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">II. Deudores comerciales</td>
+						<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['trade_debtors'];?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['trade_debtors'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">III. Tesorería</td>
+						<?php $asset_sum[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['liquid_assets'];?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['liquid_assets'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+			</div>
+			
+			<!--PASIVO-->
+			<div style="float:right">
+				<div class="titulo_cuenta_resultados2 invisible categories">
+					PASIVO
+				</div>
+				<?php $shareholders_funds[$this->company['id']]=0;?>
+				<?php $shareholders_funds[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['capital'];
+					$shareholders_funds[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['reserves'];
+					$shareholders_funds[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['year_result'];?>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1">A)</th>
+						<td class="col2">
+							Patrimonio Neto (I+II+III)
+						</td>				
+						<td class="col3"><?php echo number_format($shareholders_funds[$this->company['id']], 2, '.', ',').' €'?></td>
+					</tr>
+					<tr>	
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">I. Capital</td>
+						<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['capital'];?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['capital'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">II. Reservas</td>
+						<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['reserves'];?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['reserves'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">III. Resultado del ejercicio</td>
+						<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['year_result'];?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['year_result'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+				
+				<?php $liabilities_no_current[$this->company['id']]=0;?>
+				<?php $liabilities_no_current[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['long_term_debts'];?>
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1">B)</th>
+						<td class="col2">
+							Pasivo no corriente (I)
+						</td>				
+						<td class="col3"><?php echo number_format($liabilities_no_current[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">I. Deudas a largo plazo</td>
+						<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['long_term_debts']?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['long_term_debts'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+
+				<?php $liabilities_current[$this->company['id']]=0;?>
+				<?php $liabilities_current[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['short_term_debts'];
+					  $liabilities_current[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['creditors'];?>					
+				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
+					<tr class="resultados_total">
+						<td class="col1">C)</th>
+						<td class="col2">
+							Pasivo corriente (I+II)
+						</td>				
+						<td class="col3"><?php echo number_format($liabilities_current[$this->company['id']],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">I. Deudas a corto plazo</td>
+						<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['short_term_debts']?>
+						<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['short_term_debts'],2, '.', ',').' €'?></td>
+					</tr>
+					<tr>
+						<td class="hor_group_even categories col1"></td>
+						<td class="hor_group_even categories col2">II. Acreedores comerciales</td>
+						<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['creditors']?>
+						<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['creditors'],2, '.', ',').' €'?></td>
+					</tr>
+				</table>
+			</div>
+			<div style="clear:both"></div>
+			
+			<!--TOTALES-->
+			<div>
+				<div style="float:left">
+				
+					<table class="resultados_parcial">
+						<tr class="resultados_total">
+							<td class="col1"></th>
+							<td class="col2">
+							Total ACTIVO (A+B)
+							</td>
+							<td class="col3"><?php echo number_format($asset_sum[$this->company['id']], 2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>
+				<div style="float:right">
+					<table class="resultados_parcial">
+						<tr class="resultados_total">
+							<td class="col1"></th>
+							<td class="col2">
+								Total PASIVO (A+B+C)
+							</td>
+							<td class="col3"><?php echo number_format($liabilities_total[$this->company['id']],2, '.', ',').' €'?></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div style="clear:both"></div>
+		</div>
+	</div>
+
+	<!--INDICADORES INTERNOS-->
+	<div id="display_outcomes" class="tab">
+
+		<div class="titulo_display_outcomes">
+			<?php   echo $this->company['name'];$atmosphere=3*($this->atmosphere[$this->company['id']]);?>
+		</div>
+		
+		<div class="display_outcomes_results">
+			<div class="titulo_display_outcomes">
+				Atmósfera de trabajo
+			</div>
+			<div> 	
+				<div class="barra_resultado_texto_izquierda">Mala Atmósfera de Trabajo</div>
+				<div class="barra_resultado">
+					<div id="text"></div>
+					<div id="barbox_a"></div>
+					<div class="bar_blanc"></div>
+					<?php if ($atmosphere<=100) { ?>
+					<div class='bar_deterioration' <?php echo " style='width: ",$atmosphere, "px'"?>></div>
+					<?php }
+					else {
+					if (($atmosphere>100) && ($atmosphere<200)) {?>
+						<div class='bar_qualification' <?php echo " style='width: ",$atmosphere, "px'"?>></div>
+						<?php }
+						else {?>
+							<div class='bar_atmosphere' <?php echo " style='width: ",$atmosphere, "px'"?>></div>
+						<?php }
+					}?>
+				</div>
+				<div class="barra_resultado_texto_derecha">Buena Atmósfera</div>
+			</div>
+			<div style="clear: both"></div>			
+		</div>	
+		
+		<div class="display_outcomes_results">
+			<?php $qualification=3*($this->qualification[$this->company['id']]);?>
+			<div class="titulo_display_outcomes">
+				Cualificación de la plantilla
+			</div>
+			<div>	
+				<div class="barra_resultado_texto_izquierda">Bajo Nivel de Cualificación</div>
+				<div class="barra_resultado">	
+					<div id="text"></div>
+					<div id="barbox_a"></div>
+					<div class="bar_blanc"></div>
+					<?php if ($qualification<=100) { ?>
+						<div class='bar_deterioration' <?php echo " style='width: ",$qualification, "px'"?>></div>
+					<?php }
+					else {
+						if (($qualification>100) && ($qualification<200)) {?>
+							<div class='bar_qualification' <?php echo " style='width: ",$qualification, "px'"?>></div>
+						<?php }
+						else {?>
+							<div class='bar_atmosphere' <?php echo " style='width: ",$qualification, "px'"?>></div>
+						<?php }
+					}?>
+				</div>
+				<div class="barra_resultado_texto_derecha">Alta Cualificación</div>
+			</div>
+			<div style="clear: both"></div>
+		</div>
+		<div class="display_outcomes_results">
+			<?php foreach ($this->game_factories[$this->company['id']] as $factory){
+				$constructed=$this->lastFactory;
+				$round_constructed=$this->roundFactory;
+				if ($factory_number<$constructed && (($this->round_number>$round_constructed['factory_number_'.$factory['factory_number']])||($round_constructed['factory_number_'.$factory['factory_number']]==1))){
+				$deterioro=3*($this->deterioration[$this->company['id']]['factory_number_'.$factory['factory_number']]);?>
+			<div class="titulo_display_outcomes">
+				Grado de deterioro Fabrica <?php echo $factory['factory_number']?><br/>
+			</div>
+			<div>	
+				<div class="barra_resultado_texto_izquierda">Bajo Nivel de Deterioro</div>
+				<div class="barra_resultado">
+					<div id="text"></div>
+					<div id="barbox_a"></div>
+					<div class="bar_blanc"></div>
+					<?php if ($deterioro<=100) { ?>
+						<div class='bar_atmosphere' <?php echo " style='width: ",$deterioro, "px'"?>></div>
+					<?php }
+					else {
+						if (($deterioro>100) && ($deterioro <200)) {?>
+							<div class='bar_qualification' <?php echo " style='width: ",$deterioro, "px'"?>></div>
+						<?php }
+						else if($deterioro>300) {?>
+							<div class='bar_deterioration' <?php echo " style='width: 300px'"?>></div>
+						<?php }
+						else {?>
+							<div class='bar_deterioration' <?php echo " style='width: ",$deterioro, "px'"?>></div>
+						<?php }
+					}?>
+				</div>
+				<div class="barra_resultado_texto_derecha">Alto Nivel de Deterioro</div>
+			</div>
+			<?php }
+			}?>
+			<div style="clear: both"></div>
+		</div>
+		
+		<div class="display_outcomes_results">				
+			<?php 
+			$tituloImpreso = false;
+			
+			foreach ($this->products as $product){
+				$success=3*($this->success[$this->company['id']]['product_number_'.$product['product_number']]);
+				
+				if($success>0){
+					if($tituloImpreso == false) {?>
+						<div class="titulo_display_outcomes">Grado de desarrollo de nuevos productos</div>
+						
+						<?php $tituloImpreso = true;
+					}
+				?>		
+					
+					<div class="titulo_display_outcomes">
+						Producto  <?php echo $product['product_number']?><br/>
+					</div>
+					<div>	
+						<div class="barra_resultado_texto_izquierda">Bajo</div>
+						<div class="barra_resultado">
+							<div id="text"></div>
+							<div id="barbox_a"></div>
+							<div class="bar_blanc"></div>
+							<div class="bar_new" <?php echo " style='width: ",$success, "px'"?>></div>
+						</div>
+						<div class="barra_resultado_texto_derecha">Alto</div>
+					</div>
+				<?php }?>
+		<?php }?>
+		<div style="clear: both"></div>
+		</div>
+	</div>
+		
+	<!--ESTUDIOS DE MERCADO-->
+	<div id="market_researches_outcomes" class="tab">
+		<!--CRECIMIENTO DE CANALES-->
+		<div id="channel_reasearch_outcomes" class="tab">
+		<?php if($this->market_researches['channelResearch']==1){
+				$this->gameTables($this, "outcomesChannels");
+			}
+			else {?>
+				<h3>No ha decidido contratar este estudio</h3>
+			<?php }?>
+		</div>
+		
+		<!--COMPARATIVA DE PRECIOS-->
+		<div id="price_reasearch_outcomes" class="tab">
+			<?php if($this->market_researches['pricesResearch']==1){?>
+			<div class="titulo_display_outcomes">
+				Comparativa de precios
+			</div>
+			<div class="titulo_display_outcomes">
+				Situación del precio de sus productos respecto al mercado
+			</div>
+			
+			<?php foreach ($this->products as $product){
+					if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+						foreach ($this->regions as $region){?>
+					Producto: <? echo $product['name']; ?><br /> Regi&oacute;n: <? echo $region['name']; ?><?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"market_channel_".$product['product_number'].$region['region_number'])))?>			
+					<div id="market_channel_<? echo $product['product_number']?><? echo $region['region_number']?>" style="display:none;">	
+						<?php foreach ($this->channels as $channel){
+			 					$situation=$this->prices_research;
+			 					$max=$this->prices_max;
+			 					$min=$this->prices_min;
+								$prices_research=3*($situation['product_number_'.$product['product_number']]['region_number_'.$region['region_number']]['channel_number_'.$channel['channel_number']])?>
+				<br /><h4 style="color:grey">Canal: <? echo $channel['name']; ?><br /></h4>
+			
+			
+				<div>	
+					<div class="barra_resultado_texto_izquierda">Precio M&iacute;nimo <? echo number_format(($min['product_number_'.$product['product_number']]['region_number_'.$region['region_number']]['channel_number_'.$channel['channel_number']]),2, '.', ',').' €' ?></div>
+					<div class="barra_resultado">
+						<div id="text"></div>
+						<div id="barbox_a"></div>
+						<div class="bar_blanc"></div>
+						<div class="bar_prize" <?php echo " style='width: ",$prices_research, "px'"?>></div>
+					</div>
+					<div class="barra_resultado_texto_derecha">Precio Máximo <? echo number_format(($max['product_number_'.$product['product_number']]['region_number_'.$region['region_number']]['channel_number_'.$channel['channel_number']]),2, '.', ',').' €' ?></div>
+					
+				</div>
+						<?php }?>
+			</div>
+			<div style="clear: both"></div>
+			<?php		}
+					}
+				}
+			}
+			else {?>
+				<h3>No ha decidido contratar este estudio</h3>
+			<?php }?>
+		</div>
+		<!--COMPARATIVA DE MARKETING-->
+		<div id="mkt_reasearch_outcomes" class="tab">
+			<?php if($this->market_researches['mktResearch']==1){?>
+			<div class="display_outcomes_results">	
+				<div class="titulo_display_outcomes">
+					Comparativa de Marketing
+				</div>
+				<div class="titulo_display_outcomes">
+					Situación del presupuesto de Publicidad y Trade Mkt respecto al mercado
+				</div>
+				<?php $mkt_research=3*($this->mkt_advertising_research['situation'])?>
+				<br />
+			</div>
+			<div class="display_outcomes_results">
+				<div class="titulo_display_outcomes">
+					Publicidad
+				</div>
+				<div>	
+					<div class="barra_resultado_texto_izquierda">Presupuesto Mín <? echo number_format(($this->mkt_advertising_research['min']),2, '.', ',').' €' ?></div>
+					<div class="barra_resultado">
+						<div id="text"></div>
+						<div id="barbox_a"></div>
+						<div class="bar_blanc"></div>
+						<div class="bar_mkt" <?php echo " style='width: ",$mkt_research, "px'"?>></div>
+					</div>
+					<div class="barra_resultado_texto_derecha">Presupuesto Máx <? echo number_format(($this->mkt_advertising_research['max']),2, '.', ',').' €' ?></div>
+					
+				</div>
+			</div>
+			<div style="clear: both"></div>
+			<div class="display_outcomes_results">
+				</br>
+				<?php $mkt_research=3*($this->mkt_trade_research['situation'])?>
+				<div class="titulo_display_outcomes">
+					Trade MKT
+				</div>
+				<div>	
+					<div class="barra_resultado_texto_izquierda">Presupuesto Mín <? echo number_format(($this->mkt_trade_research['min']),2, '.', ',').' €' ?></div>
+					<div class="barra_resultado">
+						<div id="text"></div>
+						<div id="barbox_a"></div>
+						<div class="bar_blanc"></div>
+						<div class="bar_mkt" <?php echo " style='width: ",$mkt_research, "px'"?>></div>
+					</div>
+					<div class="barra_resultado_texto_derecha">Presupuesto Máx <? echo number_format(($this->mkt_trade_research['max']),2, '.', ',').' €' ?></div>
+					
+				</div>
+			</div>
+		<?php }
+			else {?>
+				<h3>No ha decidido contratar este estudio</h3>
+			<?php }?>
+		</div>
+		
+		<!--LANZAMIENTOS ESPERADOS-->
+		<div id="spected_reasearch_outcomes" class="tab">
+			<?php if($this->market_researches['spectedResearch']==1){
+					$this->gameTables($this, "outcomesSpectedLaunch");
+			}
+			else {?>
+				<h3>No ha decidido contratar este estudio</h3>
+			<?php }?>
+		</div>
+		
+		<!--ESTUDIO DE CUENTAS ANUALES-->
+		<div id="account_reasearch_outcomes" class="tab">
+			<?php if($this->market_researches['accountResearch']==1){
+					$this->gameTables($this, "outcomesAccounts");						
+			}
+			else {?>
+				<h3>No ha decidido contratar este estudio</h3>
+			<?php }?>
+		</div>
+	</div>
+	
+	<!--RESULTADOS GRÁFICOS-->
+	<div id="graphic_outcomes" class="tab">
+		<?php foreach ($this->products as $product){ 
+			if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+				foreach ($this->regions as $region){?>
+					Producto: <? echo $product['name']; ?><br /> Regi&oacute;n: <? echo $region['name']; ?><?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"marketShare_".$product['product_number'].$region['region_number'])))?>
+					<div id="marketShare_<? echo $product['product_number']?><? echo $region['region_number']?>" style="display:none;">
+						<img src="/tmp/<?php echo md5('img_'.$this->game['id'].'_'.$this->round_number.'_'.$product['product_number'].'_'.$region['region_number'])?>.png"/>
+					</div><br /><br /> 
+				<?php }?>
+			<?php }?>
+		<?php }?>
+	</div>
+
+	
+	<?php }
+	else{?>
+		<h1>No hay ningún resultado aún.</h1> 
+	<?php } ?>
+</div>

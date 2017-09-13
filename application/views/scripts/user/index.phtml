@@ -1,0 +1,14 @@
+<div id='content'>
+	<table>
+		<theader>
+			<th>Nombre</th>
+			<th>Empresa</th>
+			<th>Juego</th>
+		</theader>
+	<?php foreach($this->users as $user){?>
+		<tr>
+			<?php echo $user['email']?>
+		</tr>
+	<?php }//for  ?>
+	</table>
+</div>

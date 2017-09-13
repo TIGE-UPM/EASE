@@ -1,0 +1,118 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.js', $type = 'text/javascript')?>
+<div id='content'>
+	<img src="/images/i+d.gif" alt="i+d" width="90" height="110" style="float:right" />
+	<form name="idi" method="post">
+		<?php if($this->round_number==1){?><br /><br /><h3 style="color:grey;text-align:center">Esta secci&oacute;n no est&aacute; disponible para esta ronda</h3><br /><br /><?php } ?>
+			<?php if($this->round_number>1){?>
+			<div class="fieldDiv">		
+			</div>
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="modificationIdiFieldButton">
+					Modificación de productos		
+				</div>
+				<div id="modificationIdiFieldContainer">
+					<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">No disponible para esta ronda</h3><?php }?>
+					<div id="modificationIdiField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>
+						<div id="modificationIdiFieldDescription" class="fieldDescription" align="center">
+							Esta acción le permite modificar las características con las que est&aacute;n siendo fabricados sus productos.
+						</div>
+						<?php foreach ($this->products as $product){?>
+							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+								<div class="fieldSubHeader" style="color:#F2610D">
+									<br />
+									<?php echo $product['name']?>
+								</div>
+								<div id="changeIdiFieldDescription" class="fieldDescription">
+								<br />
+								<div class="fieldDiv" style="color:#4169E1;text-align:right;padding-right:500px">
+									  <?php foreach ($this->qualityParams as $qualityParam){?>
+									  <?php echo $qualityParam['name'] ?> : &nbsp;
+									<select name="idi[changeIdi][product_<?php echo $product['product_number'];?>][product_quality_<?php echo $qualityParam['quality_param_number'];?>]">
+										<?php if (isset($this->changeIdiDecision)) { ?>
+												<?php foreach ($this->changeidi as $changeidi){?> 
+													<option value="<?php echo $changeidi['value']?>" 
+														<?php echo (isset($this->changeIdiDecision) && $this->changeIdiDecision['product_'.$product['product_number']]['product_quality_'.$qualityParam['quality_param_number']]==$changeidi['value'])? "selected":""?>>
+														<?php echo $changeidi['descriptor']?>
+													</option>
+												<?php } } else { ?>
+												<?php foreach ($this->changeidi as $changeidi){?> 
+													<option value="<?php echo $changeidi['value']?>" 
+														<?php echo ($changeidi['value']==0? "selected":"")?>>
+														<?php echo $changeidi['descriptor']?>
+													</option>
+												<?php } //chageidi ?>				
+										<?php }//else?>
+									</select><br />
+									&nbsp;&nbsp;
+									<?php } ?>
+								</div>
+								</div>
+							<?php } // if?>
+						<?php } //products?>
+					</div>
+				</div>
+			</div>
+			<br/>
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="newIdiFieldButton">
+					Nuevos productos		
+				</div>
+				<div id="newIdiFieldContainer">
+					<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">No disponible para esta ronda</h3><?php }?>
+					<div id="newIdiField" class="fieldDiv"  <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
+						<div id="newIdiFieldDescription" class="fieldDescription" align="center">
+							Determine el nuevo producto que desea desarrollar y el presupuesto que destina al proyecto de investigación y desarrollo asociado.
+						</div>
+						<br />
+						<table align="center">
+							<thead>
+								<th class="small">Nuevo producto</th>
+								<th class="small">&nbsp;&nbsp;Lanzar&nbsp;&nbsp;</th>
+								<th class="small">&nbsp;&nbsp;Presupuesto del proyecto&nbsp;&nbsp;</th>
+							</thead>
+						<?php $idiP=1;?>
+						<?php foreach ($this->idiProducts as $idiProduct){?>
+						<?php if($this->product_availability['product_number_'.$idiProduct['product_number']]!=1) {?>
+							<tr>
+								<td><?php echo $idiProduct['name']?></td>
+								<td><select name="idi[newIdi][idiproduct_<?php echo $idiP?>][product_number_<?php echo $idiProduct['product_number']?>][newidivalue]" style="margin-left:10px;" >
+									<?php foreach ($this->newidivalue as $newidivalue){?>
+										<option value="<?php echo $newidivalue['value']?>" <?php echo (isset($this->newIdiDecision) && $this->newIdiDecision['idiproduct_'.$idiP]['product_number_'. $idiProduct['product_number']]['newidivalue']==$newidivalue['value'])? "selected":""?>>
+										<?php echo $newidivalue['descriptor']?>
+										</option>
+									<?php } ?>
+									</select></td>
+								<td><input type="text" name="idi[newIdi][idiproduct_<?php echo $idiP?>][product_number_<?php echo $idiProduct['product_number']?>][newidibudget]"id="newidibudget" display="block"
+									<?php echo isset($this->newIdiDecision)? 
+									'value = "'.$this->newIdiDecision['idiproduct_'.$idiP]['product_number_'. $idiProduct['product_number']]['newidibudget']
+									.'"':""?></input></td>
+								<?php $idiP++;?>
+								<?php } ?>
+								<?php } ?>
+							</tr>
+						</table>
+
+					</div>
+				</div>
+			</div>
+			<br/>
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Guardar">
+			</div>
+			<?php } ?>	
+		</form>
+		<script>
+			$( "#modificationIdiFieldButton" ).click(function() {
+				$( "#modificationIdiFieldContainer" ).toggle( "easeInElastic" );
+			});
+			$( "#newIdiFieldButton" ).click(function() {
+				$( "#newIdiFieldContainer" ).toggle( "easeInElastic" );
+			});
+		</script>
+</div>

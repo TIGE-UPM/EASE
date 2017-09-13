@@ -1,0 +1,41 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Inmediato</th>
+		<th class="small">1 mes</th>
+		<th class="small">2 meses</th>
+		<th class="small">3 meses</th>
+		<th class="small">4 meses</th>
+	</theader>
+	<tr>
+		<td>Recargo</td>
+		<td><input type="text" name="prSuppliersPayterms[0]" 
+			value="<?php echo $view->games->getSuppliersPaytimeCost($view->game_id, 0);?>"class="small">
+		</td>
+		<td><input type="text" name="prSuppliersPayterms[1]" 
+			value="<?php echo $view->games->getSuppliersPaytimeCost($view->game_id, 1);?>"class="small">
+		</td>
+		<td><input type="text" name="prSuppliersPayterms[2]" 
+			value="<?php echo $view->games->getSuppliersPaytimeCost($view->game_id, 2);?>"class="small">
+		</td>
+		<td><input type="text" name="prSuppliersPayterms[3]" 
+			value="<?php echo $view->games->getSuppliersPaytimeCost($view->game_id, 3);?>"class="small">
+		</td>
+		<td><input type="text" name="prSuppliersPayterms[4]" 
+			value="<?php echo $view->games->getSuppliersPaytimeCost($view->game_id, 4);?>"class="small">
+		</td>
+	</tr>
+</table>
+
+
+<table>
+	<theader>
+		<th class="small" colspan="2">Proveedores necesarios para 100% abastecimiento</th>
+	</theader>
+	<tr>
+		<td>Número</td>
+		<td><input type="text" name="prSuppliersIdealNumber" 
+			value="<?php echo $view->games->getIdealSuppliersNumber($view->game_id)?>"class="small">
+		</td>
+	</tr>
+</table>

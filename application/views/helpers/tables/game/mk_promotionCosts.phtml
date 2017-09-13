@@ -1,0 +1,32 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Intensidad </th>
+		<?php $region_number=0;?>
+		<?php $regions_configured=count($view->game_regions)?>
+		<?php foreach ($view->game_regions as $region){ ?>
+			<?php $region_number++;?>
+		<th class="small">Región <?php echo $region_number?></th>
+		<?php } //for region?>
+	</theader>
+	<?php for ($media=1; $media<=3; $media++){ ?>
+		<?php for ($i=1; $i<=3; $i++){ ?>
+	<tr>
+		<?php if ($i==2){?>
+		<td>Medio <?php echo $media?></td>
+		<?php } else{?>
+		<td></td>
+		<?php } ?>
+		<td><?php echo $i?></td>
+		
+		<?php $region_number=0;?>
+		<?php $regions_configured=count($view->game_regions)?>
+		<?php foreach ($view->game_regions as $region){ ?>
+			<?php $region_number++;?>
+		<td><input type="text" name="mkMediaCosts[media_<?php echo $media?>][region_<?php echo $region_number?>][intensity_<?php echo $i?>]"
+			value="<?php echo $view->games->getMkMediaCost($view->game_id, $media, $region_number, $i)?>" class="small"></td>
+		<?php } //for region?>
+	</tr>
+		<?php }//for i?>
+	<?php }//for media?>
+</table>

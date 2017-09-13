@@ -1,0 +1,12 @@
+<div id="content">
+	<div id="notificationHeader">
+		Notificaciones
+	</div>
+	<div id="notificationDiv">
+		<?php if (isset($this->notifications)){?>
+			<?php foreach($this->notifications as $notification){?>
+				<?php echo $notification?>
+			<?php } ?>
+		<?php } ?>
+	</div>
+</div>

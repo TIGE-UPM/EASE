@@ -1,0 +1,14 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Importe </th>
+	</theader>
+	<tr>
+		<td>Capital inicial </td>
+		<td><input type="text" name="fiCashflowParameters[starting_cash]" class="small" value="<?php echo $view->games->getFiCashflowParameter($view->game_id, 'starting_cash')?>"></td>
+	</tr>
+	<tr>
+		<td>Tipo de interés descubierto bancario </td>
+		<td><input type="text" name="fiCashflowParameters[short_term_debt_rate]" class="small" value="<?php echo $view->games->getFiCashflowParameter($view->game_id, 'short_term_debt_rate')?>"></td>
+	</tr>
+</table>

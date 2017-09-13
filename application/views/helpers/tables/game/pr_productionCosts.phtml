@@ -1,0 +1,28 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<th class="small">Región <?php echo $region_number?></th>
+		<?php } //for region?>
+	</theader>
+	<tr>
+		<td>Costes Fijos</td>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+			<?php $fixedCost=$view->games->getProductionCost($view->game_id, 1, $region_number, 'fixed');?>
+		<td><input type="text" name="prProductionCosts[round_1][region_<?php echo $region_number?>][fixed]" class="small" value="<?php echo $fixedCost?>"></td>
+		<?php } //for region?>
+	</tr>
+	<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+	<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<tr>
+			<td>Unitarios Producto <?php echo $product_number?></td>
+			<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+			<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+				<?php $unitCost=$view->games->getProductionCost($view->game_id, 1, $region_number, 'unit', $product_number);?>
+			<td><input type="text" name="prProductionCosts[round_1][region_<?php echo $region_number?>][unit][product_<?php echo $product_number?>]" class="small" value="<?php echo $unitCost?>"></td>
+			<?php } //for region?>
+		</tr>
+	<?php }//for product ?>				
+</table>

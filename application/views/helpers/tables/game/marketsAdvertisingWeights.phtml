@@ -1,0 +1,27 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small"></th>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<th class="small">Región <?php echo $region_number?></th>
+	<?php } //for region?>
+	</theader>
+	<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+	<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<?php $n_media=$view->games->getNumberOfMedia($view->game_id); ?>
+		<?php for ($media_number=1;$media_number<=$n_media;$media_number++){ ?>
+	<tr>
+		<td><?php if ($media_number==round($n_media/2)){echo "Producto ".$product_number;}?></td>
+		<td>Medio <?php echo $media_number?></td>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+			<?php $mediaWeight=$view->games->getMediaWeight($view->game_id, 1, $product_number, $media_number, $region_number);?>
+		<td>	
+			<input type="text" name="marketMediaWeight[round_1][product_<?php echo $product_number?>][media_<?php echo $media_number?>][region_<?php echo $region_number?>]" value="<?php echo $mediaWeight?>" class="small">
+		</td>
+		<?php } //for region?>
+	</tr>
+		<?php } //for channel?>
+	<?php } //for product?>
+</table>

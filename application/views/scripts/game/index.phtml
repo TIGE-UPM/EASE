@@ -1,0 +1,59 @@
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+
+<div id='content'>
+	<h1>Resumen de juegos y plantillas</h1>			
+<?php if (isset($this->games) && count($this->games)) {?>	
+	<div class="fieldHeader">
+		Juegos.
+	</div>
+	<p>Hay <?php echo count($this->games)?> juego(s) en la herramienta.</p>
+	<table style="margin-bottom:30px;">
+		<theader>
+			<th>Nombre</th>
+			<th>Descripción</th>
+			<th>Acciones</th>
+		</theader>
+	<?php foreach($this->games as $game){?>
+		<tr>
+			<td><?php echo $this->escape($game->name)?></td>
+			<td><?php echo $this->short($game->description)?></td>
+			<td><a href='<?php echo $this->url(array('controller'=>'game', 'action'=>'view')) . "?game_id=".$game->id?>'>ver</a> | 
+				<a href='<?php echo $this->url(array('controller'=>'game', 'action'=>'edit')) . "?game_id=".$game->id?>'>editar</a> | 
+				<a href='<?php echo $this->url(array('controller'=>'index', 'action'=>'notifications')) . "?game_id=".$game->id?>'>notificar</a> | 
+				<a href='#' onClick='confirmation("¿Está seguro de querer borrar el juego <?php echo $this->escape($game->name)?>?", "<?php echo $this->url(array('controller'=>'game', 'action'=>'delete')) . "?game_id=".$game->id?>","");'>borrar</a>
+			</td>
+		</tr>
+	<?php }//for  ?>
+	</table>
+<?php } //if games ==null 
+else {?>
+	<p>No hay ningún juego creado.</p>
+<?php }?>
+<?php if (isset($this->templates) && count($this->templates)) {?>
+	<div class="fieldHeader">
+		Plantillas.
+	</div>
+	<p>Hay <?php echo count($this->templates)?> plantillas(s) en la herramienta.</p>
+	<table style="margin-bottom:30px;">
+		<theader>
+			<th>Nombre</th>
+			<th>Descripción</th>
+			<th>Acciones</th>
+		</theader>
+	<?php foreach($this->templates as $template){?>
+		<tr>
+			<td><?php echo $this->escape($template->name)?></td>
+			<td><?php echo $this->short($template->description)?></td>
+			<td><a href='<?php echo $this->url(array('controller'=>'game', 'action'=>'view')) . "?game_id=".$template->id?>'>ver</a> | 
+				<a href='<?php echo $this->url(array('controller'=>'game', 'action'=>'edit')) . "?game_id=".$template->id?>'>editar</a> | 
+				<a href='#' onClick='confirmation("¿Está seguro de querer borrar la plantilla <?php echo $this->escape($template->name)?>?", "<?php echo $this->url(array('controller'=>'game', 'action'=>'delete')) . "?game_id=".$template->id?>","");'>borrar</a>
+			</td>
+		</tr>
+	<?php }//for  ?>
+	</table>
+	<?php } //if games ==null 
+	else {?>
+	<p>No hay ninguna plantilla creada.</p>
+	<?php }?>
+</div>

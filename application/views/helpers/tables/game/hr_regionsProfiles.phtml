@@ -1,0 +1,25 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<th class="small">Región <?php echo $region_number?></th>
+		<?php } //for region?>
+	</theader>
+	<tr>
+		<td>Productividad</td>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<td><input type="text" name="hrRegionProfile[region_<?php echo $region_number?>][productivity]" 
+			value="<?php echo $view->games->getHrRegionProfileParam($view->game_id, $region_number, 'productivity');?>" class="small"></td>
+		<?php } //for region?>
+	</tr>
+	<tr>
+		<td>Prob. de contratación</td>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<td><input type="text" name="hrRegionProfile[region_<?php echo $region_number?>][hiring_probability]" 
+			value="<?php echo $view->games->getHrRegionProfileParam($view->game_id, $region_number, 'hiring_probability');?>" class="small"></td>
+		<?php } //for region?>
+	</tr>
+</table>

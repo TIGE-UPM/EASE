@@ -1,0 +1,53 @@
+<div id="marketsTradeMktWeightsEvolutionFieldDescription" class="fieldDescription" style="background-color:white">
+	Configure de forma porcentual (%) la evolución temporal de los ideales de inversión en trade MKT en cada ronda.
+</div>
+<?php $n_rounds=$view->games->getNumberOfRounds($view->game_id); ?>
+	<?php if ($n_rounds>1) {?>
+		<?php for ($round_number=2;$round_number<=$n_rounds;$round_number++){ ?>
+			<div style="float: left; margin-right: 15px;">
+				Ronda <?php echo $round_number?><table>
+				<table>
+					<theader>
+						<th class="small"></th>
+						<th class="small"></th>
+						<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+						<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+						<th class="small">Canal <?php echo $channel_number?></th>
+						<?php } ?>
+					</theader>
+					<tr>
+						<td></td>
+						<td></td>
+						<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+						<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+							<td class="inCellFieldHeader">Variación (%)</td>
+						<?php } ?>
+					</tr>
+					<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+					<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+						<?php $tradem[0]=array('number'=>1, 'name'=>'Patrocinio');?>
+						<?php $tradem[1]=array('number'=>2, 'name'=>'Promoción');?>
+						<?php $this->game_trademedia=$tradem;?>	
+						<?php foreach ($this->game_trademedia as $trademedia){ ?>
+					<tr>
+						<td><?php if ($trademedia['number']==1){echo "Producto ".$product_number;}?></td>
+						<td><?php echo $trademedia['name']?></td>
+						<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+						<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+							<?php $tradeMediaWeightEvolution=$view->games->getTradeMediaWeightEvolution($view->game_id, $round_number, $product_number, $trademedia['number'], $channel_number);?>
+						<td>	
+							<input type="text" name="marketTradeMediaWeightEvolution[round_<?php echo $round_number?>][product_<?php echo $product_number?>][trade_media_<?php echo $trademedia['number']?>][channel_<?php echo $channel_number?>]" value="<?php echo $tradeMediaWeightEvolution?>" class="small">
+						</td>
+						<?php } ?>
+					</tr>
+					<?php } ?>
+					<?php } ?>
+				</table>
+			</div>
+		<?php }?>
+	<?php } else {?>
+		<div style="float: left">
+			Sólo se ha configurado una ronda para este juego de simulación
+		</div>
+	<?php }?>
+<div style="clear:both"></div>

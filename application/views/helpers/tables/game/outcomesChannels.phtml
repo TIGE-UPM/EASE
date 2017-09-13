@@ -1,0 +1,50 @@
+<?php $n_rounds=$view->games->getNumberOfRounds($view->game['id']);
+		$products=$view->games->getProducts($view->game['id']);
+		$regions=$view->games->getRegions($view->game['id']);?>
+	<?php if ( ($n_rounds>1) && (($view->round_number)+1)<=$n_rounds ) {?>
+		<?php
+			//Configuración por defecto: muestra todas las rondas siguientes
+			for ($round_number=($view->round_number)+1;$round_number<=$n_rounds;$round_number++){
+		?>
+		<?php
+			//Configuración alternativa para mostrar sólo las siguientes $N rondas
+			// $N -----> [Valor];
+			// $showNext = ($view->round_number)+$N;
+			// $endAt = min($showNext, $n_rounds);
+			// for ($round_number=($view->round_number)+1;$round_number<=$endAt;$round_number++){
+		?>
+Ronda <?php echo $round_number?>
+<table>
+	<theader>
+		<th class="normal"></th>
+	<?php foreach ($regions as $region){ ?>
+		<th class="normal">Regi&oacute;n: <?php echo $region['name']?></th>
+	<?php } //for region?>
+	</theader>
+	<tr>
+		<td></td>
+		<?php foreach ($regions as $region){ ?>
+			<td class="inCellFieldHeader">Crecimiento esperado (%)</td>
+		<?php } //for region?>
+	</tr>
+		<?php foreach ($products as $product){ 
+		if($view->game_product_availability['product_number_'.$product['product_number']]==1){?>
+	<tr>
+		<td>Producto: <?php echo $product['name']?></td>
+			<?php foreach ($regions as $region){ 
+			$chance=rand(-1,1)*($round_number-$view->round_number);?>			
+			<?php $marketSizeEvolution=($view->games->getMarketSizeEvolution($view->game['id'], $round_number, $product['product_number'], $region['region_number'])+$chance);?>
+		<td>
+			<input style="text-align: center" disabled="disabled" type="text" name="marketSizeEvolution[round_<?php echo $round_number?>][product_<?php echo $product['product_number']?>][region_<?php echo $region['region_number']?>]" 
+				   value="<?php echo $marketSizeEvolution?>" class="normal">
+		</td>
+		<?php } //for region?>
+	</tr>
+	<?php } 
+		} //for product?>
+</table>
+<?php }?>
+<?php }
+else {?> 
+	<h2 style="color:grey">No hay m&aacute;s rondas disponibles para este juego de simulaci&oacute;n</h2>
+<?php }?> 

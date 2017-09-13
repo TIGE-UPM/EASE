@@ -1,0 +1,46 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Nombre</th>
+		<th class="small">&Aacute;rea funcional</th>
+		<th class="small">Impacto (%)</th>
+		<th class="small">Coste (&euro;)</th>
+	</theader>
+	<?php $n_initiatives=$view->games->getNumberOfInitiatives($view->game_id); ?>
+	<?php $area[0]=array('area'=>0, 'descriptor'=>'Producción'); ?>
+	<?php $area[1]=array('area'=>1, 'descriptor'=>'Recursos Humanos'); ?>
+	<?php $area[2]=array('area'=>2, 'descriptor'=>'Marketing'); ?>
+	<?php $deterioration[0]=array('area'=>3, 'descriptor'=>'Deterioro f&aacute;bricas'); ?>
+	<?php $this->area=$area; ?>
+	<?php $this->deterioration=$deterioration; ?>
+	<?php for ($initiative_number=1;$initiative_number<=$n_initiatives;$initiative_number++){ ?>
+	<?php $initiative=$view->game_initiatives[$initiative_number-1]; ?>
+	<tr>
+		<td>Iniciativa <?php echo $initiative_number?></td>
+		<td><input type="text" name="initiative_<?php echo $initiative_number?>[name]" class="big" value="<?php echo $initiative['name']?>"></td>
+		<td><select name="initiative_<?php echo $initiative_number?>[area]" id="initiatives" display="block">				
+		<?php foreach ($this->area as $area){?> 
+					<option value="<?php echo $area['area']?>" <?php echo (isset($initiative) && $initiative['area']==$area['area'])? "selected":""?>>
+				 	<?php echo $area['descriptor']?>
+					</option>
+				<?php } ?>
+		</select></td>
+		<td><input type="text" name="initiative_<?php echo $initiative_number?>[weight]" class="small" value="<?php echo $initiative['weight']?>"></td>
+		<td><input type="text" name="initiative_<?php echo $initiative_number?>[cost]" class="small" value="<?php echo $initiative['cost']?>"></td>
+	</tr>
+	<?php } //for?>
+	<tr>
+	<?php $initiative=$view->game_initiatives[$initiative_number-1]; ?>
+		<td>Iniciativa <?php echo $initiative_number?></td>
+		<td><input type="text" name="initiative_<?php echo $initiative_number?>[name]" class="big" value="<?php echo $initiative['name']?>"></td>
+		<td><select name="initiative_<?php echo $initiative_number?>[area]" id="initiatives" display="block">				
+			<?php foreach ($this->deterioration as $deterioration){?> 		
+					<option value="<?php echo $deterioration['area']?>" <?php echo (isset($initiative) && $initiative['area']==$deterioration['area'])? "selected":""?>>
+					<?php echo $deterioration['descriptor']?>
+					</option>
+			<?php } ?>
+		</select></td>
+		<td><input type="text" name="initiative_<?php echo $initiative_number?>[weight]" class="small" value="<?php echo $initiative['weight']?>"></td>
+		<td><input type="text" name="initiative_<?php echo $initiative_number?>[cost]" class="small" value="<?php echo $initiative['cost']?>"></td>
+	</tr>
+</table>

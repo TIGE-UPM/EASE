@@ -1,0 +1,31 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small"></th>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<th class="small">Región <?php echo $region_number?></th>
+		<?php } //for region?>
+	</theader>
+	<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+	<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+	<tr>
+		<td>Canal <?php echo $channel_number?></td>
+		<td>Fijos </td>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<td><input type="text" name="mkChannelsCosts[round_1][channel_<?php echo $channel_number?>][region_<?php echo $region_number?>][fixed]" 
+			value="<?php echo $view->games->getMkChannelCost($view->game_id, 1, $channel_number, $region_number, 'fixed_cost')?>" class="small"></td>
+		<?php } //for region?>
+	</tr>
+	<tr>
+		<td></td>
+		<td>Comisión </td>
+		<?php $n_regions=$view->games->getNumberOfRegions($view->game_id); ?>
+		<?php for ($region_number=1;$region_number<=$n_regions;$region_number++){ ?>
+		<td><input type="text" name="mkChannelsCosts[round_1][channel_<?php echo $channel_number?>][region_<?php echo $region_number?>][variable]" 
+			value="<?php echo $view->games->getMkChannelCost($view->game_id, 1, $channel_number, $region_number, 'fare_cost')?>" class="small"></td>
+		<?php } //for region?>
+	</tr>
+	<?php }//for channel?>
+</table>

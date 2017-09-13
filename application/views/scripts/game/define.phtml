@@ -1,0 +1,29 @@
+
+
+
+			<div class="fieldSubHeader"><!-- Configuración de Regiones></!-->
+				Regiones.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"regionsParametersFields")))?>			
+			</div>
+			<div id="regionsParametersFields"> 
+				<div id="regionsFieldDescription" class="fieldDescription">
+					Configure las regiones del juego. 
+				</div>
+				<div id="regionsFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="regionsFields">
+				<?php $this->gameTables($this, "regionsParameters");?>
+				</div>
+			</div>
+			<div class="fieldSubHeader"><!-- Configuración de Calidades></!-->
+				Calidad.<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"qualitiesParametersFields")))?>			
+			</div>
+			<div id="qualitiesParametersFields"> 
+				<div id="qualitiesFieldDescription" class="fieldDescription">
+					Configure los parámetros de calidad para los productos del juego. 
+				</div>
+				<div id="qualitiesFieldsErrors" class="fieldErrors">
+				</div>
+				<div id="qualitiesFields">
+				<?php $this->gameTables($this, "qualitiesParameters");?>
+				</div>
+			</div>

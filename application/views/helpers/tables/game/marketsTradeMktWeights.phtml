@@ -1,0 +1,29 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small"></th>
+		<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+		<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+		<th class="small">Canal <?php echo $channel_number?></th>
+		<?php } //for region?>
+	</theader>
+	<?php $n_products=$view->games->getNumberOfProducts($view->game_id); ?>
+	<?php for ($product_number=1;$product_number<=$n_products;$product_number++){ ?>
+		<?php $tradem[0]=array('number'=>1, 'name'=>'Patrocinio');?>
+		<?php $tradem[1]=array('number'=>2, 'name'=>'Promoción');?>
+		<?php $this->game_trademedia=$tradem;?>	
+		<?php foreach ($this->game_trademedia as $trademedia){ ?>
+	<tr>
+		<td><?php if ($trademedia['number']==1){echo "Producto ".$product_number;}?></td>
+		<td><?php echo $trademedia['name']?></td>
+		<?php $n_channels=$view->games->getNumberOfChannels($view->game_id); ?>
+		<?php for ($channel_number=1;$channel_number<=$n_channels;$channel_number++){ ?>
+			<?php $tradeMediaWeight=$view->games->getTradeMediaWeight($view->game_id, 1, $product_number, $trademedia['number'], $channel_number);?>
+		<td>	
+			<input type="text" name="marketTradeMediaWeight[round_1][product_<?php echo $product_number?>][trade_media_<?php echo $trademedia['number']?>][channel_<?php echo $channel_number?>]" value="<?php echo $tradeMediaWeight?>" class="small">
+		</td>
+		<?php } ?>
+	</tr>
+	<?php } ?>
+	<?php } ?>
+</table>

@@ -1,0 +1,184 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.js', $type = 'text/javascript')?>
+<div id='content'>
+	<img src="/images/initiative.gif" alt="finance" width="105" height="95" style="float:right" />
+	 <form name="initiatives" method="post">
+		<?php if($this->round_number==1){?><br /><br /><h3 style="color:grey;text-align:center">Esta secci&oacute;n no est&aacute; disponible para esta ronda</h3><br /><br /><?php } ?>
+			<?php if($this->round_number>1){?>
+			<div id="initiativesFieldDescription" class="fieldDescription" align="center">
+				Determine aquellas iniciativas que desea llevar a cabo para mejorar el rendimiento de su compa&ntildeía.
+			</div>
+			<br />
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="initiativesproductionFieldButton">
+					Iniciativas de Producción y Distribución
+				</div>
+				<div id="initiativesproductionFieldContainer">
+					<?php if ($this->round_number<2){?> <h3 style="color:grey;text-align:center">No existen iniciativas disponibles para esta ronda</h3><?php }?>
+					<div id="initiativesproductionField" class="fieldDiv" <?php if ($this->round_number<2){?> style="visibility:hidden"<?php }?>>					
+						<table align="center">
+							<thead>
+								<th class="small">Acción de la iniciativa</th>
+								<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
+								<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
+							</thead>
+							<?php $numberp=1;?>
+							<?php foreach ($this->initiativesProd as $initiativesprod) {
+									$chosen=0;
+									for ($round = 1; $round < $this->round_number; $round++) {
+										$chosen_aux=$this->initiative_chosen['initiative_production']['round_'.$round]['initiativeproduction_number_'.$numberp];
+										if ($chosen_aux==1) {
+											$chosen=1;
+										}
+									}
+								?>
+							<tr>
+								<td><?php echo $initiativesprod['name']?> </td>
+								<td><select name="initiatives[initiativeproduction][initiativeproduction_number_<?php echo $numberp?>]" id="initiativesProd<?php echo $numberp?>" display="block" <?php if ($chosen==1){?> disabled="disabled"<?php }?>>	
+										<?php foreach ($this->initiativevalue as $initiativevalue){?>
+											<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativeproductionDecision) && $this->initiativeproductionDecision['initiativeproduction_number_'.$numberp])? "selected":""?> />
+										<?php if ($chosen==1){ 
+											echo ("Contratada"); // ¡esto dará problemas en la tercera ronda!
+										} else { 
+											echo ($initiativevalue['descriptor']);
+										}?>
+										</option>
+										<?php } ?>
+									</select>
+								</td>
+								<td><?php echo number_format($initiativesprod['cost'], 2, '.', ',').' €'?></td>
+								<?php $numberp++;?>
+								<?php } ?>	
+							</tr>
+							<?php $numberd=1;?>
+							<?php $factory_number_deterioration=1;?>
+							<?php foreach ($this->initiativesDET as $initiativesdet) {?>
+							<?php foreach ($this->game_factories as $factory) {?>
+							<tr>
+								<td><?php echo $initiativesdet['name']?>: F&aacute;brica <?php echo $factory_number_deterioration?></td>
+								<td><select name="initiatives[initiativedeterioration][initiativedeterioration_number_1][factory_number_<?php echo $factory['factory_number']?>]" id="initiativesProd<?php echo $numberd?>" display="block">
+										<?php foreach ($this->initiativevalue as $initiativevalue){?>
+										<option value="<?php echo $initiativevalue['value']?>"  <?php echo (isset($this->initiativedeteriorationDecision) && $this->initiativedeteriorationDecision['factory_number_'.$factory['factory_number']])? "selected":""?> />
+										<?php echo $initiativevalue['descriptor']?>
+										</option>
+										<?php } ?>
+									</select>
+								</td>
+								<td><?php echo number_format($initiativesdet['cost'], 2, '.', ',').' €'?></td>
+								<?php $factory_number_deterioration++;?>
+								<?php } ?>
+								<?php } ?>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<br />	
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="initiativesmarketingFieldButton">
+					Iniciativas de Marketing			
+				</div>
+				<div id="initiativesmarketingFieldContainer">
+					<?php if ($this->round_number<4){?> <h3 style="color:grey;text-align:center">No existen iniciativas disponibles para esta ronda</h3><?php }?>
+					<div id="initiativesmarketingField" class="fieldDiv" <?php if ($this->round_number<4){?> style="visibility:hidden"<?php }?>>
+						<table align="center">
+							<thead>
+								<th class="small">Acción de la iniciativa</th>
+								<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
+								<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
+							</thead>
+							<?php $numberm=1;?>
+							<?php foreach ($this->initiativesMKT as $initiativesmkt) {
+									$chosen=0;
+									for ($round = 1; $round < $this->round_number; $round++) {
+										$chosen_aux=$this->initiative_chosen['initiative_marketing']['round_'.$round]['initiativemarketing_number_'.$numberm];
+										?><!-- <?php var_dump($this->initiative_chosen); ?> --><?php
+										if ($chosen_aux==1) {
+											$chosen=1;
+										}
+									}
+								?>
+							<tr>
+								<td><?php echo $initiativesmkt['name']?></td>	
+								<td><select name="initiatives[initiativemarketing][initiativemarketing_number_<?php echo $numberm?>]" id="initiativesMkt<?php echo $numberm?>" display="block" <?php if ($chosen==1){?> disabled="disabled"<?php }?>>	
+									<?php foreach ($this->initiativevalue as $initiativevalue){?>
+									<!-- <?php var_dump($this->initiativemarketingDecision); ?> -->
+									<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativemarketingDecision) && $this->initiativemarketingDecision['initiativemarketing_number_'.$numberm])? "selected":""?>>
+									<?php if ($chosen==1){ ?>
+											<?php echo ("Contratada");
+											} ?><?php 
+											if ($chosen!=1) { 
+												echo ($initiativevalue['descriptor']);
+											}?>
+									</option>
+									<?php } ?>
+								</select>
+								</td>
+								<td><?php echo number_format($initiativesmkt['cost'], 2, '.', ',').' €'?></td>
+								<?php $numberm++;?>
+								<?php } ?>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<br/>
+			<div class="fieldContainer">
+				<div class="fieldHeader" id="initiativeshumanresourcesFieldButton">
+					Iniciativas de Recursos Humanos			
+				</div>
+				<div id="initiativeshumanresourcesFieldContainer">
+					<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">No existen iniciativas disponibles para esta ronda</h3><?php }?>
+					<div id="initiativeshumanresourcesField" class="fieldDiv" <?php if ($this->round_number<3){?> style="visibility:hidden"<?php }?>>
+						<table align="center">
+							<thead>
+								<th class="small">Acción de la iniciativa</th>
+								<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
+								<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
+							</thead>
+							<?php $numberh=1;?>
+							<?php foreach ($this->initiativesHR as $initiativeshr) {?>
+							<tr>
+								<td><?php echo $initiativeshr['name']?></td>
+								<td><select name="initiatives[initiativehumanresources][initiativehumanresources_number_<?php echo $numberh?>]" id="initiativesHuman<?php echo $numberh?>" display="block">
+										<?php foreach ($this->initiativevalue as $initiativevalue){?>
+										<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativehumanresourcesDecision) && $this->initiativehumanresourcesDecision['initiativehumanresources_number_'.$numberh])? "selected":""?>>
+										<?php echo $initiativevalue['descriptor']?>
+										</option>
+										<?php } ?>
+									</select>
+								</td>
+								<td><?php echo number_format($initiativeshr['cost'], 2, '.', ',').' €'?></td>
+								<?php $numberh++;?>
+								<?php } ?>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<br/>
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Guardar">
+			</div>
+			<?php } ?>
+		</form>
+				<script>
+			$( "#initiativesproductionFieldButton" ).click(function() {
+				$( "#initiativesproductionFieldContainer" ).toggle( "easeInElastic" );
+			});
+			
+			$( "#initiativesmarketingFieldButton" ).click(function() {
+				$( "#initiativesmarketingFieldContainer" ).toggle( "easeInElastic" );
+			});
+			$( "#initiativeshumanresourcesFieldButton" ).click(function() {
+				$( "#initiativeshumanresourcesFieldContainer" ).toggle( "easeInElastic" );
+			});
+
+		</script>
+	</div>

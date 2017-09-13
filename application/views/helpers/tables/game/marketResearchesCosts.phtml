@@ -1,0 +1,18 @@
+<table>
+	<theader>
+		<th class="small"></th>
+		<th class="small">Coste (&euro;)</th>
+	</theader>
+	<?php $market_reserarch[0]=array('number'=>1, 'name'=>'Crecimiento de canales');?>
+	<?php $market_reserarch[1]=array('number'=>2, 'name'=>'Comparativa de precios');?>
+	<?php $market_reserarch[2]=array('number'=>3, 'name'=>'Comparativa de MKT');?>
+	<?php $market_reserarch[3]=array('number'=>4, 'name'=>'Lanzamientos esperados');?>
+	<?php $market_reserarch[4]=array('number'=>5, 'name'=>'Cuentas anuales');?>
+	<?php foreach ($market_reserarch as $research){ ?>
+	<tr>
+		<?php $marketResearchesCost=$view->games->getMarketResearchesCosts($view->game_id);?>
+		<td><?php echo $research['name']?></td>
+		<td><input type="text" name="marketResearch_<?php echo $research['number']?>" class="medium" value="<?php echo $marketResearchesCost[$research['number']-1]['cost']?>"></td>
+	</tr>
+	<?php } //foreach region?>
+</table>

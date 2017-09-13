@@ -1,0 +1,168 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/outcomes.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/decision.css');?>
+
+<div id='content'>
+<?php if (isset($this->active_round)){ ?>
+	<h1> Turno actual: Turno <?php echo $this->active_round['round_number']?></h1>
+		<h2> (Del <?php echo date('d/m/Y', strtotime($this->active_round['opening_date']))?> 
+			   al <?php echo date('d/m/Y', strtotime($this->active_round['closing_date']))?>) </h2>
+			   <h2 style="text-align:right"> Cargo: <?php echo $this->role_profile[$this->user['role']]['name']?></h2>
+	<ul class="decisions_list" style="text-align:center">
+		<?php if($this->user['role']==2||$this->user['role']==0){?>	
+			<?php if(isset($this->production_decision_date)){?>
+			<li class="decision_taken">
+				<b>Dirección de Operaciones: </b>Decisión guardada el <?php echo $this->production_decision_date?>
+				<a href="<?php echo $this->baseUrl().'/decision/production'?>">editar decisión</a>
+			</li>
+			<?php }
+			else{?>
+			<li class="decision_pending">
+				<b>Dirección de Operaciones: </b>Decisión pendiente.
+				<a href="<?php echo $this->baseUrl().'/decision/production'?>">introducir decisión</a>
+			</li>	
+			<?php } ?>
+		<?php } ?>
+		<br />
+		<?php if($this->user['role']==4||$this->user['role']==0){?>
+			<?php if(isset($this->marketing_decision_date)){?>
+			<li class="decision_taken">
+				<b>Marketing: </b>Decisión guardada el <?php echo $this->marketing_decision_date?>
+				<a href="<?php echo $this->baseUrl().'/decision/marketing'?>">editar decisión</a>
+			</li>
+			<?php }
+			else{?>
+			<li class="decision_pending">
+				<b>Marketing: </b>Decisión pendiente.
+				<a href="<?php echo $this->baseUrl().'/decision/marketing'?>">introducir decisión</a>
+			</li>	
+			<?php } ?>
+		<?php } ?>
+		<br />
+		<?php if($this->user['role']==3||$this->user['role']==0){?>
+			<?php if(isset($this->humanResources_decision_date)){?>
+			<li class="decision_taken">
+				<b>Recursos Humanos: </b>Decisión guardada el <?php echo $this->humanResources_decision_date?>
+				<a href="<?php echo $this->baseUrl().'/decision/humanresources'?>">editar decisión</a>
+			</li>
+			<?php }
+			else{?>
+			<li class="decision_pending">
+				<b>Recursos Humanos: </b>Decisión pendiente.
+				<a href="<?php echo $this->baseUrl().'/decision/humanresources'?>">introducir decisión</a>
+			</li>	
+			<?php } ?>
+		<?php } ?>
+		<br />
+		<?php if($this->user['role']==1||$this->user['role']==0){?>
+			<?php if(isset($this->finance_decision_date)){?>
+			<li class="decision_taken">
+				<b>Finanzas: </b>Decisión guardada el <?php echo $this->finance_decision_date?>
+				<a href="<?php echo $this->baseUrl().'/decision/finance'?>">editar decisión</a>
+			</li>
+			<?php }
+			else{
+				if($this->active_round['round_number']==1){?>
+						<li class="decision_taken">
+							<b>Finanzas: </b>Decisión no disponible para este turno
+						</li>
+				<?php } 
+				else{?>
+					<li class="decision_pending">
+						<b>Finanzas: </b>Decisión pendiente.
+						<a href="<?php echo $this->baseUrl().'/decision/finance'?>">introducir decisión</a>
+					</li>	
+				<?php } ?>
+			<?php } ?>
+		<?php } ?>
+		<br />
+		<?php if($this->user['role']==0){?>
+			<?php if(isset($this->initiatives_decision_date)){?>
+			<li class="decision_taken">
+				<b>Iniciativas: </b>Decisión guardada el <?php echo $this->initiatives_decision_date?>
+				<a href="<?php echo $this->baseUrl().'/decision/initiatives'?>">editar decisión</a>
+			</li>
+			<?php }
+			else{
+				if($this->active_round['round_number']==1){?>
+						<li class="decision_taken">
+							<b>Iniciativas: </b>Decisión no disponible para este turno
+						</li>
+			<?php } 
+				else{?>
+					<li class="decision_pending">
+						<b>Iniciativas: </b>Decisión pendiente.
+						<a href="<?php echo $this->baseUrl().'/decision/initiatives'?>">introducir decisión</a>
+					</li>	
+				<?php } ?>	
+			<?php } ?>
+		<?php } ?>
+		<br />
+		<?php if($this->user['role']==0){?>
+			<?php if(isset($this->marketResearches_decision_date)){?>
+			<li class="decision_taken">
+				<b>Estudios de mercado: </b>Decisión guardada el <?php echo $this->marketResearches_decision_date?>
+				<a href="<?php echo $this->baseUrl().'/decision/marketresearches'?>">editar decisión</a>
+			</li>
+			<?php }
+			else{?>
+			<li class="decision_pending">
+				<b>Estudios de mercado: </b>Decisión pendiente.
+				<a href="<?php echo $this->baseUrl().'/decision/marketresearches'?>">introducir decisión</a>
+			</li>	
+			<?php } ?>
+		<?php } ?>
+		<br />
+		<?php if($this->user['role']==0){?>
+			<?php if(isset($this->idi_decision_date)){?>
+			<li class="decision_taken">
+				<b>I+D+i: </b>Decisión guardada el <?php echo $this->idi_decision_date?>
+				<a href="<?php echo $this->baseUrl().'/decision/idi'?>">editar decisión</a>
+			</li>
+			<?php }
+				else{
+					if($this->active_round['round_number']==1){?>
+						<li class="decision_taken">
+							<b>I+D+i: </b>Decisión no disponible para este turno
+						</li>
+					<?php } 
+					else{?>
+						<li class="decision_pending">
+							<b>I+D+i: </b>Decisión pendiente.
+							<a href="<?php echo $this->baseUrl().'/decision/idi'?>">introducir decisión</a>
+						</li>
+					<?php } ?>	
+			<?php } ?>
+		<?php } ?>
+		<br />
+		<?php if($this->user['role']==0){?>
+			<?php if ($this->validate_aux!=1){ ?>
+				<div id="advertisingbudgetFieldDescription" class="fieldDescription" align="center" style="color:red">
+					Debe validar sus decisiones.
+				</div>
+			<?php } ?>
+				<br />
+				<table  border="3" <?php if ($this->validate_aux==1){ ?> bordercolor="green" <?php } else { ?> bordercolor="red"<?php }?> align="center">
+					<td>
+						<input <?php if ($this->validate_aux==1){ ?> style="color:green" <?php } else { ?> style="color:red"<?php }?> type="button" value="Validar Decisiones" onclick="window.location.href='<?php echo $this->baseUrl().'/decision/validate'?>'">
+					</td>
+				</table>
+				<?php } ?>
+<?php }
+else{?>
+		<h1> No hay ningún turno activo actualmente.</h1> 
+		<h2> Siguiente(s) turno(s): </h2>
+	<?php if (isset($this->next_rounds)){ ?>
+		<ul>
+		<?php foreach ($this->next_rounds as $round) {?>
+		  <li> 
+			<b>Turno <?php echo $round['round_number']?>:</b> del <?php echo date('d/m/Y', strtotime($round['opening_date']))?> al <?php echo date('d/m/Y', strtotime($round['closing_date']))?>
+		  </li>
+		<?php }?>
+		</ul>
+	<?php }?>
+<?php
+}
+?>
+</div>

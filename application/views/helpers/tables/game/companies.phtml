@@ -1,0 +1,20 @@
+<table>
+	<theader>
+		<th>Id</th>
+		<th>Nombre</th>
+		<th>Usuarios</th>
+		<th>Editar</th>
+		<th>Borrar</th>
+	</theader>
+<?php foreach ($this->companies as $company){?>
+	<?php $users=new Model_DbTable_Users();?>
+	<?php $usersInCompany=count($users->getUsersInCompany($company->id));?>
+	<tr>
+		<td><?php echo $view->escape($company->id);?></td>
+		<td><?php echo $view->escape($company->name)?></td>
+		<td><?php echo $view->escape($usersInCompany)?></td>
+		<td><a href='<?php echo $view->url(array('controller'=>'company', 'action'=>'edit')) . "?company_id=".$company->id?>'>editar</a></td>
+		<td><a href='<?php echo $view->url(array('controller'=>'company', 'action'=>'confirm_delete')) . "?company_id=".$company->id?>'>borrar</a></td>
+	</tr>
+<?php }//for?>
+</table>
