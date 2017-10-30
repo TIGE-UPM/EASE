@@ -173,7 +173,7 @@
 			$channels=$games->getChannels($_GET['game_id']);
 			$medias=$games->getMedia($_GET['game_id']);
 			$trademedias[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-			$trademedias[1]=array('trademedia_number'=>2, 'name'=>'PromociÛn');
+			$trademedias[1]=array('trademedia_number'=>2, 'name'=>'Promoci√≥n');
 			$costs=0;
 			$costs+=$outcomes_costs[$company_id]['pr_fixed_cost'];
 			$costs+=$outcomes_costs[$company_id]['pr_var_costs'];
@@ -192,10 +192,6 @@
 			$costs+=$outcomes_costs[$company_id]['hr_hiring_costs'];
 			$costs+=$outcomes_costs[$company_id]['hr_training_costs'];
 			$costs+=$outcomes_costs[$company_id]['hr_wages_costs'];
-			//echo ("<br> ************* COSTE DE SALARIOS EN OUTCOMES ".$outcomes_costs[$company_id]['hr_wages_costs']. "<br>");
-			$costs+=$outcomes_costs[$company_id]['hr_dismissals_costs'];
-			//echo ("<br> ************* COSTE DE DESPIDOS EN OUTCOMES ".$outcomes_costs[$company_id]['hr_dismissals_costs']. "<br>");
-			$costs+=$outcomes_costs[$company_id]['fi_debt_costs_st'];
 			$costs+=$outcomes_costs[$company_id]['fi_debt_costs_st'];
 			$costs+=$outcomes_costs[$company_id]['fi_debt_costs_lt'];
 			$costs+=$outcomes_costs[$company_id]['initiatives_pr_costs'];

@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 	class Model_DbTable_Games extends Zend_Db_Table{
 		protected $_name = 'games';
 		
@@ -48,38 +48,6 @@
 					$gameRounds->updateRounds($id, $data);
 					break;
 				case 2:	
-					//marketMediaWeights
-					$marketMediaProfile=new Model_DbTable_Games_Param_Markets_MediaProfile();
-					$marketMediaProfile->updateMediaProfile($id, $data);
-					//marketMediaWeightsEvolution
-					$marketMediaProfileEvolution=new Model_DbTable_Games_Evolution_Markets_MediaProfile();
-					$marketMediaProfileEvolution->updateMediaProfileEvolution($id, $data);
-					//marketTradeMediaWeights
-					//marketPrices
-					$marketPrices=new Model_DbTable_Games_Param_Markets_Prices();
-					$marketPrices->updateMarketPrices($id, $data);
-					//marketPricesEvolution
-					$marketPricesEvolution=new Model_DbTable_Games_Evolution_Markets_Prices();
-					$marketPricesEvolution->updateMarketPricesEvolution($id, $data);
-					//marketMediaWeights
-					$marketMediaProfile=new Model_DbTable_Games_Param_Markets_MediaProfile();
-					$marketMediaProfile->updateMediaProfile($id, $data);
-					//marketMediaWeightsEvolution
-					$marketMediaProfileEvolution=new Model_DbTable_Games_Evolution_Markets_MediaProfile();
-					$marketMediaProfileEvolution->updateMediaProfileEvolution($id, $data);
-					//marketTradeMediaWeights
-					$marketTradeMediaProfile=new Model_DbTable_Games_Param_Markets_TradeMediaProfile();
-					$marketTradeMediaProfile->updateTradeMediaProfile($id, $data);
-					//marketTradeMediaWeightsEvolution
-					$marketTradeMediaProfileEvolution=new Model_DbTable_Games_Evolution_Markets_TradeMediaProfile();
-					$marketTradeMediaProfileEvolution->updateTradeMediaProfileEvolution($id, $data);
-					//JESUS
-					//MarketTaxRate
-					$gameMarketTaxRate = new Model_DbTable_Games_Param_Markets_TaxRates();
-					$gameMarketTaxRate->updateMarketTaxRates($id, $data);
-					//MarketTaxRateEvolution
-					$gameMarketTaxRateEvolution = new Model_DbTable_Games_Evolution_Markets_TaxRates();
-					$gameMarketTaxRateEvolution->updateMarketTaxRateEvolution($id, $data);
 					//products
 					$gameProducts=new Model_DbTable_Games_Param_Markets_Products();
 					$gameProducts->updateProducts($id, $data);
@@ -89,9 +57,6 @@
 					//regions
 					$gameRegions=new Model_DbTable_Games_Param_Markets_Regions();
 					$gameRegions->updateRegions($id, $data);
-					//JESUS
-					$trademediaRegion = new Model_DbTable_Games_Param_Mk_TradeMediaRegion();
-					$trademediaRegion->updateRegionDistribution($id, $data);
 					//channels
 					$gameChannels=new Model_DbTable_Games_Param_Markets_Channels();
 					$gameChannels->updateChannels($id, $data);
@@ -99,7 +64,15 @@
 					$gameMedia=new Model_DbTable_Games_Param_Markets_Media();
 					$gameMedia->updateMedia($id, $data);
 					//quality_params
-					
+					$gameQualityParams=new Model_DbTable_Games_Param_Markets_QualityParams();
+					$gameQualityParams->updateQualityParams($id, $data);
+					//VERO
+					/**$gameThreshold=new Model_DbTable_Games_Param_Idi_Threshold();
+					$gameThreshold->updateThreshold($id, $data);**/
+
+					$gameFunctionalityParams=new Model_DbTable_Games_Param_Markets_FunctionalityParams();
+					$gameFunctionalityParams->updateFunctionalityParams($id, $data);
+					//VERO
 					//initiatives
 					$gameInitiatives=new Model_DbTable_Games_Param_Markets_Initiatives();
 					$gameInitiatives->updateInitiatives($id, $data);
@@ -108,7 +81,7 @@
 					$gameMarketSizes->updateMarketSizes($id, $data);
 					//marketSizesEvolution
 					$gameMarketSizesEvolution=new Model_DbTable_Games_Evolution_Markets_Sizes();
-					$gameMarketSizesEvolution->updateMarketSizesEvolution($id, $data);								
+					$gameMarketSizesEvolution->updateMarketSizesEvolution($id, $data);
 					//channelWeights
 					$channelWeights=new Model_DbTable_Games_Param_Markets_ChannelsWeights();
 					$channelWeights->updateChannelWeights($id, $data);
@@ -128,22 +101,14 @@
 					$marketMediaProfileEvolution=new Model_DbTable_Games_Evolution_Markets_MediaProfile();
 					$marketMediaProfileEvolution->updateMediaProfileEvolution($id, $data);
 					//marketTradeMediaWeights
-					//VERO
-					$gameFunctionalityParams=new Model_DbTable_Games_Param_Markets_FunctionalityParams();
-					$gameFunctionalityParams->updateFunctionalityParams($id, $data);
-
-					$gameQualityParams=new Model_DbTable_Games_Param_Markets_QualityParams();
-					$gameQualityParams->updateQualityParams($id, $data);
-					
-					$gameThreshold=new Model_DbTable_Games_Param_Idi_Threshold();
-					$gameThreshold->updateThreshold($id, $data);
-
-				
-					$gameInvestmentParams=new Model_DbTable_Games_Param_Markets_Investment();
-					$gameInvestmentParams->updateInvestment($id, $data);
-					//VERO
-							
-					
+					$marketTradeMediaProfile=new Model_DbTable_Games_Param_Markets_TradeMediaProfile();
+					$marketTradeMediaProfile->updateTradeMediaProfile($id, $data);
+					//marketTradeMediaWeightsEvolution
+					$marketTradeMediaProfileEvolution=new Model_DbTable_Games_Evolution_Markets_TradeMediaProfile();
+					$marketTradeMediaProfileEvolution->updateTradeMediaProfileEvolution($id, $data);
+					//fidelity
+					$marketFidelity=new Model_DbTable_Games_Param_Markets_Fidelity();
+					$marketFidelity->updateFidelity($id, $data);
 					break;
 
 					
@@ -178,7 +143,9 @@
 					//hrStaffCosts
 					$hrCosts=new Model_DbTable_Games_Param_Hr_Costs();
 					$hrCosts->updateHrCosts($id, $data);
-					
+					//hrStaffCostsEvolution
+					$hrCostsEvolution=new Model_DbTable_Games_Evolution_Hr_Costs();
+					$hrCostsEvolution->updateHrCostsEvolution($id, $data);
 					//hrRegionProfile
 					$hrRegionProfile=new Model_DbTable_Games_Param_Hr_RegionProfile();
 					$hrRegionProfile->updateHrProfile($id, $data);
@@ -203,15 +170,12 @@
 					//VERO
 					$investmentParam=new Model_DbTable_Games_Param_Markets_InvestmentsParams();
 					$investmentParam->updateinvestmentParams($id, $data);
+		
 					$gameInvestmentEvolution=new Model_DbTable_Games_Evolution_Fi_Investment();
 					$gameInvestmentEvolution->updateInvestmentEvolution($id, $data);
-					//hrStaffCostsEvolution
-					$hrCostsEvolution=new Model_DbTable_Games_Evolution_Hr_Costs();
-					$hrCostsEvolution->updateHrCostsEvolution($id, $data);
-					
 
 					//VERO
-					break;//fiCashFlow
+					//break;//fiCashFlow
 					$fiCashflowParams=new Model_DbTable_Games_Param_Fi_Cashflow();
 					$fiCashflowParams->updateCashflowParameters($id, $data);
 					//fiInterestRate
@@ -264,9 +228,7 @@
 							new Model_DbTable_Games_Param_Mk_MediaCosts(),
 							new Model_DbTable_Games_Param_Mk_TradeMediaCosts(),
 							new Model_DbTable_Games_Param_Fi_Cashflow(),
-							new Model_DbTable_Games_Param_Fi_InterestRate(),
-							new Model_DbTable_Games_Param_Markets_TaxRates(),
-							new Model_DbTable_Games_Evolution_Markets_TaxRates());	
+							new Model_DbTable_Games_Param_Fi_InterestRate());	
 			foreach ($parametersTables as $parameter){
 				$parameter->applyTemplate($id, $template_id);
 			}
@@ -468,34 +430,6 @@
 			return $result['evolution'];
 			//return $fl_result;
 		}
-		//JESUS
-
-			function getMarketTaxRate($game_id, $round_number, $region_number){
-			$marketTR=new Model_DbTable_Games_Param_Markets_TaxRates();
-			$result=$marketTR->fetchRow('game_id = '.$game_id.' AND round_number = '.$round_number. '  AND region_number = '.$region_number);
-			//var_dump($result);die();
-			return $result['tax_rate'];
-		}
-		function getMarketsTaxRates($game_id){
-			$marketTR=new Model_DbTable_Games_Param_Markets_TaxRates();
-			$results=$marketTR->fetchAll('game_id = '.$game_id, array('region_number ASC'));
-			foreach ($results as $result){
-				$sizes ['region_'.$result['region_number']]=$result['tax_rate'];
-				}
-			return $sizes;
-		}
-		function getMarketTaxRateEvolution($game_id, $round_number, $region_number){
-			$marketTREvolution=new Model_DbTable_Games_Evolution_Markets_TaxRates();
-			$result=$marketTREvolution->fetchRow('game_id = '.$game_id.' AND round_number = '.$round_number. ' AND region_number = '.$region_number);
-			//$fl_result=(float)$result['evolution'];
-			//var_dump($fl_result);
-			return $result['evolution'];
-			//return $fl_result;
-		}
-
-
-
-
 		function getChannelWeight($game_id, $round_number, $product_number, $channel_number, $region_number){
 			$marketSizes=new Model_DbTable_Games_Param_Markets_ChannelsWeights();
 			$result=$marketSizes->fetchRow('game_id = '.$game_id.' AND round_number = '.$round_number.' AND product_number = '.$product_number. ' AND channel_number = '.$channel_number.' AND region_number = '.$region_number);
@@ -526,7 +460,6 @@
 			$result=$marketMediaProfileEvolution->fetchRow('game_id = '.$game_id.' AND round_number = '.$round_number.' AND product_number = '.$product_number.' AND media_number = '.$media_number.' AND region_number = '.$region_number);
 			return $result['evolution'];
 		}
-		
 		function getTradeMediaWeight($game_id, $round_number, $product_number, $tradeMedia_number, $channel_number){
 			$marketTradeMediaProfile=new Model_DbTable_Games_Param_Markets_TradeMediaProfile();
 			$result=$marketTradeMediaProfile->fetchRow('game_id = '.$game_id.' AND round_number = '.$round_number.' AND product_number = '.$product_number. ' AND tradeMedia_number = '.$tradeMedia_number.' AND channel_number = '.$channel_number);
@@ -660,12 +593,8 @@
 			$nominal_time=array();
 			$prOrganization=new Model_DbTable_Games_Param_Pr_Organization();
 			$result=$prOrganization->fetchRow('game_id = '.$game_id);
-			//$work_shifts=$result['work_shifts'];
+			$work_shifts=$result['work_shifts'];
 			//$work_shifts_extension=ceil(($work_shifts/$machines)*$machines_extension);
-			//JESUS
-			$shifts=new Model_DbTable_Decisions_Hr_Shifts();
-			$work_shifts=$shifts->getDecision($game_id, $company_id, $round_number);
-			
 			$work_shifts_extension=0; //porque lo anterior no tiene sentido
 			$work_hours_per_week=$result['work_hours_per_week'];
 			$constructed=$this->getRoundFactoryCreated($game_id, $company_id);
@@ -676,19 +605,9 @@
 				if(($round_number>$constructed['factory_number_'.$factory['factory_number']])||($constructed['factory_number_'.$factory['factory_number']]==1)){
 					$machines=$result['machines'];
 					$machines_extension=$this->getExtensionFactory($game_id, $round_number, $company_id, $factory['factory_number']);
-					$machine_number=$machines+$machines_extension;
-					$factory_number=$factory['factory_number'];
-					//JESUS
-					$machines_final = $this->numberofMachinesEmployees($machine_number, $game_id, $round_number, $company_id, $factory_number);
-					echo("<br>******** Turnos: ".$work_shifts."<br>");
-					echo ("<br>Total máquinas: ".$machines_final."<br>");
 					echo("<br>Factory: ".$factory['factory_number']."<br>");
-					echo("<br>Machines extension :".$machines_extension."<br>");
-					
-					//JESUS
-					$nominal_time['factory_number_'.$factory['factory_number']]=$work_shifts*($machines_final)*$work_hours_per_week*52*60;
-					
-					
+					echo("<br>Machines extension".$machines_extension."<br>");
+					$nominal_time['factory_number_'.$factory['factory_number']]=$work_shifts*($machines+$machines_extension)*$work_hours_per_week*52*60;
 					echo("<br>Nominal time added: ".$nominal_time."<br>");
 				}
 			}
@@ -739,12 +658,6 @@
 			$costs=explode(";",$result['costs']);
 			return $costs[$intensity-1];
 		}
-		//JESUS
-		function getRegionDistribution($game_id){
-			$mktrademediaRegion = new Model_DbTable_Games_Param_Mk_TradeMediaRegion();
-			$results=$mktrademediaRegion->fetchRow('game_id = '.$game_id, 'region_number ASC');
-			return $results;
-		}
 		
 		function getMarketResearchesCosts($game_id){
 			$results=new Model_DbTable_Games_Param_Markets_MarketResearches();
@@ -788,7 +701,7 @@
 			$result=$budget->getProductBudget($game_id, $product_number);
 			return $result;
 		}
-		// Devuelve la disponivilidad de los productos de una compa–ia
+		// Devuelve la disponivilidad de los productos de una compaâ€“ia
 		function getProductsAvailibility($game_id, $round_number, $company_id){
 			$ProductsNumber=$this->getNumberOfProducts($game_id);
 			for ($product_number = 1; $product_number <= $ProductsNumber; $product_number++) {
@@ -814,7 +727,7 @@
 			//var_dump($availabilty);
 			return $availabilty;
 		}
-		// Devuelve la disponibilidad de un producto para una compa–ia
+		// Devuelve la disponibilidad de un producto para una compaâ€“ia
 		function getProductAvailibility($game_id, $round_number, $company_id, $product_number){
 			$new=new Model_DbTable_Games_Evolution_Np_NewProducts();
 			$game_availability=$this->getProductParamAvailability($game_id, $product_number);
@@ -936,9 +849,9 @@
 			$amount=($total_market_size/$ChannelsNumber)/$companies_counter;
 			
 			$option[0]=array('value'=>ceil(0.0*$amount), 'descriptor'=>'Ninguno');
-			$option[1]=array('value'=>ceil(0.6*$amount), 'descriptor'=>'OpciÃ³n 1: '.number_format(ceil(0.6*$amount), 2, '.', ',').' â‚¬');
-			$option[2]=array('value'=>ceil(0.9*$amount), 'descriptor'=>'OpciÃ³n 2: '.number_format(ceil(0.9*$amount), 2, '.', ',').' â‚¬');
-			$option[3]=array('value'=>ceil(1.2*$amount), 'descriptor'=>'OpciÃ³n 3: '.number_format(ceil(1.2*$amount), 2, '.', ',').' â‚¬');
+			$option[1]=array('value'=>ceil(0.6*$amount), 'descriptor'=>'OpciÃƒÂ³n 1: '.number_format(ceil(0.6*$amount), 2, '.', ',').' Ã¢â€šÂ¬');
+			$option[2]=array('value'=>ceil(0.9*$amount), 'descriptor'=>'OpciÃƒÂ³n 2: '.number_format(ceil(0.9*$amount), 2, '.', ',').' Ã¢â€šÂ¬');
+			$option[3]=array('value'=>ceil(1.2*$amount), 'descriptor'=>'OpciÃƒÂ³n 3: '.number_format(ceil(1.2*$amount), 2, '.', ',').' Ã¢â€šÂ¬');
 			
 			return $option;
 		}
@@ -1054,13 +967,7 @@
 				$taxes=0;
 			}
 			else {
-				//JESUS
-				//Primer se comprueba la regiçon en la que tiene la sede la compañia
-				$pr_decision = new Model_DbTable_Decisions_Production();
-				$headquarters = $pr_decision->getCompanyHQ($game_id, $company_id);
-											
-				$taxRate=$this->getMarketTaxRate($game_id, $round_number, $headquarters)/100;
-				$taxes=($ebt-$amortization)*$taxRate;
+				$taxes=($ebt-$amortization)*0.25;
 			}
 			$result=$ebt-$amortization-$taxes;
 			echo("<br/> EQUIPO ".$company_id."<br/> INGRESOS ANUALES: ".$incomes);
@@ -1296,7 +1203,7 @@
 				}
 				else{
 					if ($solicited==1) {
-						//Comentadas estas líneas porque si no, se entiende que siempre se lanza el producto.
+						//Comentadas estas lÃ­neas porque si no, se entiende que siempre se lanza el producto.
 						//if($round_number+1>$n_rounds){							
 							$result['product_'.$product_number]['Equipo_'.$company_id]=0;//"No ha conseguido lanzar el producto";
 						//}
@@ -1345,12 +1252,8 @@
 			$initiatives_mkt=$this->getInitiativesMarketingCost($game_id, $company_id, $round_number);
 			$initiatives_hr=$this->getInitiativesHumanResourcesCost($game_id, $company_id, $round_number);
 			$initiatives_det=$this->getInitiativesDeteriorationCost($game_id, $company_id, $round_number);
-			$market_researches=$this->getMarketResearchesDirectPayment($game_id,$round_number,$company_id);	
-			//VERO
-			$investments= $this->getInvestmentsCost($game_id,$round_number,$company_id);	
-			$money_needed+=$investments;
-			//VERO
-
+			$market_researches=$this->getMarketResearchesDirectPayment($game_id,$round_number,$company_id);		
+			
 			$money_needed+=$factory;
 			$money_needed+=$extension;
 			$money_needed+=$advertising->getDecision($game_id, $company_id, $round_number);
@@ -1473,16 +1376,7 @@
 			}
 			return $totalCost;
 		}
-		//VERO
-		function getInvestmentsCost($game_id, $company_id, $round_number){
-			$finance=new Model_DbTable_Decisions_Finance();
-			$investment_amount=$finance->getInvestmentsCost($game_id, $company_id, $round_number);
-
-			return $investment_amount;
-		}
-		//VERO
-
-		//Devuelve dinero necesario para realizar cada construcci—n
+		//Devuelve dinero necesario para realizar cada construcciâ€”n
 		function getConstructionCost($game_id, $company_id, $round_number){
 			$production=new Model_DbTable_Decisions_Production();
 			$factories=$production->getFactories($game_id, $company_id, $round_number);
@@ -1558,97 +1452,6 @@
 				$result=0;
 			}
 			return $result;			
-		}
-		//JESUS
-		function numberofMachinesEmployees($machine_number, $game_id, $round_number, $company_id, $factory_number){
-			$employees = new Model_DbTable_Decisions_Hr_Employees();
-			$shifts_dec = new Model_DbTable_Decisions_Hr_Shifts();
-			$shift_number = $shifts_dec->getDecision($game_id, $company_id, $round_number);
-
-			//echo ("<br> DENTRO DE MACHINESEMPLOYEES    ************    <br>");
-
-			//multiplico por el número de turnos para saber si hay empleados para todos los turnos
-			$machines=$machine_number*$shift_number;
-			$employees_c1=0;
-			$employees_c2=0;
-			$employees_c3=0;
-			$employees_c4=0;
-
-			//echo ("<br>************ numero turnos ".$shift_number."   <br>");
-			//echo ("<br>************ numero máquinas inicial ".$machine_number."   <br>");
-			//echo ("<br>************ MÁQUINAS * TURNOS ".$machines."   <br>");
-
-
-
-			//saco el número de empleados de cada categoría
-			for ($r = 1; $r <= $round_number; $r++){
-				$employees_dec= $employees->getDecision($game_id, $company_id, $r);
-				$employees_factory = $employees_dec['factory_number_'.$factory_number];
-				$employees_c1+=$employees_factory['category_1'];
-				$employees_c2+=$employees_factory['category_2'];
-				$employees_c3+=$employees_factory['category_3'];
-				$employees_c4+=$employees_factory['category_4'];
-			
-				
-			}
-				//echo ("<br>************ EMPLEADOS C1 ".$employees_factory['category_1']."   <br>");
-				//echo ("<br>************ EMPLEADOS C2 ".$employees_factory['category_2']."   <br>");
-				//echo ("<br>************ EMPLEADOS C3 ".$employees_factory['category_3']."   <br>");
-				//echo ("<br>************ EMPLEADOS C4 ".$employees_factory['category_4']."   <br>");
-	
-			//Si hay suficientes empleados para todos los turnos se pueden usar todas las maquinas
-			if ($employees_c1 >= $machines && $employees_c2 >= 2*$machines && $employees_c3 >= $machines/2 && $employees_c4 >= $machines/2){
-
-				//echo ("<br>************ haY SUFICIENTES EMPLEADOS, SE DEVUELVE  ".$machine_number."   <br>");
-				return $machine_number;
-			}
-			else {
-				//echo ("<br>************ NO HAY SUFICIENTES EMPLEADOS    <br>");
-				//Si no hay suficientes me creo 4 variables auxiliares
-				$machines_1=$machine_number;
-				$machines_2=$machine_number;
-				$machines_3=$machine_number;
-				$machines_4=$machine_number;
-
-				//Compruebo de qué categoría faltan empleados, de la que falten actualizo el número de máquinas utilizables
-				if($employees_c1 < $machines){
-					$machines_1 = $machine_number - round(($machines-$employees_c1)/$shift_number);
-					echo ("<br>NO HAY SUFICIENTES OPERARIOS DE FABRIACIÓN, SE USAN  ".$machines_1."  MÁQUINAS <br>");
-				}
-				if($employees_c2 < 2*$machines){
-					$machines_2 = $machine_number - round(($machines-$employees_c2/2)/$shift_number);
-					echo ("<br>NO HAY SUFICIENTES OPERARIOS DE ENSAMBLADO, SE USAN  ".$machines_2."  MÁQUINAS <br>");
-				}
-				
-				if($employees_c3 < $machines/2){
-					$machines_3 = $machine_number - round(($machines-2*$employees_c3)/$shift_number);
-					echo ("<br>NO HAY SUFICIENTES SUPERVISORES DE CALIDAD, SE USAN  ".$machines_3."  MÁQUINAS <br>");
-				}
-				if($employees_c4 < $machines/2){
-					$machines_4 = $machine_number - round(($machines-2*$employees_c4)/$shift_number);
-					echo ("<br>NO HAY SUFICIENTES TÉNICOS DE MANTENIMIENTO, SE USAN  ".$machines_4."  MÁQUINAS <br>");
-				}
-				
-
-				//devuelvo el mayor número de máquinas utilizables que coincide con el menor de los resultados
-				//echo ("<br>************ NO HAY SUFICIENTES EMPLEADOS, SE DEVUELVE  ".min ($machines_1, $machines_2, $machines_3, $machines_4)."   <br>");
-				return min ($machines_1, $machines_2, $machines_3, $machines_4);
-			}
-		}
-
-		function getCompanyMKTRegionDistribution($game_id, $company_id, $region_number, $round_number){
-			$decision = new Model_DbTable_Decisions_Mk_TradeMktBudgetRegion();
-			$regiondistribution = $decision->getDecision($game_id, $company_id, $round_number, $region_number);
-	
-
-			return $regiondistribution;
-
-		}
-		function getRegionIdealMKTDistribution($game_id, $region_number){
-			$decisions = new Model_DbTable_Games_Param_Mk_TradeMediaRegion();
-			$regionidealdistribution = $decisions->getRegionDistribution($game_id, $region_number);
-			//echo ("<br> **************** en GAMES, DISTRIBUCION IDEAL".$regionidealdistribution);
-			return $regionidealdistribution;
 		}
 		
 	}
