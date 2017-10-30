@@ -328,21 +328,81 @@
 		// OK
 		//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//
 		function production(){
-			foreach ($this->_companies as $company){				
-				$time_available=$company->getTimeAvailable();
-				$time_needed=$company->getTimeNeeded();
-				//var_dump($time_needed);
-				if ($time_needed>$time_available){
-					print_r('<br>'.$company->getId().' Capacidad Insuficiente:');
-					print_r('<br>   -  Tiempo Necesario: '.$time_needed);
-					print_r('<br>   -  Tiempo Disponible: '.$time_available);
-					$this->production_notEnoughTime($company, $time_needed);
-				}
-				else{
-					print_r('<br>'.$company->getId().' Capacidad Suficiente');
-					print_r('<br>   -  Tiempo Necesario: '.$time_needed);
-					print_r('<br>   -  Tiempo Disponible: '.$time_available);
-					$this->production_enoughTime($company);
+			//TO-DO AHG 20171029 Esto hay que corregirlo porque calcula tiempo global, no por fábrica (DONE!)
+			//AHG 20171029 Añadido por fábrica	
+			// Calculamos para cada empresa si alguna de las fábricas (pero no la suma de ellas) tiene exceso de producciób.
+			foreach ($this->_companies as $company){	
+				$numberOfFactories=$company->getNumberOfFactories();
+				$units = 0;
+				$factory_overload = array();
+				for ($factory_number=1; $factory_number<=$numberOfFactories; $factory_number++){
+					$time_available=$company->getTimeAvailable($factory_number);
+					$time_needed=$company->getTimeNeeded($factory_number);
+					//var_dump($time_needed);
+					if ($time_needed>$time_available){
+						// print_r('<br>'.$company->getId().' Fábrica ' . $factory_number . ' Capacidad Insuficiente:');
+						// print_r('<br>   -  Tiempo Necesario: '.$time_needed);
+						// print_r('<br>   -  Tiempo Disponible: '.$time_available);
+						$factory_overload['factory_'.$factory_number]=1;
+					}
+					else{
+						// print_r('<br>'.$company->getId().' Fábrica ' . $factory_number .' Capacidad Suficiente');
+						// print_r('<br>   -  Tiempo Necesario: '.$time_needed);
+						// print_r('<br>   -  Tiempo Disponible: '.$time_available);
+						$factory_overload['factory_'.$factory_number]=0;
+						// foreach ($this->_regions as $region){
+							// foreach ($this->_channels as $channel){
+								// $company->setUnitsAvailable($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $units);
+								// $this->production_save_units($company->getId(), $product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $units);
+							// }
+						// }						
+					}
+				}			
+
+				// Calculamos el total de unidades producidas por región y canal.
+				foreach ($this->_products as $product) {
+					foreach ($this->_regions as $region){
+						foreach ($this->_channels as $channel){
+							for ($factory_number=1; $factory_number<=$numberOfFactories; $factory_number++){
+								// Aquí empieza el lío. Si hay exceso de producción, hay que calcular la parte proporcional producida por producto, canal y región.
+								// El sumatorio de $units al final es porque la tabla de unidades producidas no va por fábrica (que es como debería ser para hacer estos cálculos, sino en total). La ventaja de tener los totales es que facilita el cálculo de la demanda y el reparto (si no, habría siempre que sumar la producción de cada fábrica para cada producto, región y canal).
+								if ($factory_overload['factory_'.$factory_number]==1){
+									//Cálculo region_percentage
+									echo("Factory overload: Producto " . $product->getProductNumber() . " y Fábrica " . $factory_number . "<br/>");
+									$units_produced=$company->getUnitsProduced($product->getProductNumber(), $factory_number);
+									echo("units_produced " . $units_produced . "<br/>");
+									$region_units_decided = $company->getUnitsDecided($product->getProductNumber(), null, $region->getRegionNumber(), $factory_number);
+									echo("region_units_decided " . $region_units_decided . "<br/>");
+									$total_region_units_decided = $company->getUnitsDecided($product->getProductNumber(), null, null, $factory_number);
+									echo("total_region_units_decided " . $total_region_units_decided . "<br/>");
+									if ($total_region_units_decided==0){
+										$region_percentage=0;
+									} else {
+										$region_percentage = ($region_units_decided/$total_region_units_decided);
+									}
+									echo("region_percentage " . $region_percentage . "<br/>");
+									// Cálculo channel percentage
+									$channel_units_decided = $company->getUnitsDecided($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $factory_number);
+									if ($region_units_decided==0 || $channel_units_decided==0){
+										$channel_percentage = 0;
+									} else {
+										$channel_percentage = ($channel_units_decided/$region_units_decided);
+									}
+									echo("channel_percentage " . $channel_percentage . "<br/>");									
+									// Lo producido por canal y región es la producción total del producto ponderada por contribución de región y canal.
+									$units += round ($units_produced * $region_percentage * $channel_percentage);
+									echo("units " . $units . "<br/>");
+								} else {
+									// Si no hay exceso, es lo decidido.
+									$units += $company->getUnitsDecided($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $factory_number);
+								}	
+							}	
+							$company->setUnitsAvailable($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $units);
+							$this->production_save_units($company->getId(), $product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $units);
+							// Reset de units, porque al salir del bucle pasa al siguiente canal, región, y producto. Si no, lo sumaría todo.
+							$units = 0;
+						}
+					}					
 				}
 				$this->production_save_messages($company);
 				$this->production_save_capacity_data($company);
@@ -434,8 +494,11 @@
 			}
 		}
 		function production_save_capacity_data($company){
-			$needed=$company->getTimeNeeded();
-			$capacity=$company->getTimeAvailable();
+			$numberOfFactories=$company->getNumberOfFactories();
+			for ($factory_number=1; $factory_number<=$numberOfFactories; $factory_number++){
+				$needed+=$company->getTimeNeeded($factory_number);
+				$capacity+=$company->getTimeAvailable($factory_number);
+			}
 			//var_dump($this->_outcomes_updating);die();
 			if ($this->_outcomes_updating){
 				$this->_outcomes_production_capacity_data->update(array('capacity'=>$capacity, 'capacity_needed'=>$needed), 
@@ -452,69 +515,71 @@
 			}
 		}
 
-		function production_enoughTime($company){
-			foreach ($this->_products as $product){
-				$availability=$this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
-				if($availability==1){
-					foreach ($this->_regions as $region){
-						foreach ($this->_channels as $channel){
-							$units=$company->getUnitsDecided($product->getProductNumber(), 
-																	$channel->getChannelNumber(),
-																	$region->getRegionNumber());
-							$company->setUnitsAvailable($product->getProductNumber(), 
-														 $channel->getChannelNumber(), 
-														 $region->getRegionNumber(), $units);
-							$this->production_save_units($company->getId(), 
-														 $product->getProductNumber(), 
-														 $channel->getChannelNumber(), 
-														 $region->getRegionNumber(), $units);
-						}
-					}
-				}
-			}
-		}
-		
-		function production_notEnoughTime($company, $total_time_needed){			
-			foreach ($this->_products as $product){
-				$availability=$this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
-				if($availability==1){
-				$units=$company->getUnitsProduced($product->getProductNumber());		
-					// por regiones:
-					foreach ($this->_regions as $region){
-						$region_units_decided = $company->getUnitsDecided($product->getProductNumber(), 
-																	   null, 
-																	   $region->getRegionNumber());					
-						$total_units_decided = $company->getUnitsDecided($product->getProductNumber());
-						if ($total_units_decided==0){
-							$region_percentage=0;
-						}
-						else{
-							$region_percentage=$region_units_decided/$total_units_decided;
-						}
-						$region_units = round ($units*$region_percentage);					
-						foreach ($this->_channels as $channel){
-							$channel_units_decided = $company->getUnitsDecided($product->getProductNumber(), 
-																	        $channel->getChannelNumber(), 
-																			$region->getRegionNumber());
-							if ($region_units_decided==0 || $channel_units_decided==0){
-								$channel_percentage = 0;
-							}
-							else{
-								$channel_percentage = $channel_units_decided/$region_units_decided;
-							}
-							$channel_units = round ($region_units * $channel_percentage);
-							$company->setUnitsAvailable($product->getProductNumber(), 
-														 $channel->getChannelNumber(), 
-														 $region->getRegionNumber(), $channel_units);
-							$this->production_save_units($company->getId(), 
-														 $product->getProductNumber(), 
-														 $channel->getChannelNumber(), 
-														 $region->getRegionNumber(), $channel_units);
-						}
-					}
-				}
-			}
-		}
+		//AHG 20171029 Añadido por fábrica, pero marcada como obsoleta
+		// function production_enoughTime($company, $factory_number){
+			// foreach ($this->_products as $product){
+				// $availability=$this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
+				// if($availability==1){
+					// foreach ($this->_regions as $region){
+						// foreach ($this->_channels as $channel){
+							// $units=$company->getUnitsDecided($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $factory_number);
+							// return $units;
+							// // AHG 20171027: Hubo que cambiar setUnitsAvailable para que metiera el stock. Si no, no hacía redistribución antes de calcular la demanda y cuotas
+							// // $company->setUnitsAvailable($product->getProductNumber(), 
+														 // // $channel->getChannelNumber(), 
+														 // // $region->getRegionNumber(), $units);
+							// // $this->production_save_units($company->getId(), 
+														 // // $product->getProductNumber(), 
+														 // // $channel->getChannelNumber(), 
+														 // // $region->getRegionNumber(), $units);
+						// }
+					// }
+				// }
+			// }
+		// }
+
+		// //AHG 20171029 Añadido por fábrica			
+		// function production_notEnoughTime($company, $product_number, $channel_number, $region_number, $factory_number){			
+			// // foreach ($this->_products as $product){
+				// // $availability=$this->_games->getProductAvailibility($this->_game['id'], $this->_round['round_number'],$company->getId(), $product->getProductNumber());
+				// // if($availability==1){
+				// // $units=$company->getUnitsProduced($product->getProductNumber(), $factory_number);		
+				// // echo("Unidades: " . $units . "<br/>");
+					// // // por regiones:
+					// // foreach ($this->_regions as $region){
+						// // $region_units_decided = $company->getUnitsDecided($product->getProductNumber(), null, $region->getRegionNumber(), $factory_number);					
+						// // $total_units_decided = $company->getUnitsDecided($product->getProductNumber(), null, null, $factory_number);
+						// // if ($total_units_decided==0){
+							// // $region_percentage=0;
+						// // }
+						// // else{
+							// // $region_percentage=$region_units_decided/$total_units_decided;
+						// // }
+						// // $region_units = round ($units*$region_percentage);	
+						// // echo("Unidades región: " . $region_units . "<br/>");						
+						// // foreach ($this->_channels as $channel){
+							// // $channel_units_decided = $company->getUnitsDecided($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $factory_number);
+							// // if ($region_units_decided==0 || $channel_units_decided==0){
+								// // $channel_percentage = 0;
+							// // }
+							// // else{
+								// // $channel_percentage = $channel_units_decided/$region_units_decided;
+							// // }
+							// // $channel_units = round ($region_units * $channel_percentage);
+							// // echo("Unidades: canal" . $channel_units . "<br/>");
+							// // return $channel_units;
+							// // // $company->setUnitsAvailable($product->getProductNumber(), 
+														 // // // $channel->getChannelNumber(), 
+														 // // // $region->getRegionNumber(), $channel_units);
+							// // // $this->production_save_units($company->getId(), 
+														 // // // $product->getProductNumber(), 
+														 // // // $channel->getChannelNumber(), 
+														 // // // $region->getRegionNumber(), $channel_units);
+						// // }
+					// // }
+				// // }
+			// // }
+		// }
 		
 		// Lanzamiento de nuevos productos
 		function production_new_Products(){
@@ -578,6 +643,7 @@
 								//var_dump("Ya Entro en availability==1");
 								//var_dump($company->getPrice($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber()));
 								//var_dump($company->getUnitsAvailable($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber()));
+								
 								if ($company->getPrice($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber())!=0 &&
 									$company->getUnitsAvailable($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber())!=0){
 										$prices[]=$company->getPrice($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber());
@@ -733,9 +799,7 @@
 				//$quality=$company->getProductQuality($product->getProductNumber());
 				$quality=$company->getProductQualityFunctionality($product->getProductNumber());
 				//VERO
-				var_dump("Maxima y media");
-				var_dump($this->_max_quality);
-				var_dump($this->_avg_quality);
+				echo("Maxima: " . $this->_max_quality . " y media " . $this->_avg_quality . "<br/>");
 				if ($quality == $this->_max_quality){
 					$n=1;
 					$qualityScore=$m*($quality+$functionalities)+$n;
@@ -799,6 +863,7 @@
 						$share_total[$company->getId()]=$share[$company->getId()];		
 					} else {
 						$ms=new Model_DbTable_Outcomes_Rd_MarketShares();
+						// INTERESANTE: past_share, usado para la fidelización, no va sobre cuota real, sino cuota ideal. Tiene sentido, dado que algunos usuarios compraron nuestro producto porque el que les gustaba no estaba disponible. Esos no son clientes fieles.
 						$past_share=$ms->getPastShare($this->_game['id'], $company->getId(), $this->_round['round_number'],
 									$product->getProductNumber(), $region->getRegionNumber(), $channel->getChannelNumber());
 						$share_total[$company->getId()]=((1-$coef_fidelity)*$share[$company->getId()])+($coef_fidelity*$past_share);
@@ -1204,34 +1269,44 @@
 								} else {																																			//Si rondas sucesivas
 									$stocks=new Model_DbTable_Games_Evolution_St_Stocks();
 									$stock_round = new Model_DbTable_Decisions_St_StockFinal();
-																																													//Número de ventas de producto (por canal por región, este turno)
+									//Número de ventas de producto (por canal por región, este turno)
 									$sales=$sold['company_'.$company->getId()]['product_'.$product->getProductNumber()]																
 												['region_'.$region->getRegionNumber()]['channel_'.$channel->getChannelNumber()];													
-																																													//Número de producidas este turno y coste de producción
+									//Número de producidas este turno
 									$new=$produced['company_'.$company->getId()]['product_'.$product->getProductNumber()]['region_'.$region->getRegionNumber()]['channel_'.$channel->getChannelNumber()];
 									//$new_pr_cost=($new*$company->getProductCostStock($round_number, $product->getProductNumber());
 									
-									//AHG
+									//AHG: Stock ronda anterior, tras redistribución
 									$old=$stock_round->getStockByMarket($this->_game['id'], $this->_round['round_number'], $company->getId(), $product->getProductNumber(), $region->getRegionNumber(), $channel->getChannelNumber());
+									//Total unidades disponible
 									$total_available=$old+$new;
 									
 									
 									//for($round_number=1; $round_number<$this->_round['round_number']; $round_number++){	
 									//Para cada ronda
-									// AHG
-									
+									// AHG : Utilizamos valoración ponderada para no tener que recorrer año a año. Interesa el stock de rondas anteriores (valoración ponderada) y el actual (valor actual). De ambos sacamos el nuevo valor ponderado.
+									//TO-DO OJO: En la valoración de stock no está incluido el valor de la materia prima!!! getPrRawMaterialsCost($channel_number, $region_number,$product_number)
+									// Precio valoración actual
 									$pr_cost=$company->getProductCostStock($this->_round['round_number'], $product->getProductNumber());
+									// Valoración unidades producidas
 									$new_pr_cost=$new*$pr_cost;
+									// Precio ponderado stock existente rondas anteriores
 									$pr_cost_prev=$company->getProductCostStock($this->_round['round_number']-1, $product->getProductNumber());
+									// Valoración stock rondas anteriores
 									$old_pr_cost=$pr_cost_prev*$old;
+									// Unidades de stock esta ronda (total disponibles - unidades vendidas)
 									$units_stocked = $total_available-$sales;
+									// Si todo lo anterior se ha vendido, sólo hay valoración a precio de nuevas unidades producidas
 									if ($sales >= $old ) {											
 										$pr_stock = $pr_cost;
 									} else {
+										// Si no, hay que ponderar el valor de lo anterior y lo nuevo para determinar el precio unitario ponderado del stock existente ahora
 										$pr_stock = (($pr_cost_prev*($old-$sales))+($new_pr_cost))/$units_stocked;
 									}
-									echo("<br/>Empresa: ". $company->getId() . ", Producto" . $product->getProductNumber() . ", Región ". $region->getRegionNumber() . ", Canal ". $channel->getChannelNumber() . ". Unidades vendidas = ".$sales.", Unidades en stock = " . $old . ", unidades producidas = " . $new . " y unidades finales en stock ronda ".$round_number." = ".$units_stocked. ". Precio Coste = ". $pr_cost . ", Precio Coste(t-1) = ". $pr_cost_prev. ", Precio ponderado = ". $pr_stock ."<br/>");
-									 $this->stock_save_units($company->getId(), 
+									// Check
+									// echo("<br/>Empresa: ". $company->getId() . ", Producto" . $product->getProductNumber() . ", Región ". $region->getRegionNumber() . ", Canal ". $channel->getChannelNumber() . ". Unidades vendidas = ".$sales.", Unidades en stock = " . $old . ", unidades producidas = " . $new . " y unidades finales en stock ronda ".$round_number." = ".$units_stocked. ". Precio Coste = ". $pr_cost . ", Precio Coste(t-1) = ". $pr_cost_prev. ", Precio ponderado = ". $pr_stock ."<br/>");
+									// Guardamos unidades
+									$this->stock_save_units($company->getId(), 
 														$this->_round['round_number'],
 														$product->getProductNumber(), 
 														$region->getRegionNumber(),
@@ -1244,8 +1319,10 @@
 														$units_stocked, $pr_stock);
 									// AHG 20171027
 									//$stock_value+=$company->getStockValue($product->getProductNumber(), $region->getRegionNumber(), $channel->getChannelNumber());
+									// Valor del stock esta ronda (producto, región, canal)
 									$stock_value+=$company->getStockValueRound($this->_round['round_number'], $product->getProductNumber(), $region->getRegionNumber(), $channel->getChannelNumber());
 										
+										//AHG 20171028: Esta parte de Vero era un lío por cómo recorría la "Evolution" de Stocks
 										//Saca coste de stock en ronda
 										//var_dump($pr_cost);
 										//echo("<br/> COUNTER: ".$round_number);																									//¿Cuánto se stockó esa ronda?
@@ -1305,6 +1382,7 @@
 						}
 					}
 				}
+			// Valor total del stock
 			$this->_balance[$company->getId()]['stock']=$stock_value;
 			$this->save_stock_total($company->getId(), $stock_value);
 			}
@@ -1395,6 +1473,11 @@
 				$this->_costs[$company->getId()]['hr_hiring_costs']=$company->getHrHiringCost();
 				$this->_costs[$company->getId()]['hr_training_costs']=$company->getHrTrainingCost();
 				$this->_costs[$company->getId()]['hr_wages_costs']=$company->getHrWagesCost();	
+				// Los de distribución sacados de abajo porque se calculan completos (excepto los de distribución de stock) en la rutina $company->getPrDistribCost()
+				if (! isset($this->_costs[$company->getId()]['pr_distrib_costs'])){
+					$this->_costs[$company->getId()]['pr_distrib_costs']=0;
+				}
+				$this->_costs[$company->getId()]['pr_distrib_costs']=$company->getPrDistribCost();
 				//todo lo incluido en este foreach funciona debidamente
 				foreach ($this->_channels as $channel){
 					foreach ($this->_regions as $region){
@@ -1418,10 +1501,14 @@
 									$this->_costs[$company->getId()]['pr_distrib_costs']=0;
 								}
 								
-								$this->_costs[$company->getId()]['pr_distrib_costs']+=(($company->getPrDistribCost($channel->getChannelNumber(),
-																												$region->getRegionNumber(),
-																												$product->getProductNumber())));
-								//VERO
+								// Sacado el cálculo fuera porque la rutina ya calcula el total.
+								// $this->_costs[$company->getId()]['pr_distrib_costs']+=(($company->getPrDistribCost($channel->getChannelNumber(), $region->getRegionNumber(), $product->getProductNumber())));
+																												
+								//test
+								// if ($company->getId()==168) {
+										// echo("Costes distribución Test. Empresa: " . $company->getId() . ", Canal: " . $channel->getChannelNumber() . ", Región : " . $region->getRegionNumber() . ", Producto: " . $product->getProductNumber() . ", COSTE = " . ($company->getPrDistribCost($channel->getChannelNumber(), $region->getRegionNumber(), $product->getProductNumber())) . "<br/>");
+								// }
+								//VERO: Costes de distribución de stocks
 								foreach($this->_channels as $channelD){
 									foreach ($this->_regions as $regionD){
 										$this->_costs[$company->getId()]['pr_distrib_costs']+=$company->getStDistribCost($channel->getChannelNumber(), $channelD->getChannelNumber(), $region->getRegionNumber(), $regionD->getRegionNumber(), $product->getProductNumber());
@@ -1594,11 +1681,10 @@
 			$investment= new Model_DbTable_Outcomes_In_Investment();
 			foreach ($this->_companies as $company){
 				$result=$company->getInvestmentInterest();
-				var_dump("Core - función investment");
-				var_dump($result);
+				echo("Core - función investment" . $result . "<br/>");
 				if($this->_round_number==1){
 					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_losses', 0);
-				$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_earnings', 0);
+					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_earnings', 0);
 				}else{
 					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_losses', $result['fi_investment_losses']);
 					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_earnings', $result['fi_investment_earnings']);
@@ -1617,7 +1703,7 @@
 				$investmentBalance=$company->getInvestmentBalanceSheet();
 				if($this->_round_number==1){
 					$this->_balance[$company->getId()]['investment_assets']=0;
-				}else{
+				} else {
 					$this->_balance[$company->getId()]['investment_assets']=$investmentBalance['investment_assets'];
 				}
 				

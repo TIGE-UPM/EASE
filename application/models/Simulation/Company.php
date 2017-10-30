@@ -240,7 +240,7 @@
 			//TO-DO: Cálculo costes
 		}
 		//OK
-		function getTimeAvailable(){
+		function getTimeAvailable($factory_number){
 			if (! isset ($this->_time_available)){
 				$this->_time_available=0;
 				$constructed=$this->_core->_games->getRoundFactoryCreated($this->_game_id, $this->_company_id);
@@ -250,18 +250,24 @@
 				//var_dump($newfactory);
 				echo("<br/>");
 				//foreach ($this->_factory as $factory){
-				foreach ($newfactory as $factory){
-					//var_dump($factory);
-					//echo("<br/>FACTORY NO.:".$factory['factory_number']."<br/>");
-					//echo("<br/>CONSTRUCTED FACTORY NO.".$constructed['factory_number_'.$factory['factory_number']]."<br/>");
-					//echo("<br/>ROUND NO.".$this->_round_number."<br/>");
-					if(($this->_round_number>$constructed['factory_number_'.$factory['factory_number']])||($constructed['factory_number_'.$factory['factory_number']]==1)){
-						echo("<br/> EQUIPO ".$this->_company_id);
-						echo("<br/> FABRICA ".$factory['factory_number']);
-						echo("<br/> CONSTRUCTED ".$constructed['factory_number_'.$factory['factory_number']]);
-						echo("<br/> TIME AVAILABLE BEFORE: ".$this->_time_available."<br/>");
-						$this->_time_available+=$this->getProductionCapacity($factory['factory_number']);
-						echo("<br/> TIME AVAILABLE AFTER: ".$this->_time_available."<br/>");
+				//AHG 20171029 Añadido por fábrica
+				if (!(is_null($factory_number))) {
+					//$this->_time_available=$this->getProductionCapacity($factory['factory_number']);
+					$this->_time_available=$this->getProductionCapacity($factory_number);
+				} else {
+					foreach ($newfactory as $factory){
+						//var_dump($factory);
+						//echo("<br/>FACTORY NO.:".$factory['factory_number']."<br/>");
+						//echo("<br/>CONSTRUCTED FACTORY NO.".$constructed['factory_number_'.$factory['factory_number']]."<br/>");
+						//echo("<br/>ROUND NO.".$this->_round_number."<br/>");
+						if(($this->_round_number>$constructed['factory_number_'.$factory['factory_number']])||($constructed['factory_number_'.$factory['factory_number']]==1)){
+							echo("<br/> EQUIPO ".$this->_company_id);
+							echo("<br/> FABRICA ".$factory['factory_number']);
+							echo("<br/> CONSTRUCTED ".$constructed['factory_number_'.$factory['factory_number']]);
+							echo("<br/> TIME AVAILABLE BEFORE: ".$this->_time_available."<br/>");
+							$this->_time_available+=$this->getProductionCapacity($factory['factory_number']);
+							echo("<br/> TIME AVAILABLE AFTER: ".$this->_time_available."<br/>");
+						}
 					}
 				}
 			}
@@ -429,8 +435,8 @@
 			
 		}
 		//VERO
-
-		function getTimeNeeded(){
+//AHG 20171029 Añadido por fábrica	
+		function getTimeNeeded($factory_number = null){
 			//$games=new Model_DbTable_Games();
 			if (! isset($this->_time_needed)){
 				$total=0;
@@ -438,7 +444,7 @@
 					$availability=$this->_core->_games->getProductAvailibility($this->_game_id, $this->_round_number, $this->_company_id, $product->getProductNumber());
 					//var_dump($availability);
 					if($availability==1){
-						$total+=$this->getProductionTime($product->getProductNumber());
+						$total+=$this->getProductionTime($product->getProductNumber(), null, null, $factory_number);
 						//var_dump($total);
 					}	
 				}
@@ -446,20 +452,22 @@
 			}
 			return $this->_time_needed;
 		}
-		function getProductionTime($product_number, $channel_number=null, $region_number=null){
-			$product_time=$this->_core->_games->getProductionTime($this->_game_id, 
-																  $product_number, 
-																  ($this->getProductQuality($product_number))-1);  /* ESTO ES CORRECTO */
+		
+//AHG 20171029 Añadido por fábrica		
+		function getProductionTime($product_number, $channel_number=null, $region_number=null, $factory_number = null){
+			$product_time=$this->_core->_games->getProductionTime($this->_game_id, $product_number, ($this->getProductQuality($product_number))-1);  /* ESTO ES CORRECTO */
 			/*$product_time=$this->_core->_games->getProductionTime($this->_game_id, 
 																  $product_number, 
 																  $this->getProductQuality($product_number)); */
-			$units=$this->getUnitsDecided($product_number, $channel_number, $region_number);
+			$units=$this->getUnitsDecided($product_number, $channel_number, $region_number, $factory_number);
 			//var_dump($product_time);
 			//var_dump($units);
 			return $product_time*$units;
 		}
-		function getUnitsProduced($product_number){			
-			$percentage=$this->getProductionTime($product_number)/$this->getTimeNeeded();										
+//AHG 20171029 Añadido por fábrica
+		function getUnitsProduced($product_number, $factory_number = null){			
+			$percentage=$this->getProductionTime($product_number, null, null, $factory_number)/$this->getTimeNeeded($factory_number);
+			//echo("<br/>Production time: " . $this->getProductionTime($product_number, null, null, $factory_number) . ", Time needed: " . $this->getTimeNeeded($factory_number) . "<br/>");
 			$time=$this->_time_available*$percentage;
 			$unit_time=$this->_core->_games->getProductionTime($this->_game_id, 
 																  $product_number, 
@@ -469,29 +477,45 @@
 																$this->getProductQuality($product_number));*/
 			//echo("Unit Time: ".$unit_time."<br>");
 			//if (($unit_time)>0) {											  
-			print_r('<br>  -  - Producto: '.$product_number.' ==> '.$percentage.' (%) =>'.$time.' (tiempo) '.($time/$unit_time).' (unidades)');													
+			print_r('<br>  -  Fábrica ' . $factory_number . '- Producto: '.$product_number.' ==> '.$percentage.' (%) =>'.$time.' (tiempo) '.($time/$unit_time).' (unidades)<br/>');													
 			return ($time/$unit_time);
 			//} else {
 			//	return 0;
 			//}
 		}
-		function getUnitsDecided($product_number, $channel_number=null, $region_number=null){
+
+//AHG 20171029 Añadido por fábrica		
+		function getPercentageUnitsProduced($product_number, $factory_number){			
+			$percentage=$this->getProductionTime($product_number, null, null, $factory_number)/$this->getTimeNeeded($factory_number);
+			if (is_null($percentage)) {
+				$percentage = 0;
+			}
+			return $percentage;
+		}		
+		
+//AHG 20171029 Añadido por fábrica	
+		function getUnitsDecided($product_number, $channel_number=null, $region_number=null, $factory_number=null){
+			//echo("<br/>CHECK GetUnitsDecided para " . $this->_company_id . " (Canal, Región, Fábrica),(" . $channel_number . "," . $region_number . ",". $factory_number . ")<br/>");
 			$created_aux=$this->_core->_games->getRoundFactoryCreated($this->_game_id, $this->_company_id);
-			if (isset($channel_number) && isset($region_number)){// si se especifica canal y region
+
+			if (isset($factory_number) && isset($region_number) && isset($channel_number)){	// Si se especifica todo
+				$created=$created_aux['factory_number_'.$factory['factory_number']];
+					if($this->_round_number>$created || $created==1){
+						$units=$this->_production_units_decided['factory_number_'.$factory_number]['product_'.$product_number]['region_'.$region_number]['channel_'.$channel_number];
+					}
+				return $units;
+			}
+
+			if (isset($channel_number) && isset($region_number) && is_null($factory_number)){ // Si se especifica canal y region
 				foreach ($this->_factory as $factory){
 					$created=$created_aux['factory_number_'.$factory['factory_number']];
 					if($this->_round_number>$created || $created==1){
-						$units['product_'.$product_number]['region_'.$region_number]['channel_'.$channel_number]+=$this->_production_units_decided['factory_number_'.$factory['factory_number']]
-															   																					 	   ['product_'.$product_number]													   
-															 																						   ['region_'.$region_number]
-																																					   ['channel_'.$channel_number];
+						$units['product_'.$product_number]['region_'.$region_number]['channel_'.$channel_number]+=$this->_production_units_decided['factory_number_'.$factory['factory_number']]['product_'.$product_number]['region_'.$region_number]['channel_'.$channel_number];
 					}
 				}	
-				return $units ['product_'.$product_number]													   
-							  ['region_'.$region_number]
-							  ['channel_'.$channel_number];
+				return $units ['product_'.$product_number]['region_'.$region_number]['channel_'.$channel_number];
 			}			
-			if (isset($region_number)){//sÃ³lo regiÃ³n
+			if (isset($region_number) && is_null($region_number) && is_null($factory_number)){	//Sólo región
 				foreach ($this->_factory as $factory){
 					$created=$created_aux['factory_number_'.$factory['factory_number']];
 					if($this->_round_number>$created || $created==1){
@@ -510,7 +534,8 @@
 				return $total;
 
 			}
-			if (isset($channel_number)){//sÃ³lo canal
+			
+			if (isset($channel_number) && is_null($region_number) && is_null($factory_number)){// Sólo canal
 				foreach ($this->_factory as $factory){
 					$created=$created_aux['factory_number_'.$factory['factory_number']];
 					if($this->_round_number>$created || $created==1){
@@ -528,6 +553,42 @@
 				}
 				return $total;
 			}
+
+	
+			if (isset($factory_number) && isset($region_number) && is_null($channel_number)){	// Se devuelven todas las del producto para esa fábrica y región
+				$created=$created_aux['factory_number_'.$factory_number];
+				if($this->_round_number>$created || $created==1){
+					$array['factory_number_'.$factory_number]=$this->_production_units_decided['factory_number_'.$factory_number]['product_'.$product_number]['region_'.$region_number];
+				}
+				
+				$total=0;
+				$created=$created_aux['factory_number_'.$factory_number];
+				if($this->_round_number>$created || $created==1){					
+					foreach ($array['factory_number_'.$factory_number] as $units){
+						$total+=$units;
+					}
+				}
+				return $total;
+			}
+				
+				
+			if (isset($factory_number) && is_null($region_number) && is_null($channel_number)){	// Se devuelven todas las del producto para esa fábrica
+				$array['factory_number_'.$factory_number]=$this->_production_units_decided['factory_number_'.$factory_number]['product_'.$product_number];
+				//echo("<br/>Entro en todas las del producto para esa fábrica<br/>");
+				//var_dump($array['factory_number_'.$factory_number]);
+				//echo("<br/>");
+				$total=0;
+				$created=$created_aux['factory_number_'.$factory_number];
+				if($this->_round_number>$created || $created==1){
+					foreach ($array['factory_number_'.$factory_number] as $channel_array){
+						foreach ($channel_array as $region_units){
+								$total+=$region_units;
+						}
+					}
+				}
+				return $total;
+			}		
+			
 			//si no se especifica nada, devuelve todas las del producto
 			foreach ($this->_factory as $factory){
 				$created=$created_aux['factory_number_'.$factory['factory_number']];
@@ -876,11 +937,11 @@
 			$nfuncionalities=$this->_core->_games->getNumberOfFunctionalities($this->_game_id);
 			$aditional_unit_cost=0;
 			for ($functionality_param_number=1; $functionality_param_number<=$nfuncionalities; $functionality_param_number++ ){
-				var_dump($this->_game_id);
-				var_dump($this->_company_id);
-				var_dump($product_number);
-				var_dump($functionality_param_number);
-				var_dump($functionality_decision->getFunctionalityByProductAndParamNumber($this->_game_id, $this->_company_id, $product_number, $functionality_param_number));
+				// var_dump($this->_game_id);
+				// var_dump($this->_company_id);
+				// var_dump($product_number);
+				// var_dump($functionality_param_number);
+				// var_dump($functionality_decision->getFunctionalityByProductAndParamNumber($this->_game_id, $this->_company_id, $product_number, $functionality_param_number));
 				if($functionality_decision->getFunctionalityByProductAndParamNumber($this->_game_id, $this->_company_id, $product_number, $functionality_param_number)==1){
 					$aditional_unit_cost+=$this->_functionality_parameters->getFunctionalityCost($this->_game_id, $functionality_param_number);
 				}
@@ -911,16 +972,106 @@
 			/* echo("Unidades : ".$units." | Coste unitario: ".$unit_cost." | Incremento por n proveedores : ".$unit_increment." | Incremento por plazo de pago: ".$suppliers_paytime_increment."<br/>"); */
 			return $unit_cost*$units;
 		}
-		function getPrDistribCost($channel_number, $region_number,$product_number){
+		function getPrDistribCost() {	//AHG 20171030 OLD->($channel_number, $region_number, $product_number){
+			//Éste bucle es incorrecto. Cuenta dos veces la producción total. AHG 20171030 (¡Arreglado!)
+			//Esta solución es similar a la de la función production() en Core.php
+			//Antes se devolvía por producto, región y canal porque el bucle de cálculo estaba en el core e iba sumando hasta tener el total.
+			//Ahora se hace el total aquí, y se devuelve a Core.php en la función costs()
+			$discount=$this->getInitiativesDistribution($round_number);			
+			$result = 0;
+			$units = 0;
 			foreach ($this->_factory as $factory) {
-				$unit_cost=$this->_core->_games->getDistributionCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], $region_number);
-				//$units=$this->getUnitsAvailable($product_number, $channel_number, $region_number);//deberia ser $this->getProductionUnits($product_number, $channel_number, $region_number);
-				$units=$this->getProductionUnits($product_number, $channel_number, $region_number);
-				$discount=$this->getInitiativesDistribution($round_number);
-				$result+=$unit_cost*$units*$discount;
+				//Éste bucle es incorrecto. Cuenta dos veces la producción total
+				//AHG 20171029
+				
+
+				$factory_overload = array();
+				$time_available=$this->getTimeAvailable($factory['factory_number']);
+				$time_needed=$this->getTimeNeeded($factory['factory_number']);
+				if ($time_needed>$time_available){
+					$factory_overload['factory_'.$factory['factory_number']]=1;
+				} else {
+					$factory_overload['factory_'.$factory['factory_number']]=0;
+				}
+
+				foreach ($this->_core->_products as $product) {
+					foreach ($this->_core->_regions as $region){
+						$unit_cost=$this->_core->_games->getDistributionCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], $region->getRegionNumber());
+						foreach ($this->_core->_channels as $channel){
+							if ($factory_overload['factory_'.$factory['factory_number']]==1){
+								//Cálculo region_percentage
+								// echo("Factory overload: Producto " . $product->getProductNumber() . " y Fábrica " . $factory['factory_number'] . "<br/>");
+								$units_produced=$this->getUnitsProduced($product->getProductNumber(), $factory['factory_number']);
+								// echo("units_produced " . $units_produced . "<br/>");
+								$region_units_decided = $this->getUnitsDecided($product->getProductNumber(), null, $region->getRegionNumber(), $factory['factory_number']);
+								// echo("region_units_decided " . $region_units_decided . "<br/>");
+								$total_region_units_decided = $this->getUnitsDecided($product->getProductNumber(), null, null, $factory['factory_number']);
+								// echo("total_region_units_decided " . $total_region_units_decided . "<br/>");
+								if ($total_region_units_decided==0){
+									$region_percentage=0;
+								} else {
+									$region_percentage = ($region_units_decided/$total_region_units_decided);
+								}
+								// echo("region_percentage " . $region_percentage . "<br/>");
+								$channel_units_decided = $this->getUnitsDecided($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $factory['factory_number']);
+								if ($region_units_decided==0 || $channel_units_decided==0){
+									$channel_percentage = 0;
+								} else {
+									$channel_percentage = ($channel_units_decided/$region_units_decided);
+								}
+								// echo("channel_percentage " . $channel_percentage . "<br/>");									
+								$units = round ($units_produced * $region_percentage * $channel_percentage);
+								$result += $unit_cost*$units*$discount;
+								// echo("units " . $units . "<br/>");
+							} else {
+								$units = $this->getUnitsDecided($product->getProductNumber(), $channel->getChannelNumber(), $region->getRegionNumber(), $factory['factory_number']);
+								$result += $unit_cost*$units*$discount;
+							}
+							
+						}	
+					}
+				}
+				
 			}
+
 			return $result;
-		}
+		}			
+
+				// if ($time_needed>$time_available) {
+					// $pct=$this->getPercentageUnitsProduced($product_number, $factory['factory_number']);
+					// $units=$pct*($this->_production_units_decided['factory_number_'.$factory['factory_number']]['product_'.$product_number]['region_'.$region_number]['channel_'.$channel_number]);
+					// //echo("<br/>Porcentaje unidades producto: " . $pct . ", Unidades producidas en fábrica " . $factory['factory_number'] . " = " . $units);
+
+					// // foreach ($this->_core->_regions as $region){
+						// // $region_units_decided = $this->getUnitsDecided($product_number, null, $region_number, $factory['factory_number']);					
+						// // $total_units_decided = $this->getUnitsDecided($product_number, null, null, $factory['factory_number']);
+						// // if ($total_units_decided==0){
+							// // $region_percentage=0;
+						// // } else {
+							// // $region_percentage=$region_units_decided/$total_units_decided;
+						// // }
+						// // $region_units = round ($units*$region_percentage);					
+						// // echo("<br/>Porcentaje región " . $region_number . " unidades producto: " . $region_percentage . ", Unidades producidas en fábrica " . $factory['factory_number'] . " = " . $region_units);
+						// // foreach ($this->_core->_channels as $channel){
+							// // $channel_units_decided = $this->getUnitsDecided($product_number, $channel_number, $region_number, $factory['factory_number']);
+							// // if ($region_units_decided==0 || $channel_units_decided==0){
+								// // $channel_percentage = 0;
+							// // }
+							// // else{
+								// // $channel_percentage = $channel_units_decided/$region_units_decided;
+							// // }
+							// // $factory_units += round ($region_units * $channel_percentage);
+							// // echo("<br/>Porcentaje región " . $region_number . " y canal " . $channel_number . " unidades producto " . $product_number . ": " . $channel_percentage . ". Suma unidades producidas en fábrica " . $factory['factory_number'] . " = " . $factory_units);
+							
+						// // }
+					// // }
+				// } else {
+						// $factory_units = $this->_production_units_decided['factory_number_'.$factory['factory_number']]['product_'.$product_number]['region_'.$region_number]['channel_'.$channel_number];
+				// }				
+			
+			// }
+			// return $result;
+
 
 		//VERO
 		function getStDistribCost($channelO, $channelD, $regionO, $regionD, $product){
@@ -1103,84 +1254,261 @@
 		
 			// recursos humanos
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				
-		function getHrHiringCost(){
+		// AHG 20171030 - NO USADA. PREPARANDO PARA MIGRACIÓN
+		function staff() {
 			$result=0;
+			$hr_staff=array();
 			foreach ($this->_factory as $factory){
-				$employee_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'hiring_cost');
-//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
-//				if (! isset ($staff)){
-
+				$employee_hiring_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'hiring_cost');
+				$employee_training_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'training_cost');
+				$employee_wages_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'wages_cost');		$created_aux=$this->_core->_games->getRoundFactoryCreated($this->_game_id, $this->_company_id);
+				$created=$created_aux['factory_number_'.$factory['factory_number']];
+				if (($this->_round_number==1)&&($created==1)) {
 					$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
 					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
-					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%
-					
-				if ($this->_round_number==1) {
-					$staff=round($staff*$hired_percentage);
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+					$hr_staff['staff']=round($staff*$hired_percentage);
+				} elseif ($this->_round_number==2) {
+					$hr_staff['staff']=0;
+					$hr_staff['staff_ext']=0;
+					// Rotación de personal. El personal contratado depende de la atmósfera de trabajo. Contratamos nuevos cada ronda para compensar los que se van.					
+					$old_staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+					$old_staff=round($old_staff*$hired_percentage);
+					$hr_staff['new_hired_staff'] = (ceil((1-$this->getWorkAtmosphere())/100)*$old_staff);
 				} else {
+					$hr_staff['staff']=0;
+					if($this->_round_number==($created-1)) {
+						$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+						$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					}
 					// Contratamos al personal para la extensión con los datos de la región.
-					$staff_ext=($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number']))*$hired_percentage;
+					$hr_staff['staff_ext']=($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number']))*$hired_percentage;
 					// Rotación de personal. El personal contratado depende de la atmósfera de trabajo. Contratamos nuevos cada ronda para compensar los que se van.
-					$new_hired_staff = (ceil((1-$this->getWorkAtmosphere())/100)*$staff);
-					$total_new_staff = $new_hired_staff+$staff_ext;
-//					echo("<br>Staff Hiring: ".$staff."<br/>");
-//				}
-				
-				// OLD $cost=$staff*$employee_cost;
-				// NEW
-				
-				$cost=$total_new_staff*$employee_cost;
-				$result+=$cost;
+					$old_staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+					$old_staff=round($old_staff*$hired_percentage);					
+					$hr_staff['new_hired_staff']  = (ceil((1-$this->getWorkAtmosphere())/100)*$old_staff);
+					
 				}
 			}
+			return $hr_staff;
+			
+		}
+
+				
+		function getHrHiringCost(){
+			$result=0;
+			
+			foreach ($this->_factory as $factory){
+				$employee_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'hiring_cost');			$old_staff = 0;
+				$staff = 0;
+				$new_hired_staff = 0;
+				$staff_ext = 0;				
+				$created_aux=$this->_core->_games->getRoundFactoryCreated($this->_game_id, $this->_company_id);
+				$created=$created_aux['factory_number_'.$factory['factory_number']];
+				echo("<br/>");
+				
+//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
+//				if (! isset ($staff)){
+				if (($this->_round_number==1)&&($created==1)) {
+					echo(1);
+					$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+					$staff=round($staff*$hired_percentage);
+				} elseif (($this->_round_number==2)&&($created==1)) {
+					echo(2);
+					// Rotación de personal. El personal contratado depende de la atmósfera de trabajo. Contratamos nuevos cada ronda para compensar los que se van.					
+					$old_staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+					$old_staff=round($old_staff*$hired_percentage);
+					$out=(1-$this->getWorkAtmosphere());
+					$new_hired_staff = ceil($out*$old_staff);
+					echo("<br/>Out: " . $out . "<br/>");
+					echo("<br/>Old staff: " . $old_staff . "<br/>");
+					echo("<br/>New hired staff: " . $new_hired_staff . "<br/>");
+				} elseif ($this->_round_number==$created){
+					// Contratamos al personal para la extensión con los datos de la región.
+					$staff_ext=($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number']))*$hired_percentage;					
+					echo(3);
+				} elseif($this->_round_number==($created-1)) {
+					echo(4);
+					$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+					$staff=round($staff*$hired_percentage);					
+				} else {
+					echo(5);
+					// Rotación de personal. El personal contratado depende de la atmósfera de trabajo. Contratamos nuevos cada ronda para compensar los que se van.
+					$old_staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');	
+					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+					$old_staff=round($old_staff*$hired_percentage);					
+					$out=(1-$this->getWorkAtmosphere());
+					$new_hired_staff = ceil($out*$old_staff);
+
+					// Contratamos al personal para la extensión con los datos de la región.
+					$staff_ext=($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number']))*$hired_percentage;
+					
+				}
+				echo("<br/>Staff: " . $staff . "<br/>");
+				echo("<br/>New hired staff: " . $new_hired_staff . "<br/>");
+				echo("<br/>Ext staff: " . $staff_ext . "<br/>");
+				$total_new_staff = $staff+$new_hired_staff+$staff_ext;
+				echo(" WA= ". $this->getWorkAtmosphere() . "Total personal nuevo: " . $total_new_staff . "<br/>");
+				$cost=$total_new_staff*$employee_cost;
+				$result+=$cost;
+				
+			}
+	
 			return $result;
 		}
 		function getHrTrainingCost(){
 			$result=0;
 			foreach ($this->_factory as $factory){
 				$employee_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'training_cost');
+				$old_staff = 0;
+				$staff=0;
+				$new_hired_staff=0;
+				$staff_ext = 0;				
+				$created_aux=$this->_core->_games->getRoundFactoryCreated($this->_game_id, $this->_company_id);
+				$created=$created_aux['factory_number_'.$factory['factory_number']];
+				
 //	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
 //				if (! isset ($staff)){
+				if (($this->_round_number==1)&&($created==1)) {
 					$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
-					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');
-					$staff+=$this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number']);
-					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];;
+					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
 					$staff=round($staff*$hired_percentage);
-//					echo("<br>Staff Hiring: ".$staff."<br/>");
-//				}
-				$cost=$staff*$employee_cost;
+				} elseif ($this->_round_number>$created) {
+						$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+						$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+						if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+						$staff=round($staff*$hired_percentage);
+				}
+				// Contratamos al personal para la extensión con los datos de la región.
+				for ($round==3;$round<=$this->_round_number;$round++) {
+					$staff_ext+=($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number']))*$hired_percentage;
+				}
+				$total_new_staff = $staff+$staff_ext;
+				$cost=$total_new_staff*$employee_cost;
 				$result+=$cost;
+				
 			}
+				
+							
+//	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
+//				if (! isset ($staff)){
+					// $staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+					// $staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+					// $staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+					// $staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');
+					// $staff+=$this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number']);
+					// $hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];;
+					// $staff=round($staff*$hired_percentage);
+// //					echo("<br>Staff Hiring: ".$staff."<br/>");
+//				}
+				// }
+				// $total_staff = ($staff + $new_hired_staff + $staff_ext);
+				// $cost=$staff*$employee_cost;
+				// $result+=$cost;
+			// }
 			return $result;
 		}
 		function getHrWagesCost(){
 			$result=0;
-			$i=1;
 			foreach ($this->_factory as $factory){
-				echo("<br>Pass ".$i."<br/>");
-				$i++;
+
 				$employee_cost=$this->_core->_games->getHrStaffCost($this->_game_id, $this->_round_number, $this->_region[$factory['factory_number']], 'wages_cost');
+				
+				$old_staff = 0;
+				$staff=0;
+				$new_hired_staff=0;
+				$staff_ext = 0;				
+				$created_aux=$this->_core->_games->getRoundFactoryCreated($this->_game_id, $this->_company_id);
+				$created=$created_aux['factory_number_'.$factory['factory_number']];
+				
 //	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
 //				if (! isset ($staff)){
+				if (($this->_round_number==1)&&($created==1)) {
 					$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
 					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
-					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');
-					$staff+=$this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number']);
-					//echo("<br/>  NUEVA PLANTILLA ".($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number'])));
+					$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
 					$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
-					$wages=$this->_sal;
-					$staff=round($staff*$hired_percentage*$wages);
-					echo("<br>Staff Hiring: ".$staff."<br/>");
-//				}
-				$cost=$staff*$employee_cost;
+					if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+					$staff=round($staff*$hired_percentage);
+				} elseif ($this->_round_number>$created) {
+						$staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+						$staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');				
+						$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+						if ($hired_percentage>100) {$hired_percentage=100;} // No contratamos más del 100%					
+						$staff=round($staff*$hired_percentage);
+				}
+				
+				// Contratamos al personal para la extensión con los datos de la región.
+				for ($round==3;$round<=$this->_round_number;$round++) {
+					$staff_ext+=($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number']))*$hired_percentage;
+				}
+				$total_new_staff = $staff+$staff_ext;
+				$wages = $this->_sal;
+				$cost=$total_new_staff*$employee_cost*$wages;
 				$result+=$cost;
-			}
+					
+			}						
+// //	QUITADOS LOS ISSET PORQUE CON UNA EXTENSIÓN EN LA PRIMERA FÁBRICA, PONÍA ESE NÚMERO DE EMPLEADOS EN TODAS (NO VOLVÍA A ENTRAR EN EL BUCLE): ¿POR QUÉ SE PUSO ESA CONDICIÓN? 
+// //				if (! isset ($staff)){
+					// $staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
+					// $staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
+					// $staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'quality_workers');
+					// $staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'maintenance_workers');
+					// $staff+=$this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number']);
+					// //echo("<br/>  NUEVA PLANTILLA ".($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number'])));
+					// $hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
+					// $wages=$this->_sal;
+					// $staff=round($staff*$hired_percentage*$wages);
+					// echo("<br>Staff Hiring: ".$staff."<br/>");
+// //				}
+				// $cost=$staff*$employee_cost;
+				// $result+=$cost;
+			// }
 			return $result;
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1331,13 +1659,13 @@
 						$result=$outcomes->getInvestment($this->_game_id, $this->_company_id, $round_number, $investment_number);
 						if($term == 1){
 							$liquid_assets +=$result;
-						}elseif($term_aux==0){
+						} elseif ($term_aux==0) {
 							$liquid_assets +=(-$amount);
 							$activeInvestment+=$result+$amount+$result_final;
-						}elseif($term_aux==$term-1){
+						} elseif ($term_aux==$term-1) {
 							$result_final=$this->getAllResultsByInvestment($this->_round_number, $round_number, $investment_number);
 							$liquid_assets +=($amount+$result_final);
-						}else{
+						} else {
 							$result_final=$this->getAllResultsByInvestment($this->_round_number, $round_number, $investment_number);
 							$activeInvestment+=($result_final+$amount);
 						}
@@ -1402,6 +1730,7 @@
 		
 		// AHG 20171027
 		function getStockValueRound($round_number, $product_number, $region_number, $channel_number){
+			//TO-DO OJO: En la valoración de stock no está incluido el valor de la materia prima!!! getPrRawMaterialsCost($channel_number, $region_number,$product_number)
 			$stocks=new Model_DbTable_Games_Evolution_St_Stocks();
 			$stock_value=0;
 			// // for($round_number=1; $round_number<=$this->_round_number; $round_number++){
@@ -1540,7 +1869,7 @@
 				$creditors+=$this->getComercialCreditors($channel->getChannelNumber());
 				$debtors+=$this->getTradeDebtors($channel->getChannelNumber());
 			}
-			$liquid_asset=$starting_cash-$credit_payment-$overdraft_payment+$year_result-$variation_stock_value+$year_amortization-$debtors+$creditors-$year_tiedup_investments+$year_investments['liquid_assets'];//-$stock;
+			$liquid_asset=$starting_cash-$credit_payment-$overdraft_payment+$year_result-$variation_stock_value+$year_amortization-$debtors+$creditors-$year_tiedup_investments-$year_investments['investment_assets'];//20171028 Quitamos esto porque ya está incluido en los resultados anuales, y añadimos los activos+$year_investments['liquid_assets'];//-$stock;
 			echo("<br/><br/> ");
 			echo("Liquid Asset: ".$liquid_asset);
 			echo("<br/><br/>");
