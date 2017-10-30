@@ -41,7 +41,6 @@
 				$this->view->outcomes_sales_incomes=$outcomes->getIncomes($this->game['id'], $round_number);
 				$this->view->outcomes_stocks_units=$outcomes->getStocksUnits($this->game['id'], $round_number);
 				$this->view->outcomes_costs=$outcomes->getCosts($this->game['id'], $round_number);
-				$this->view->outcomes_investments=$outcomes->getInterestInvestment($this->game['id'], $round_number);
 				$this->view->outcomes_balance_sheet=$outcomes->getBalanceSheet($this->game['id'], $round_number);
 				$this->view->prev_outcomes_balance_sheet=0;
 				if($round_number>1){
@@ -156,31 +155,7 @@
 
 				$this->view->lastFactory=$games->getLastFactory($this->game['id'], $this->company['id']);
 				$this->view->roundFactory=$games->getRoundFactoryCreated($this->game['id'], $this->company['id']);
-				
-				//generación del array de producción general
-				$this->view->array_production_general = prepare_array_production_general($this->view, $this->company['id']);
-				
-				
-				//generación del array de producción por producto y canal
-				$this->view->array_production_productoYcanal = prepare_array_production_productoYcanal($this->view, $this->company['id']);
-				
-				//generación array general de stocks
-				$this->view->array_stocks_general = prepare_array_stocks_general($this->view, $this->company['id']);
-				
-				//generación del array de stocks por producto y canal
-				$this->view->array_stocks_productoYcanal = prepare_array_stocks_productoYcanal($this->view, $this->company['id']);
-				
-				//generación del array de ventas general
-				$this->view->array_ventas_general = prepare_array_ventas_general($this->view, $this->company['id']);
-				
-				//generación del array de ventas general
-				$this->view->array_ventas_productoYcanal = prepare_array_ventas_productoYcanal($this->view, $this->company['id']);
-				
-				//generacioón del array de cuotas de mercado
-				$this->view->array_cuotas_mercado = prepare_array_cuotas_mercado($this->view);
-
-			}
-			
+			}	
 		}
 		function historyAction(){
 			$this->view->title .= " / HistÃ³rico.";			
@@ -214,7 +189,6 @@
 				$this->view->products=$products;
 				//regiones
 				$regions=$games->getRegions($this->game['id']);
-				var_dump("1");
 				$this->view->regions=$regions;
 
 				$this->view->outcomes=$outcomes;
@@ -224,7 +198,6 @@
 				$this->view->outcomes_sales_incomes=$outcomes->getIncomes($this->game['id'], $round_number);
 				$this->view->outcomes_stocks_units=$outcomes->getStocksUnits($this->game['id'], $round_number);
 				$this->view->outcomes_costs=$outcomes->getCosts($this->game['id'], $round_number);
-				$this->view->outcomes_investments=$outcomes->getInterestInvestment($this->game['id'], $round_number);
 				$this->view->outcomes_balance_sheet=$outcomes->getBalanceSheet($this->game['id'], $round_number);
 				$this->view->prev_outcomes_balance_sheet=0;
 				if($round_number>1){
@@ -336,31 +309,8 @@
 				
 				$this->view->lastFactory=$games->getLastFactory($this->game['id'], $this->company['id']);
 				$this->view->roundFactory=$games->getRoundFactoryCreated($this->game['id'], $this->company['id']);
-				
-				//generación del array general de producción
-				$this->view->array_production_general = prepare_array_production_general($this->view, $this->company['id']);			
-				
-				//generación del array de producción por producto y canal
-				$this->view->array_production_productoYcanal = prepare_array_production_productoYcanal($this->view, $this->company['id']);
-				
-				//generación array general de stocks
-				$this->view->array_stocks_general = prepare_array_stocks_general($this->view, $this->company['id']);
-				
-				//generación del array de stocks por producto y canal
-				$this->view->array_stocks_productoYcanal = prepare_array_stocks_productoYcanal($this->view, $this->company['id']);
-				
-				//generación del array de ventas general
-				$this->view->array_ventas_general = prepare_array_ventas_general($this->view, $this->company['id']);
-				
-				//generación del array de ventas general
-				$this->view->array_ventas_productoYcanal = prepare_array_ventas_productoYcanal($this->view, $this->company['id']);
-				
-				//generacioón del array de cuotas de mercado
-				$this->view->array_cuotas_mercado = prepare_array_cuotas_mercado($this->view);
-	
 			}
 		}
-		
 		/*Funcion para la descarga de los resultados en modo usuario: Resultados del equipo al que se pertenece*/
 		function downloadAction() {
 			require_once 'PHPExcel.php';
@@ -373,10 +323,7 @@
 			$games = new Model_DbTable_Games();
 			$outcomes= new Model_DbTable_Outcomes();
 			$company= $this->company;			
-			$getData=$this->getRequest()->getParams();			
-			//$round_number=$outcomes->getLatestRoundNumber($this->game['id']); //MODIFICAR PARA EL CASO DE RONDAS ANTERIORES!!
-			$round_number = $getData['round_number'];
-			//print_r($round_number);die();
+			$round_number=$outcomes->getLatestRoundNumber($this->game['id']); //MODIFICAR PARA EL CASO DE RONDAS ANTERIORES!!
 			
 			/*Se crea el objeto de tipo PHPExcel para componer la hoja excel a través de las consultas a MySQL*/
 			$objPHPExcel = new PHPExcel();
@@ -515,7 +462,7 @@
 			$objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
 			
 			//Obtenemos las unidades vendidas y su precio
-			//$round_number=$outcomes->getLatestRoundNumber($this->game['id']); //A MODIFICAR PARA EL CASO DE RONDAS ANTERIORES!!
+			$round_number=$outcomes->getLatestRoundNumber($this->game['id']); //A MODIFICAR PARA EL CASO DE RONDAS ANTERIORES!!
 			$outcomes_sales=$outcomes->getSalesUnits($this->game['id'], $round_number);						
 			$outcomes_prizes=$outcomes->getExportPrices($this->game['id'], $round_number);
 			$company_sales=$outcomes_sales['company_'.$company['id']];
@@ -849,21 +796,13 @@
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses Financiación a L.P.'));
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_costs[$company['id']]['fi_debt_costs_lt']);
 			$offset++;
-			$outcomes_investments=$outcomes->getInterestInvestment($this->game['id'], $round_number);
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses ganados por inversiones financieras'));
-			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_investments[$company['id']]['fi_investment_earnings']);
-			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses perdidos por inversiones financieras'));
-			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_investments[$company['id']]['fi_investment_losses']);
-			$offset++;
-
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Total Financieros'));
-			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_costs[$company['id']]['fi_debt_costs_lt']+$outcomes_costs[$company['id']]['fi_debt_costs_st']+$outcomes_investments[$company['id']]['fi_investment_losses']-$outcomes_investments[$company['id']]['fi_investment_earnings']);
+			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_costs[$company['id']]['fi_debt_costs_lt']+$outcomes_costs[$company['id']]['fi_debt_costs_st']);
 			$offset++;
 			
 			//CTAS.RESULTADOS --> EBT
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('EBT'));
-			$ebt=$ebitda-$outcomes_costs[$company['id']]['fi_debt_costs_st']-$outcomes_costs[$company['id']]['fi_debt_costs_lt']+$outcomes_investments[$company['id']]['fi_investment_losses']-$outcomes_investments[$company['id']]['fi_investment_earnings']-$amortization;
+			$ebt=$ebitda-$outcomes_costs[$company['id']]['fi_debt_costs_st']-$outcomes_costs[$company['id']]['fi_debt_costs_lt']-$amortization;
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $ebt); //EBT
 			$offset++;
 			
@@ -894,9 +833,9 @@
 			$worksheet->getStyle('B1')->applyFromArray($bold);
 			
 			$offset=3;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('A) Activo no corriente (I+II+III)'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('A) Activo no corriente (I+II)'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
-			$asset_no_current_sum=$outcomes_balance_sheet[$company['id']]['tied_up']-$outcomes_balance_sheet[$company['id']]['amortization']+$outcomes_balance_sheet[$company['id']]['investment_assets'];
+			$asset_no_current_sum=$outcomes_balance_sheet[$company['id']]['tied_up']-$outcomes_balance_sheet[$company['id']]['amortization'];
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $asset_no_current_sum); 
 			$worksheet->getStyleByColumnAndRow(1, $offset)->applyFromArray($bold);
 			$offset++;
@@ -905,9 +844,6 @@
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('II. Amortización de inmovilizado'));
 			$worksheet->setCellValueByColumnAndRow(1, $offset, -$outcomes_balance_sheet[$company['id']]['amortization']);
-			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('III. Instrumentos de inversión'));
-			$worksheet->setCellValueByColumnAndRow(1, $offset, -$outcomes_balance_sheet[$company['id']]['investment_assets']);
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('B) Activo corriente (I+II+III)'));
 			$worksheet->getStyleByColumnAndRow(0, $offset)->applyFromArray($bold);
@@ -944,7 +880,7 @@
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('I. Capital'));
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_balance_sheet[$company['id']]['capital']);
 			$offset++;
-			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('II. Resultados de ejercicios anteriores'));
+			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('II. Reservas'));
 			$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_balance_sheet[$company['id']]['reserves']);
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('III. Resultado del ejercicio'));
@@ -1003,242 +939,10 @@
 		}
 	}
 	
-	//generación del array general de producción
-	function prepare_array_production_general($thisview, $mycompanyid) {				
-		$array_production_general = null;
-		$array_production_general = "[['Producto', 'Canal'";
-		foreach ($thisview->regions as $region){ 
-			$array_production_general =  $array_production_general.','."'".$region['name']."'";
-		}
-		$array_production_general =  $array_production_general.", 'TOTAL']";
-		foreach ($thisview->products as $product){
-			if($thisview->game_product_availability['product_number_'.$product['product_number']]==1){
-				foreach ($thisview->channels as $channel){
-					$array_production_general = $array_production_general.","."["."'".$product['name']."'".","."'".$channel['name']."'";
-					$suma_production_regiones = 0;
-					foreach ($thisview->regions as $region){
-						$suma_production_regiones = $suma_production_regiones + $thisview->outcomes_production_units['company_'.$mycompanyid]
-							['product_'.$product['product_number']]
-							['region_'.$region['region_number']]
-							['channel_'.$channel['channel_number']];
-						
-						$array_production_general = $array_production_general.",".number_format($thisview->outcomes_production_units['company_'.$mycompanyid]
-							['product_'.$product['product_number']]
-							['region_'.$region['region_number']]
-							['channel_'.$channel['channel_number']], 0, '', '');
-					}
-					$array_production_general = $array_production_general.",".number_format($suma_production_regiones, 0, '', '')."]";
-				}
-			}
-		}
-		$array_production_general = $array_production_general."]";
-		return $array_production_general;
-	}
-	
-	
-	function prepare_array_production_productoYcanal($thisview, $mycompanyid) {
-		$array_production_productoYcanal = null;
-		$array_production_productoYcanal = "[['Producto'";
-		foreach ($thisview->channels as $channel){
-			$array_production_productoYcanal = $array_production_productoYcanal.','."'".$channel['name']."'";
-		}
-		$array_production_productoYcanal = $array_production_productoYcanal."]";
-		foreach ($thisview->products as $product){
-			if($thisview->game_product_availability['product_number_'.$product['product_number']]==1){
-				$array_production_productoYcanal = $array_production_productoYcanal.","."["."'".$product['name']."'";
-				foreach ($thisview->channels as $channel){
-					$suma_produccion_regiones_en_canal = 0;
-					foreach ($thisview->regions as $region){
-						$suma_produccion_regiones_en_canal = $suma_produccion_regiones_en_canal + $thisview->outcomes_production_units['company_'.$mycompanyid]
-									['product_'.$product['product_number']]
-									['region_'.$region['region_number']]
-									['channel_'.$channel['channel_number']];
-					}
-					$array_production_productoYcanal = $array_production_productoYcanal.",".number_format($suma_produccion_regiones_en_canal,0, '', '');
-				}
-				$array_production_productoYcanal = $array_production_productoYcanal."]";
-			}
-		}
-		$array_production_productoYcanal = $array_production_productoYcanal."]";
-		return $array_production_productoYcanal;
-	}
-	
-	function prepare_array_stocks_general($thisview, $mycompanyid){
-		$array_stocks_general = null;
-		$array_stocks_general = "[['Producto', 'Canal'";
-		foreach ($thisview->regions as $region){ 
-			$array_stocks_general =  $array_stocks_general.','."'".$region['name']."'";
-		}
-		$array_stocks_general =  $array_stocks_general.", 'TOTAL']";
-		foreach ($thisview->products as $product){
-			if($thisview->game_product_availability['product_number_'.$product['product_number']]==1){
-				foreach ($thisview->channels as $channel){
-					$array_stocks_general = $array_stocks_general.","."["."'".$product['name']."'".","."'".$channel['name']."'";
-					$suma_stocks_regiones = 0;
-					foreach ($thisview->regions as $region){
-						$suma_stocks_regiones = $suma_stocks_regiones + $thisview->outcomes_stocks_units['company_'.$mycompanyid]
-							['product_'.$product['product_number']]
-							['region_'.$region['region_number']]
-							['channel_'.$channel['channel_number']];
-						
-						$array_stocks_general = $array_stocks_general.",".number_format($thisview->outcomes_stocks_units['company_'.$mycompanyid]
-							['product_'.$product['product_number']]
-							['region_'.$region['region_number']]
-							['channel_'.$channel['channel_number']], 0, '', '');
-					}
-					$array_stocks_general = $array_stocks_general.",".number_format($suma_stocks_regiones, 0, '', '')."]";
-				}
-			}
-		}
-		$array_stocks_general = $array_stocks_general."]";
-		return $array_stocks_general;
-	}
-	
-	function prepare_array_stocks_productoYcanal($thisview, $mycompanyid) {
-		//generación del array de stocks por producto y canal
-		$array_stocks_productoYcanal = null;
-		$array_stocks_productoYcanal = "[['Producto'";
-		foreach ($thisview->channels as $channel){
-			$array_stocks_productoYcanal = $array_stocks_productoYcanal.','."'".$channel['name']."'";
-		}
-		$array_stocks_productoYcanal = $array_stocks_productoYcanal."]";
-		foreach ($thisview->products as $product){
-			if($thisview->game_product_availability['product_number_'.$product['product_number']]==1){
-				$array_stocks_productoYcanal = $array_stocks_productoYcanal.","."["."'".$product['name']."'";
-				foreach ($thisview->channels as $channel){
-					$suma_stocks_regiones_en_canal = 0;
-					foreach ($thisview->regions as $region){
-						$suma_stocks_regiones_en_canal = $suma_stocks_regiones_en_canal + $thisview->outcomes_stocks_units['company_'.$mycompanyid]
-									['product_'.$product['product_number']]
-									['region_'.$region['region_number']]
-									['channel_'.$channel['channel_number']];
-					}
-					$array_stocks_productoYcanal = $array_stocks_productoYcanal.",".number_format($suma_stocks_regiones_en_canal,0, '', '');
-				}
-				$array_stocks_productoYcanal = $array_stocks_productoYcanal."]";
-			}
-		}
-		$array_stocks_productoYcanal = $array_stocks_productoYcanal."]";
-		return $array_stocks_productoYcanal;
-	}
-	
-	
-	function prepare_array_ventas_general($thisview, $mycompanyid) {
-		$array_ventas_general = null;
-		$array_ventas_general = "[['Producto', 'Canal'";
-		foreach ($thisview->regions as $region){ 
-			$array_ventas_general =  $array_ventas_general.','."'".$region['name']."'";
-			$array_ventas_general =  $array_ventas_general.','."'".$region['name']."'";
-			$array_ventas_general =  $array_ventas_general.','."'".$region['name']."'";
-			
-		}
-		$array_ventas_general =  $array_ventas_general."]";
-		foreach ($thisview->products as $product){
-			if($thisview->game_product_availability['product_number_'.$product['product_number']]==1){
-				foreach ($thisview->channels as $channel){
-					$array_ventas_general = $array_ventas_general.","."["."'".$product['name']."'".","."'".$channel['name']."'";
-					foreach ($thisview->regions as $region){
-						$outcomes_sales_units_regionYcanal = null;
-						$outcomes_prices_regionYcanal = null;
-						$outcomes_sales_units_regionYcanal  = $thisview->outcomes_sales_units['company_'.$mycompanyid]
-																	['product_'.$product['product_number']]
-																	['region_'.$region['region_number']]
-																	['channel_'.$channel['channel_number']];
-						$outcomes_prices_regionYcanal = $thisview->outcomes_prices['company_'.$mycompanyid]
-																	['product_'.$product['product_number']]
-																	['channel_'.$channel['channel_number']]
-																	['region_'.$region['region_number']];
-						$outcomes_total_sales_regionYcanal = $outcomes_sales_units_regionYcanal*$outcomes_prices_regionYcanal;
-						
-						
-						$array_ventas_general = $array_ventas_general.",".number_format($outcomes_sales_units_regionYcanal,0, '.', '');
-						$array_ventas_general = $array_ventas_general.",".number_format($outcomes_prices_regionYcanal,2, '.', '');
-						$array_ventas_general = $array_ventas_general.",".number_format($outcomes_total_sales_regionYcanal,2, '.', '');
-					}
-					$array_ventas_general = $array_ventas_general."]";
-				}
-			}
-		}
-		$array_ventas_general = $array_ventas_general."]";
-		return $array_ventas_general;
-	}
-	
-	
-	function prepare_array_ventas_productoYcanal($thisview, $mycompanyid) {
-				//generación del array de stocks por producto y canal
-		$array_ventas_productoYcanal = null;
-		$array_ventas_productoYcanal = "[['Producto'";
-		foreach ($thisview->channels as $channel){
-			$array_ventas_productoYcanal = $array_ventas_productoYcanal.','."'".$channel['name']."'";
-			$array_ventas_productoYcanal = $array_ventas_productoYcanal.','."'".$channel['name']."'";
-		}
-		$array_ventas_productoYcanal = $array_ventas_productoYcanal."]";
-		foreach ($thisview->products as $product){
-			if($thisview->game_product_availability['product_number_'.$product['product_number']]==1){
-				$array_ventas_productoYcanal = $array_ventas_productoYcanal.","."["."'".$product['name']."'";
-				foreach ($thisview->channels as $channel){
-					$unidades_ventas_regiones_en_canal = 0;
-					$importe_ventas_regiones_en_canal = 0;
-					$suma_unidades_ventas_regiones_en_canal = 0;
-					$suma_importe_ventas_regiones_en_canal = 0;
-					foreach ($thisview->regions as $region){
-						$unidades_ventas_regiones_en_canal = $thisview->outcomes_sales_units['company_'.$mycompanyid]
-									['product_'.$product['product_number']]
-									['region_'.$region['region_number']]
-									['channel_'.$channel['channel_number']];
-						$importe_ventas_regiones_en_canal = $thisview->outcomes_prices['company_'.$mycompanyid]
-																	['product_'.$product['product_number']]
-																	['channel_'.$channel['channel_number']]
-																	['region_'.$region['region_number']];
-						$suma_unidades_ventas_regiones_en_canal = $suma_unidades_ventas_regiones_en_canal + $unidades_ventas_regiones_en_canal;
-						$suma_importe_ventas_regiones_en_canal = $suma_importe_ventas_regiones_en_canal + $unidades_ventas_regiones_en_canal*$importe_ventas_regiones_en_canal;
-					}
-					$array_ventas_productoYcanal = $array_ventas_productoYcanal.",".number_format($suma_unidades_ventas_regiones_en_canal,0, '', '');
-					$array_ventas_productoYcanal = $array_ventas_productoYcanal.",".number_format($suma_importe_ventas_regiones_en_canal,0, '', '');
-				}
-				$array_ventas_productoYcanal = $array_ventas_productoYcanal."]";
-			}
-		}
-		$array_ventas_productoYcanal = $array_ventas_productoYcanal."]";
-		return $array_ventas_productoYcanal;
-		
-	}
-	
-	
-	function prepare_array_cuotas_mercado ($thisview) {
-	
-		//generación del array de cuotas de mercado
-		$array_cuotas_mercado = null;
-		$array_cuotas_mercado = "[['Producto', 'Pais', 'Canal', 'Equipo', 'Unidades vendidas']";
-		foreach ($thisview->products as $product){
-			if($thisview->game_product_availability['product_number_'.$product['product_number']]==1){
-				foreach ($thisview->regions as $region) {
-					foreach ($thisview->channels as $channel){
-						foreach ($thisview->companies as $company) {
-							$array_cuotas_mercado = $array_cuotas_mercado.",['".$product['name']."','".$region['name']."','".$channel['name']."','".$company['name']."'";
-							$array_cuotas_mercado = $array_cuotas_mercado.",".number_format($thisview->outcomes_sales_units['company_'.$company['id']]
-																		['product_'.$product['product_number']]
-																		['region_'.$region['region_number']]
-																		['channel_'.$channel['channel_number']],0, '.', '')."]";
-						}
-					}
-					
-				}
-			}
-		}
-		
-		$array_cuotas_mercado = $array_cuotas_mercado."]";
-		return $array_cuotas_mercado;
-	
-	}
-	
-	
-	
-	
 	function prepareArrayChart($chart) {
 		$tmp = serialize($chart);
 		$tmp = urlencode($chart);
 		return $tmp;
-	}
+	}	
 	
 ?>

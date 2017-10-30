@@ -88,7 +88,7 @@
 				}
 			}
 		}
-	
+		
 		function historyAction(){
 			$this->view->headTitle($this->view->title, 'PREPEND');
 			$this->view->controllerName='decision';
@@ -104,7 +104,6 @@
 			$this->view->controllerName='decision';
 			$this->view->actionName="production";
 			$this->view->round_number = $this->round['round_number'];
-
 			
 			$games=new Model_DbTable_Games();
 			$region_count= new Model_DbTable_Decisions_Pr_Region();
@@ -114,16 +113,6 @@
 			$qualityParams=$games->getQualityParams($this->game['id']);	
 			$game_channels=$games->getChannels($this->game['id']);
 			$game_media=$games->getMedia($this->game['id']);
-
-			//VERO
-			$this->view->channelsO=$game_channels;
-			$this->view->channelsD=$game_channels;
-			$this->view->regionsO=$regions;
-			$this->view->regionsD=$regions; 
-			$outcomes=new Model_DbTable_Outcomes();
-			$this->view->stocks_units=$outcomes->getStock($this->game['id'],$this->round['round_number']-1);
-			//VERO
-
 			
 			$this->view->lastFactory=$games->getLastFactory($this->game['id'], $this->company['id']);
 			$this->view->roundFactory=$games->getRoundFactoryCreated($this->game['id'], $this->company['id']);
@@ -149,17 +138,6 @@
 				$this->view->new_product[$product['product_number']]=$newproducts->getActualAvailability($this->game['id'], $this->company['id'], $this->round['round_number'], $product['product_number']);
 				$this->view->prev_rnd_new_product[$product['product_number']]=$newproducts->getActualAvailability($this->game['id'], $this->company['id'], $this->round['round_number']-1, $product['product_number']);
 			}
-
-
-			//VERO
-			$n_products=$games->getNumberOfProductsAvailable($this->game['id'], $this->round['round_number'], $this->company['id']);
-			$n_channels=$games->getNumberOfChannels($this->game['id']);
-			$n_regions=$games->getNumberOfRegions($this->game['id']);
-			
-			$this->view->n_channels=$n_channels;
-			$this->view->n_regions=$n_regions;
-			
-			//VERO
 			
 			$channel_payterms[0]=array('value'=>0, 'descriptor'=>'Inmediato');
 			$channel_payterms[1]=array('value'=>1, 'descriptor'=>'Aplazado 1 mes');
@@ -168,31 +146,10 @@
 			$channel_payterms[4]=array('value'=>4, 'descriptor'=>'Aplazado 4 meses');
 
 			$this->view->channel_payterms=$channel_payterms;
-
-			//VERO
-			$n_product=$games->getNumberOfProductsAvailable($this->game['id'], $this->round['round_number'], $this->company['id']);			
-
-			$gameFunctionalityParams = new Model_DbTable_Games_Param_Markets_FunctionalityParams();
-			$game_functionality_params_weight=$gameFunctionalityParams->getFunctionalityParamsWeight($this->game['id']);
-			$game_functionality_params_name=$gameFunctionalityParams->getFunctionalityParamsName($this->game['id']);
-			$n_functionalities=$games->getNumberOfFunctionalities($this->game['id']);
-			for($i=1; $i<=$n_functionalities;$i++){
-				$a=$i+1;
-				$functionalities[$a]= array('value'=>$i, 'descriptor'=>$game_functionality_params_name['functionality_param_number_'.$i]);
-			}
-			$this->view->functionalities=$functionalities;
-
-			$this->view->game_functionality_params_weight=$game_functionality_params_weight;
-			//VERO
 			
 
 			$decisions=new Model_DbTable_Decisions_Production();
 			$decisions_sup=new Model_DbTable_Decisions_Suppliers();
-			//VERO
-			$st_decisions=new Model_DbTable_Decisions_Stock();
-			$st_outcomes=new Model_DbTable_Outcomes_St_Units();
-			//VERO
-
 
 			$lastDecision=$decisions->getActiveRoundLastDecisionSaved();
 			$this->view->regionDecision=$lastDecision['factories'];
@@ -205,10 +162,6 @@
 			$round_actual=$this->round['round_number'];
 			if($round_actual>1){
 				$round_previous=$round_actual-1;
-				//VERO
-				$st_outcomes_prev=$st_outcomes->getStockByCompany($this->game['id'], $round_previous, $this->company['id']);
-				$this->view->unitsStockCacheDecision=$st_outcomes_prev;
-				//VERO
 				$pr_lastDecision_prev=$decisions->getDecisionArray($this->game['id'], $this->company['id'], $round_previous);
 				$sup_lastDecision_prev=$decisions_sup->getDecisionArray($this->game['id'], $this->company['id'], $round_previous);
 					
@@ -217,142 +170,19 @@
 				//var_dump($this->view->addCapacityDecision);die();
 				$this->view->numberDecision=$sup_lastDecision_prev['number'];
 				$this->view->paytermsDecision=$sup_lastDecision_prev['payterms'];
-
-
 			}		
 		
 			
 			//si hay decisión sobre este turno guardada se imprime		
-			if ($this->getRequest()->isPost()){
-				//VERO
+			if ($this->getRequest()->isPost()){				
 				$postData=$this->getRequest()->getPost();
-				$st_decisionLeft=$postData['stock']['unitsStockLeft'];
-				$st_decisionCache=$postData['unitsStockCache'];
-				$st_decisionResult=$postData['stock']['unitsStockRight'];
-				$contadorResult=0;
-				$contadorCache=0;
-				$error= false;
-				
-				for ($product=1; $product<=$n_products; $product++){
-					for ($channel=1; $channel<=$n_channels; $channel++){
-						for ($region=1; $region<=$n_regions; $region++){
-							/**if($st_decisionLeft['product_'.$product]['channel_'.$channel] ['region_'.$region]  <> "0" AND !is_null($st_decisionLeft['product_'.$product]['channel_'.$channel] ['region_'.$region])){
-								$error=true;
-							}**/
-							$contadorResult+= intval($st_decisionResult['product_'.$product]['channel_'.$channel] ['region_'.$region]);
-							$contadorCache+= intval($st_decisionCache['product_'.$product]['channel_'.$channel] ['region_'.$region]);
-
-						}
-					}
-				}
-				if($contadorResult!=$contadorCache){
-						$error=true;
-				}
-				if($error){
-					print '<script language="JavaScript">'; 
-					print 'alert("La distribución del stock realizada es incorrecta");'; 
-					print '</script>'; 
-				}else{
-					if (isset ($postData['stock'])){
-						$st_decisionDistributionData=$postData['stock']['distributionInformation'];
-						$distribution= explode (";" ,  $st_decisionDistributionData);
-						$distributionInformation=array();
-						for ($product=1; $product<=$n_products; $product++){
-							for ($channelO=1; $channelO<=$n_channels; $channelO++){
-								for ($regionO=1; $regionO<=$n_regions; $regionO++){
-									for ($channelD=1; $channelD<=$n_channels; $channelD++){
-										for ($regionD=1; $regionD<=$n_regions; $regionD++){
-											if((count($distribution)-1)==0){
-												$distributionInformation['product_'.$product]
-													['channelO_'.$channelO]
-													['regionO_'.$regionO]
-													['channelD_'.$channelD]
-													['regionD_'.$regionD] = "0";
-											}
-											for ($i=0; $i<count($distribution)-1; $i++ ){
-												if($product==substr($distribution[$i], 0, 1) && $channelO ==substr($distribution[$i], 2, 1)&&$regionO ==substr($distribution[$i], 1, 1)&&$channelD ==substr($distribution[$i], 4, 1)&&$regionD ==substr($distribution[$i], 3, 1)){
-													$distributionInformation['product_'.$product]
-													['channelO_'.$channelO]
-													['regionO_'.$regionO]
-													['channelD_'.$channelD]
-													['regionD_'.$regionD] = substr($distribution[$i], 5);
-												}
-												elseif($distributionInformation['product_'.$product]['channelO_'.$channelO] ['regionO_'.$regionO] ['channelD_'.$channelD]
-													['regionD_'.$regionD] == null or
-													$distributionInformation['product_'.$product]['channelO_'.$channelO]['regionO_'.$regionO]['channelD_'.$channelD]
-													['regionD_'.$regionD] == ""){
-													$distributionInformation['product_'.$product]
-													['channelO_'.$channelO]
-													['regionO_'.$regionO]
-													['channelD_'.$channelD]
-													['regionD_'.$regionD] = "0";
-												}
-												
-											}
-										}
-									}
-								}
-
-							}
-
-						}
-						$st_decisionData['stock']['unitsStockResult']=$postData['stock']['unitsStockRight'];
-						$st_decisionData['stock']['distributionInformation']=$distributionInformation;
-
-
-						$st_decisions->processDecision($st_decisionData, $this->game['id'], $this->company['id'], $this->round['round_number']);
-
-					}
-					//VERO
-					if(!$error){				
-						$postData=$this->getRequest()->getPost();
-						$decisionData=$postData['production_decision'];
-						//VERO
-						$productionFunctionalities=$decisionData['functionality_params'];
-						$functionalityInformation=array();
-
-
-
-						$auxLoop = New Model_DbTable_Games();
-						$nFunct = $auxLoop->getNumberOfFunctionalities($this->game['id']);
-						for ($product=1; $product<=$n_products; $product++){
-							$productionFSet=$productionFunctionalities['product_number_'.$product];
-							for ($functionality_param_number=1; $functionality_param_number<=$nFunct; $functionality_param_number++){
-								if(count($productionFSet)==0){
-									$functionalityInformation['product_number_'.$product]
-													['functionality_param_number_'.$functionality_param_number] = "0";
-									}else{
-								$product_numberLoop=1;
-								foreach ($productionFunctionalities as $productionFunctionality){
-									foreach($productionFunctionality as $j ){
-										if($product==$product_numberLoop && $j==$functionality_param_number){
-											$functionalityInformation['product_number_'.$product]
-											['functionality_param_number_'.$functionality_param_number] = "1";
-										}
-										elseif($functionalityInformation['product_number_'.$product]
-											['functionality_param_number_'.$functionality_param_number] == null or
-											$functionalityInformation['product_number_'.$product]
-											['functionality_param_number_'.$functionality_param_number] == ""){
-											$functionalityInformation['product_number_'.$product]
-											['functionality_param_number_'.$functionality_param_number]= "0";
-										}
-									}
-									$product_numberLoop++;							
-								}
-							}
-						}
-						}
-						$decisionData['functionality_params']=$functionalityInformation;		
-						//VERO
-						$decisionData_sup=$postData['suppliers'];
-						$decisions->processDecision($decisionData, $this->game['id'], $this->company['id'], $this->round['round_number']);
-						$decisions_sup->processDecision($decisionData_sup, $this->game['id'], $this->company['id'], $this->round['round_number']);
-
-						$validateData=0;
-						$validate=new Model_DbTable_Decisions_Validate();
-						$validate->processDecision($validateData, $this->game['id'], $this->company['id'], $this->round['round_number']);
-					}
-				}
+				$decisionData=$postData['production_decision'];
+				$decisionData_sup=$postData['suppliers'];
+				$decisions->processDecision($decisionData, $this->game['id'], $this->company['id'], $this->round['round_number']);
+				$decisions_sup->processDecision($decisionData_sup, $this->game['id'], $this->company['id'], $this->round['round_number']);
+				$validateData=0;
+				$validate=new Model_DbTable_Decisions_Validate();
+				$validate->processDecision($validateData, $this->game['id'], $this->company['id'], $this->round['round_number']);
 			}
 			if ($decisions->existsPrevious()){
 				$lastDecision=$decisions->getActiveRoundLastDecisionSaved();
@@ -365,58 +195,12 @@
 				$this->view->game_factories=$factories;
 				$this->view->regionDecision=$lastDecision['factories'];
 				$this->view->qualitiesDecision=$lastDecision['qualities'];
-				//VERO
-				$this->view->FunctionalitiesDecision=$lastDecision['functionalities'];
-				//VERO
 				$this->view->addCapacityDecision=$lastDecision['capacity'];
 				$lastDecision_sup=$decisions_sup->getActiveRoundLastDecisionSaved();
 				$this->view->numberDecision=$lastDecision_sup['number'];
 				$this->view->paytermsDecision=$lastDecision_sup['payterms'];
-
-			}
-			//VERO
-			if ($st_decisions->existsPrevious($this->game['id'], $this->company['id'], $this->round['round_number'])){
-
-				$st_lastDecision=$st_decisions->getDecisionArray($this->game['id'], $this->company['id'], $this->round['round_number']);
-				$this->view->unitsStockRightDecision=$st_lastDecision['unitsStock'];
-				$distributionData=$st_lastDecision['distributionStock'];
-
-				$product_number=1;
-				$distributionData['product_'.$product_number];
-				while (isset($distributionData['product_'.$product_number])){
-					$units_product=$distributionData['product_'.$product_number];
-					$channelO_number=1;
-					while (isset($units_product['channelO_number_'.$channelO_number])){
-						$units_channelO=$units_product['channelO_number_'.$channelO_number];
-						$regionO_number=1;
-						while (isset($units_channelO['regionO_number_'.$regionO_number])){
-							$units_regionO=$units_channelO['regionO_number_'.$regionO_number];
-							$channelD_number=1;
-							while (isset($units_regionO['channelD_number_'.$channelD_number])){
-								$units_channelD=$units_regionO['channelD_number_'.$channelD_number];
-								$regionD_number=1;
-								while (isset($units_channelD['regionD_number_'.$regionD_number])){
-									$units=$units_channelD['regionD_number_'.$regionD_number];
-									if ($units<> "0"){
-										$st_distribuion_lastDecision=($st_distribuion_lastDecision.strval($product_number).strval($regionO_number).strval($channelO_number).strval($regionD_number).strval($channelD_number).strval($units).";");
-									}
-									$regionD_number++;
-								}
-								$channelD_number++;
-							}
-							$regionO_number++;
-						}
-						$channelO_number++;
-					}
-					$product_number++;
-				}
-
-				$this->view->unitsStockDistributiontDecision=$st_distribuion_lastDecision;
-			}else{
-				$this->view->unitsStockRightDecision=$st_outcomes_prev;
-			}
-			//VERO	
-		}
+			}			
+	}
 	
 		function marketingAction(){
 			$this->view->title .= " / Marketing.";
@@ -478,8 +262,6 @@
 				$this->view->trademktpercentageDecision=$lastDecision['trademkt_percentage'];
 			}		
 		}
-
-
 		
 		function suppliersAction(){
 			$this->view->title .= " / Proveedores.";
@@ -582,12 +364,7 @@
 					}
 				}
 			}
-			//VERO
-			$gameInvestmentParams = new Model_DbTable_Games_Param_Markets_InvestmentsParams();
-			$investmentsType=$gameInvestmentParams->getinvestmentParamsName($this->game['id']);
-			$this->view->investmentsType=$investmentsType;
-			//VERO
-
+			
 			//Para calcular el interes de la opcion seleccionada
 			$this->view->interest_rate=$games->getInterestRate($this->game['id']);
 			$interest[0]=array('value'=>$this->view->interest_rate['term_2']);
@@ -614,9 +391,6 @@
 				$this->view->termDecision=$lastDecision['term'];
 				$this->view->amountDecision=$lastDecision['amount'];
 				$this->view->patrimonyDecision=$lastDecision['patrimony'];
-				//VERO
-				$this->view->investmentDecision=$lastDecision['investment'];
-				//VERO
 			}
 		}
 		
@@ -832,26 +606,6 @@
 			$channel_payterms[2]=array('value'=>2, 'descriptor'=>'Aplazado 2 meses');
 			$channel_payterms[3]=array('value'=>3, 'descriptor'=>'Aplazado 3 meses');
 			$channel_payterms[4]=array('value'=>4, 'descriptor'=>'Aplazado 4 meses');
-			//VERO
-			$n_product=$games->getNumberOfProductsAvailable($this->game['id'], $_GET['round_number'], $this->company['id']);			
-
-			$gameFunctionalityParams = new Model_DbTable_Games_Param_Markets_FunctionalityParams();
-			$game_functionality_params_weight=$gameFunctionalityParams->getFunctionalityParamsWeight($this->game['id']);
-			$game_functionality_params_name=$gameFunctionalityParams->getFunctionalityParamsName($this->game['id']);
-			$n_functionalities=$games->getNumberOfFunctionalities($this->game['id']);
-			for($i=1; $i<=$n_functionalities;$i++){
-				$a=$i+1;
-				$functionalities[$a]= array('value'=>$i, 'descriptor'=>$game_functionality_params_name['functionality_param_number_'.$i]);
-			}
-			$this->view->functionalities=$functionalities;
-
-			$this->view->game_functionality_params_weight=$game_functionality_params_weight;
-
-
-			$gameInvestmentParams = new Model_DbTable_Games_Param_Markets_InvestmentsParams();
-			$investmentsType=$gameInvestmentParams->getinvestmentParamsName($this->game['id']);
-			$this->view->investmentsType=$investmentsType;
-			//VERO
 			
 			$wages[0]=array('value'=>1.015, 'descriptor'=>'Primer Cuartil');
 			$wages[1]=array('value'=>1.000, 'descriptor'=>'Segundo Cuartil');
@@ -932,86 +686,31 @@
 			$this->view->lastFactory=$games->getLastFactory($this->game['id'], $this->company['id']);
 			$this->view->roundFactory=$games->getRoundFactoryCreated($this->game['id'], $this->company['id']);
 			$this->view->product_availability=$games->getProductsAvailibility($this->game['id'],$_GET['round_number'],$this->company['id']);
-			//VERO
-			$this->view->channelsO=$game_channels;
-			$this->view->channelsD=$game_channels;
-			$this->view->regionsO=$regions;
-			$this->view->regionsD=$regions;
-			//VERO
 			
 			$region_count= new Model_DbTable_Decisions_Pr_Region();
 			$factories=$games->getFactories($this->game['id'],$this->company['id']);
 			$aux=$region_count->countFactories($this->game['id'],$this->company['id']);
 			$this->view->numberOfFactories=$aux;
 			$this->view->game_factories=$factories;
-			$this->view->booleanCreate=0;	
-		
+			$this->view->booleanCreate=0;			
 								
 			$pr_decisions=new Model_DbTable_Decisions_Production();
 			$mk_decisions=new Model_DbTable_Decisions_Marketing();
 			$su_decisions=new Model_DbTable_Decisions_Suppliers();
-
 			$hr_decisions=new Model_DbTable_Decisions_HumanResources();
 			$fi_decisions=new Model_DbTable_Decisions_Finance();
 			$in_decisions=new Model_DbTable_Decisions_Initiatives();
 			$idi_decisions=new Model_DbTable_Decisions_Idi();
 			$validate_decisions=new Model_DbTable_Decisions_Validate();
-			//VERO
-			$st_decisions=new Model_DbTable_Decisions_Stock();
-			//VERO
 		
 			if ($pr_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
 				$pr_lastDecision=$pr_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
 				//$this->view->regionDecision=$pr_lastDecision['region'];
 				$this->view->regionDecision=$pr_lastDecision['factories'];
 				$this->view->qualitiesDecision=$pr_lastDecision['qualities'];
-				//VERO
-				$this->view->FunctionalitiesDecision=$pr_lastDecision['functionalities'];
-				//VERO
 				$this->view->unitsDecision=$pr_lastDecision['units'];
 				//$this->view->addCapacityDecision=$pr_lastDecision['capacity'];
 			}
-			//VERO
-			if ($st_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
-				$st_lastDecision=$st_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
-				$this->view->unitsStockRightDecision=$st_lastDecision['unitsStock'];
-				$distributionData=$st_lastDecision['distributionStock'];
-
-				$product_number=1;
-				$distributionData['product_'.$product_number];
-				while (isset($distributionData['product_'.$product_number])){
-					$units_product=$distributionData['product_'.$product_number];
-					$channelO_number=1;
-					while (isset($units_product['channelO_number_'.$channelO_number])){
-						$units_channelO=$units_product['channelO_number_'.$channelO_number];
-						$regionO_number=1;
-						while (isset($units_channelO['regionO_number_'.$regionO_number])){
-							$units_regionO=$units_channelO['regionO_number_'.$regionO_number];
-							$channelD_number=1;
-							while (isset($units_regionO['channelD_number_'.$channelD_number])){
-								$units_channelD=$units_regionO['channelD_number_'.$channelD_number];
-								$regionD_number=1;
-								while (isset($units_channelD['regionD_number_'.$regionD_number])){
-									$units=$units_channelD['regionD_number_'.$regionD_number];
-									if ($units<> "0"){
-										$st_distribuion_lastDecision=($st_distribuion_lastDecision.strval($product_number).strval($regionO_number).strval($channelO_number).strval($regionD_number).strval($channelD_number).strval($units).";");
-									}
-									$regionD_number++;
-								}
-								$channelD_number++;
-							}
-							$regionO_number++;
-						}
-						$channelO_number++;
-					}
-					$product_number++;
-				}
-
-				$this->view->unitsStockDistributiontDecision=$st_distribuion_lastDecision;
-			}else{
-				$this->view->unitsStockLeftDecision=$st_outcomes_prev;
-			}
-			//VERO
 			if ($mk_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
 				$mk_lastDecision=$mk_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
 				$this->view->pricesDecision=$mk_lastDecision['prices'];
@@ -1022,7 +721,6 @@
 				$this->view->trademktbudgetDecision=$mk_lastDecision['trademkt_budget'];
 				$this->view->trademktpercentageDecision=$mk_lastDecision['trademkt_percentage'];
 			}
-
 			if ($su_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
 				$su_lastDecision=$su_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
 				$this->view->numberDecision=$su_lastDecision['number'];
@@ -1038,9 +736,6 @@
 				$this->view->termDecision=$fi_lastDecision['term'];
 				$this->view->dividends=$fi_lastDecision['patrimony']['dividends'];
 				$this->view->amountDecision=$fi_lastDecision['amount']['amount'];
-				//VERO
-				$this->view->investmentDecision=$fi_lastDecision['investment'];
-				//VERO
 			}
 			if ($in_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
 				$in_lastDecision=$in_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
