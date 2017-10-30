@@ -20,8 +20,8 @@
 				$investment_param=$data['investment_param_'.$investmentParamCounter];
 				$limit=(double) $investment_param['limit'];
 				$investment_param_number=$investmentParamCounter;
-				$average_performace=(double) $investment_param['investment_param_average_performance'];
-				for($round_number=1;$round_number<$n_rounds;$round_number++){
+				for($round_number=1;$round_number<=$n_rounds;$round_number++){
+					$average_performace=(double) $investment_param['investment_param_average_performance'];
 					$random=rand(0, 100)/100*2-1;
 					$interest =($random*$limit+$average_performace)/100;
 					$this->insert(array('game_id'=>$game_id, 'round_number'=>$round_number,'investment_number'=>$investment_param_number, 'interest'=>$interest));

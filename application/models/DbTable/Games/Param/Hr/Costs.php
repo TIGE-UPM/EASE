@@ -17,11 +17,6 @@
 			return $results['wages_costs'];			
 		}
 
-		function getDismissalsCostsInRegion($region_id){
-			$results=$this->fetchRow('region_id = '.$region_id);
-			return $results['dismissals_cost'];			
-		}
-
 		function add($parameters){		
 			$this->insert($parameters);
 		}
@@ -32,13 +27,13 @@
 			while (isset($hrCosts['region_'.$regionCounter])){
 				$regionCost=$hrCosts['region_'.$regionCounter];
 				$this->add(array('game_id'=>$game_id, 'round_number'=>1, 'region_number'=>$regionCounter, 'hiring_cost'=>$regionCost['hiring'], 
-								 'training_cost'=>$regionCost['training'],'wages_cost'=>$regionCost['wages'], 'dismissals_cost'=>$regionCost['dismissals']));
+								 'training_cost'=>$regionCost['training'],'wages_cost'=>$regionCost['wages']));
 				$regionCounter++;
 			}
 		}
-		function setRoundHumanResourcesCosts($game_id, $round_number, $region_number, $hiring_cost, $training_cost, $wages_cost, $dismissals_cost){
+		function setRoundHumanResourcesCosts($game_id, $round_number, $region_number, $hiring_cost, $training_cost, $wages_cost){
 			$this->delete(array('game_id = '.$game_id, 'round_number = '.$round_number, 'region_number = '.$region_number));
-			$this->add(array('game_id'=>$game_id, 'round_number'=>$round_number, 'region_number'=>$region_number, 'hiring_cost'=>$hiring_cost, 'training_cost'=>$training_cost, 'wages_cost'=>$wages_cost, 'dismissals_cost'=>$dismissals_cost));
+			$this->add(array('game_id'=>$game_id, 'round_number'=>$round_number, 'region_number'=>$region_number, 'hiring_cost'=>$hiring_cost, 'training_cost'=>$training_cost, 'wages_cost'=>$wages_cost));
 		}
 	}
 ?>

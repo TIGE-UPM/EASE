@@ -74,8 +74,7 @@
 			foreach ($results as $result){
 				$cost=$result['cost'];
 			}
-			var_dump("El coste adicional de la funcionalidad es:");
-			var_dump($cost);
+			echo("El coste adicional de la funcionalidad es:" . $cost . "<br/>");
 			return $cost;
 		}
 		//VERO
