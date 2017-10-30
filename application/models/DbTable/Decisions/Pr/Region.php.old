@@ -26,34 +26,16 @@
 					$factory_number++;
 				}*/
 			$factory_regions=$parameters['factories'];
-
-			if($factory_regions==null) {return;}			
-			foreach ($factory_regions as $fr_key=>$fr_val) {
-				//echo($fr_key);die();
-				//$region_set=$fr[$fr_key];
-				$region_number=$fr_val['region'];
-				$factory_number=ltrim($fr_key, "factory_number_");
-				//echo($factory_number);die();
-				$newfactory=$this->getDecisionFactory($game_id, $company_id, $factory_number);
-				if($newfactory==null){
-					self::insert(array('game_id'=>$game_id, 'company_id' => $company_id, 'region_number'=>$region_number, 'factory_number'=>$factory_number, 'round_number_created'=>$round_number));
-				}			}
-			
-			/*foreach ($factory_regions as $fr) {
+			foreach ($factory_regions as $fr) {
+				//Revisar aquí si se estropea al crear la primera fábrica (primera decisión). Si se puede eliminar alguna fábrica, el contador de $factory_number no funcionará bien.
 				$factory_number=1;
-				$region_set=$fr['factory_number_'.$factory_number];
-				//var_dump($fr);die();
-				$region_number=$region_set['region'];
+				$region_number=$fr['region'];
+				//var_dump($region_number);echo("<br/>");die();
 				//var_dump($region_number);die();
-				$newfactory=$this->getDecisionFactory($game_id, $company_id, $factory_number);
-				if($newfactory==null){
-					self::insert(array('game_id'=>$game_id, 'company_id' => $company_id, 'region_number'=>$region_number, 'factory_number'=>$factory_number, 'round_number_created'=>$round_number));
-				} else {
-					//self::update(array('region_number'=>$region_number), 'game_id = '.$game_id.' AND company_id = '.$company_id.' AND factory_number = '.$factory_number.' AND round_number_created = '.$round_number);
-				}
+				self::insert(array('game_id'=>$game_id, 'company_id' => $company_id, 
+								   'region_number'=>$region_number, 'factory_number'=>$factory_number ,'round_number_created'=>$round_number));			
 				$factory_number++;
-				/*self::insert(array('game_id'=>$game_id, 'company_id' => $company_id, 'region_number'=>$region_number, 'factory_number'=>$factory_number ,'round_number_created'=>$round_number));*/
-			/*}*/
+			}
 		}
 
 		function updateDecision($parameters, $game_id=null, $company_id=null, $round_number=null){	
@@ -94,7 +76,8 @@
 				$factory_number++;
 			}*/
 			$factory_regions=$parameters['factories'];
-			if($factory_regions==null) {return;}			
+			if($factory_regions==null) {return;}
+			//var_dump($factory_regions);die();
 			foreach ($factory_regions as $fr_key=>$fr_val) {
 				//echo($fr_key);die();
 				//$region_set=$fr[$fr_key];
@@ -105,7 +88,7 @@
 				if($newfactory==null){
 					self::insert(array('game_id'=>$game_id, 'company_id' => $company_id, 'region_number'=>$region_number, 'factory_number'=>$factory_number, 'round_number_created'=>$round_number));
 				} else {
-					//self::update(array('region_number'=>$region_number), 'game_id = '.$game_id.' AND company_id = '.$company_id.' AND factory_number = '.$factory_number.' AND round_number_created = '.$round_number);
+					self::update(array('region_number'=>$region_number), 'game_id = '.$game_id.' AND company_id = '.$company_id.' AND factory_number = '.$factory_number.' AND round_number_created = '.$round_number);
 				}
 			}
 		}

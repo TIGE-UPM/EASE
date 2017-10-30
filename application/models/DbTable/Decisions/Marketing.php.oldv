@@ -16,7 +16,7 @@
 				$round=$front->getParam('activeRound');
 				$round_number=$round['round_number'];
 			}			
-			$date=date( 'Y-m-d H:i:s', time());
+			$date=date( 'Y-m-d H:i:s', mktime());
 			$mk_prices= new Model_DbTable_Decisions_Mk_Prices();
 			$mk_advertising_budget= new Model_DbTable_Decisions_Mk_AdvertisingBudget();
 			$mk_advertising_budget_distribution= new Model_DbTable_Decisions_Mk_AdvertisingBudgetDistribution();
@@ -130,11 +130,6 @@
 		function getPrices($game_id, $company_id, $round_number){
 			$mk_prices=new Model_DbTable_Decisions_Mk_Prices();
 			return $mk_prices->getDecision($game_id, $company_id, $round_number);
-		}
-		function getExportPrices($game_id, $round_number){
-			$exportPrices=new Model_DbTable_Decisions_Mk_Prices();
-			return $exportPrices->getPrices($game_id, $round_number);
-			
 		}
 		function getAdvertisingsBudget($game_id, $company_id, $round_number){
 			$mk_advertisings_budget=new Model_DbTable_Decisions_Mk_AdvertisingBudget();

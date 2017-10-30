@@ -25,9 +25,6 @@
 			$pr_functionality= new Model_DbTable_Decisions_Pr_ProductsFunctionality();
 			//VERO
 			$pr_units= new Model_DbTable_Decisions_Pr_Units();
-			//JESUS 
-			$pr_HQ = new Model_DbTable_Decisions_Pr_Headquarters();
-
 			// si no existe ya una decisión para esta ronda se crea
 			if ($this->fetchRow('game_id = '.$game_id.
 								' AND company_id = '.$company_id.
@@ -41,8 +38,6 @@
 				$pr_functionality->add($decisionData, $game_id, $company_id, $round_number);
 				//VERO
 				$pr_units->add($decisionData, $game_id, $company_id, $round_number);
-				//JESUS
-				$pr_HQ->add($decisionData, $game_id, $company_id);
 				$this->insert(array('game_id'=>$game_id, 
 									'company_id' => $company_id, 
 									'round_number' => $round_number, 
@@ -57,8 +52,6 @@
 				$pr_functionality->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				//VERO
 				$pr_units->updateDecision($decisionData, $game_id, $company_id, $round_number);
-				//JESUS
-				$pr_HQ->updateDecision($decisionData, $game_id, $company_id);
 				$this->update(array('date'=>$date), 
 							  'game_id = '.$game_id.
 							  ' AND company_id = '.$company_id.
@@ -106,8 +99,6 @@
 			$pr_functionality= new Model_DbTable_Decisions_Pr_ProductsFunctionality();
 			//VERO
 			$pr_units= new Model_DbTable_Decisions_Pr_Units();
-			//JESUS
-			$pr_HQ = new Model_DbTable_Decisions_Pr_Headquarters();
 			// $cap = $pr_capacities->getTotalMachinesExtFactory($game['id'], $company['id']);
 			// $cap2 = $pr_capacities->getMachinesExtFactory($game['id'], $company['id']);
 			// var_dump($cap); echo("<br/><br/>"); var_dump($cap2);die("2");
@@ -115,8 +106,7 @@
 						 'capacity'=>$pr_capacities->getActiveRoundLastDecisionSaved(), 
 						 'qualities'=>$pr_quality->getActiveRoundLastDecisionSaved(),
 						 'functionalities'=>$pr_functionality->getActiveRoundLastDecisionSaved(),
-						 'units'=>$pr_units->getActiveRoundLastDecisionSaved(),
-						 'headquarters'=>$pr_HQ->getActiveRoundLastDecisionSaved());
+						 'units'=>$pr_units->getActiveRoundLastDecisionSaved());
 		}
 		
 		function getDecision($game_id, $company_id, $round_number){
@@ -133,8 +123,6 @@
 			$pr_functionality= new Model_DbTable_Decisions_Pr_ProductsFunctionality();
 			//VERO
 			$pr_units= new Model_DbTable_Decisions_Pr_Units();
-				//JESUS
-			$pr_HQ = new Model_DbTable_Decisions_Pr_Headquarters();
 			/*var_dump(array('factories'=>$pr_regions->getDecision($game_id, $company_id),
 						 'capacity'=>$pr_capacities->getDecision($game_id, $company_id), 
 						 'qualities'=>$pr_quality->getDecision($game_id, $company_id),
@@ -143,8 +131,7 @@
 						 'capacity'=>$pr_capacities->getDecision($game_id, $company_id), 
 						 'qualities'=>$pr_quality->getDecision($game_id, $company_id),
 						 'functionalities'=>$pr_functionality->getDecision($game_id, $company_id),
-						 'units'=>$pr_units->getDecision($game_id, $company_id, $round_number),
-						 'headquarters'=>$pr_HQ->getDecision($game_id, $company_id));
+						 'units'=>$pr_units->getDecision($game_id, $company_id, $round_number));
 		}
 		
 		//funciona perfectamente
@@ -240,16 +227,6 @@
 			$pr_factories= new Model_DbTable_Decisions_Pr_Region();
 			$results=$pr_factories->fetchAll('game_id = '.$game_id.' AND company_id = '.$company_id, array('round_number_created ASC', 'factory_number ASC'));
 			return $results;
-		}
-//JESUS
-		function getCompanyHQ($game_id, $company_id){
-			$pr_HQ = new Model_DbTable_Decisions_Pr_Headquarters();
-			$array = $pr_HQ->fetchAll('game_id = '.$game_id.' AND company_id = '.$company_id);
-			$results = $array['headquarters']->headquarters;
-
-			return $results;
-
-
 		}
 	}
 ?>

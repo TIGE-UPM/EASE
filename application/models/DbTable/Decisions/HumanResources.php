@@ -19,27 +19,20 @@
 			$date=date( 'Y-m-d H:i:s', time());
 			$hr_cuartil= new Model_DbTable_Decisions_Hr_Cuartil();
 			$hr_formation= new Model_DbTable_Decisions_Hr_Formation();
-			//JESUS
-			$hr_employees = new Model_DbTable_Decisions_Hr_Employees();
-			$hr_shifts = new Model_DbTable_Decisions_Hr_Shifts();
-			// si no existe ya una decisión para esta ronda se crea
+			// si no existe ya una decisiÃ³n para esta ronda se crea
 			if ($this->fetchRow('game_id = '.$game_id.
 								' AND company_id = '.$company_id.
 								' AND round_number = '.$round_number)==null){
 				$hr_cuartil->add($decisionData, $game_id, $company_id, $round_number);
 				$hr_formation->add($decisionData, $game_id, $company_id, $round_number);
-				$hr_employees->add($decisionData, $game_id, $company_id, $round_number);
-				$hr_shifts->add($decisionData, $game_id, $company_id, $round_number);
 				$this->insert(array('game_id'=>$game_id, 
 									'company_id' => $company_id, 
 									'round_number' => $round_number, 
 									'date'=>$date));
 			}
-			else{ //si ya se tomó con anterioridad se sobreescribe
+			else{ //si ya se tomÃ³ con anterioridad se sobreescribe
 				$hr_cuartil->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$hr_formation->updateDecision($decisionData, $game_id, $company_id, $round_number);
-				$hr_employees->updateDecision($decisionData, $game_id, $company_id, $round_number);
-				$hr_shifts->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$this->update(array('date'=>$date), 
 							  'game_id = '.$game_id.
 							  ' AND company_id = '.$company_id.
@@ -83,13 +76,8 @@
 			$round=$front->getParam('activeRound');	
 			$hr_cuartil= new Model_DbTable_Decisions_Hr_Cuartil();
 			$hr_formation= new Model_DbTable_Decisions_Hr_Formation();
-			//JESUS
-			$hr_employees = new Model_DbTable_Decisions_Hr_Employees();
-			$hr_shifts = new Model_DbTable_Decisions_Hr_Shifts();
 			return array('cuartil'=>$hr_cuartil->getActiveRoundLastDecisionSaved(), 
-						 'formation'=>$hr_formation->getActiveRoundLastDecisionSaved(),
-						 'employees'=>$hr_employees->getActiveRoundLastDecisionSaved(),
-						 'shifts'=>$hr_shifts->getActiveRoundLastDecisionSaved());
+						 'formation'=>$hr_formation->getActiveRoundLastDecisionSaved());
 
 		}
 		function getDecision($game_id, $company_id, $round_number){
@@ -100,13 +88,8 @@
 		function getDecisionArray($game_id, $company_id, $round_number){
 			$hr_cuartil= new Model_DbTable_Decisions_Hr_Cuartil();
 			$hr_formation= new Model_DbTable_Decisions_Hr_Formation();
-			//JESUS
-			$hr_employees = new Model_DbTable_Decisions_Hr_Employees();
-			$hr_shifts = new Model_DbTable_Decisions_Hr_Shifts();
 			return array('cuartil'=>$hr_cuartil->getDecision($game_id, $company_id, $round_number), 
-						 'formation'=>$hr_formation->getDecision($game_id, $company_id),
-						 'employees'=>$hr_employees->getDecision($game_id, $company_id, $round_number),
-						 'shifts'=>$hr_shifts->getDecision($game_id, $company_id, $round_number));
+						 'formation'=>$hr_formation->getDecision($game_id, $company_id));
 		}
 		function getCuartiles($game_id, $company_id, $round_number){
 			$hr_cuartil= new Model_DbTable_Decisions_Hr_Cuartil();
@@ -115,19 +98,6 @@
 		function getFormations($game_id, $company_id){
 			$hr_formation= new Model_DbTable_Decisions_Hr_Formation();
 			return $hr_formation->getDecision($game_id, $company_id);
-		}
-		//JESUS
-		function getEmployeeNumber($game_id, $company_id, $round_number){
-			$hr_employees = new Model_DbTable_Decisions_Hr_Employees();
-			$result = $hr_employees->getDecision($game_id, $company_id, $round_number);			
-			return $result;
-
-		}
-
-		function getShiftNumber($game_id, $company_id, $round_number){
-			$hr_shifts = new Model_DbTable_Decisions_Hr_Shifts();
-			return $hr_shifts->getDecision($game_id, $company_id, $round_number);
-
 		}
 	}
 ?>
