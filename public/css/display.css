@@ -1,0 +1,171 @@
+.titulo_display_outcomes {
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	width: 800px;
+	margin-left:auto;
+	margin-right:auto;
+}
+.display_outcomes_results{
+	text-align: center;
+	margin-top: 5px;
+	margin-bottom: 5px;
+	width: 800px;
+	margin-left:auto;
+	margin-right:auto;
+}
+.barra_resultado_texto_izquierda {
+	height: 20px; 
+	width:240px; 
+	float:left; 
+	text-align: right; 
+	padding-right: 5px
+}
+	
+.barra_resultado {
+	border: 1px solid #336699;
+	display:block;
+	position:relative;
+	width:300px; 
+	float:left
+}
+
+.barra_resultado_texto_derecha{
+	height: 20px; 
+	width:240px; 
+	float:left;
+	text-align:left;
+	padding-left: 5px
+}
+
+Div#text{
+	position: absolute;
+	left:10px;
+	top:2px;
+	font-size: 18px;
+	text-align: center;
+	width: 300px;
+}
+
+Div#barbox_a {
+	position: absolute;
+	left:0px;
+	width: 304px;
+	height: 25px;
+	background-color: silver;
+	border-radius:25px;
+}
+
+.bar_blanc {
+	position: absolute;
+	left:2px;
+	top:2px;
+	width: 300px;
+	height: 20px;
+	background-color: white;
+	border-radius:25px;
+}
+
+.bar_deterioration {
+	position: absolute;
+	left:2px;
+	top:2px;
+	width: 0px;
+	height: 20px;
+ 	background: transparent url(../images/red.gif) no-repeat left;
+    border-radius:25px;
+}
+.bar_qualification {
+	position: absolute;
+	left:2px;
+	top:2px;
+	width: 0px;
+	height: 20px;
+	background: transparent url(../images/yellow.gif) no-repeat left;
+	border-radius:25px;
+}
+.bar_atmosphere {
+	position: absolute;
+	left:2px;
+	top:2px;
+	width: 0px;
+	height: 20px;
+	background: transparent url(../images/green.gif) no-repeat left;
+	border-radius:25px;
+}
+.bar_new {
+	position: absolute;
+	left:2px;
+	top:2px;
+	width: 0px;
+	height: 20px;
+	background: transparent url(../images/blue.gif) no-repeat left;
+	border-radius:25px;
+}
+.bar_prize {
+	position: absolute;
+	left:2px;
+	top:2px;
+	width: 0px;
+	height: 20px;
+	background: transparent url(../images/orange.gif) no-repeat left;
+	border-radius:25px;
+}
+.bar_mkt {
+	position: absolute;
+	left:2px;
+	top:2px;
+	width: 0px;
+	height: 20px;
+	background: transparent url(../images/red.gif) no-repeat left;
+	border-radius:25px;
+}
+.med {
+	position: absolute;
+	left:2px;
+	top:2px;
+	width: 40px;
+	height: 40px;
+	background: transparent url(../images/med.png) no-repeat left;
+}
+
+
+
+
+
+
+
+
+
+	.per {
+	  position: absolute;
+	  font-size: 14px;
+	  left: 50%;
+	  margin: 1px 0px 0px 165px;
+	  background-color: #FFFFFF;
+	  border-radius:25px;
+	}
+	.in {
+	  position: absolute;
+	  font-size: 18px;
+	  left: 50%;
+	  margin: 1px 0px 0px -370px;
+	  background-color: #FFFFFF;
+	  border-radius:25px;
+	}
+	.in_mkt {
+	  position: absolute;
+	  font-size: 14px;
+	  left: 50%;
+	  margin: 1px 0px 0px -390px;
+	  background-color: #FFFFFF;
+	  border-radius:25px;
+	}	
+	
+	.blank {
+	  background-color: white;
+	  width: 300px;
+	  border-radius:25px;
+	}

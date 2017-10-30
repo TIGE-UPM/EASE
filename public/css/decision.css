@@ -1,0 +1,110 @@
+.flotante{
+    display: block;
+    position: fixed;
+    top: 100px;
+    right: 5%;
+    width: 156px;
+}
+
+#image_text{
+	position: absolute;
+	left:0;
+    top:0;
+	z-index:100;
+	font-weight:bold;
+}
+
+#image {
+	position: absolute;
+	left:0;
+    top:0;
+}
+
+.fieldContainer{
+	border:1px solid #336699;
+	border-radius:3px;
+	padding: 3px;
+	background-color: #FFFFFF;
+}
+
+.fieldHeader{
+	font-size: 20px;
+}
+
+.show_hide_links{
+	font-size: 12px;
+}
+
+.fieldDiv{
+	margin-left: 25px;
+}
+
+.fieldDescription {
+	text-align: center;
+	border: 1px solid #336699;
+	margin-right: 25px;
+	background-color: rgb(238, 238, 238);
+	color: #678;
+	padding: 3px;
+	
+}
+
+.subFieldContainer1{
+	display: table;
+	margin:0 auto 0 auto;
+	width: 100%;
+}
+
+.subFieldContainer2{
+	display: table;
+	border-radius:3px;
+	float: left;
+	margin: 3px;
+	padding: 3px;
+}
+
+.fieldSubHeader{
+	color:#F2610D;
+	text-align: center;
+}
+
+.fieldContent{
+
+}
+
+table.table_input, table.table_input tr, table.table_input td   {
+	background-color: #FFFFFF;
+	border: none;
+}
+table.table_input th {
+	border-bottom: 1px solid #336699;
+}
+
+.factoryField{
+	width: 300px;
+	float: left;
+	margin: 5px;
+	padding-left: 5px;
+}
+
+.left {
+    padding-left: 10px;
+    padding-top: 10px;
+    margin-left: 57px;
+    float: left;
+    position: relative;
+    width: 45%;
+    border: steelblue solid 1px;
+    height: auto;
+}
+
+.right {
+    padding-top: 10px;
+    padding-left: 10px;
+    margin-left: 10px;
+    position: relative;
+    float: left;
+    width: 45%;
+    border: steelblue solid 1px;
+    height: auto;
+}

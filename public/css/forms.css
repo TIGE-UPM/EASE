@@ -1,0 +1,233 @@
+/* GENERAL */
+
+div.fieldHeader{
+	margin-bottom:10px;
+	font-size:large;
+	color: #258;
+	background: transparent url(../images/1-4.gif) no-repeat left;
+	padding: 2px 0 0 15px;
+	/*border-bottom:1px solid #258;*/
+}
+div.fieldSubHeader{
+	margin-top:10px;
+	margin-bottom:5px;	
+	margin-left:50px;
+	font-size:medium;
+	color: #258;
+}
+div.fieldCategory{
+	margin-bottom:5px;
+	font-size:medium;
+	color: #47A;
+}
+div.fieldDiv{
+	margin-right:20px;
+	margin-left:20px;
+	margin-bottom:15px;
+	font-size:medium;
+	color: #47A;
+}
+/*VERO*/
+div.multiSelectDiv{
+	margin-right:20px;
+	margin-left:20px;
+	margin-bottom:15px;
+	font-size:medium;
+	color: #47A;
+	width: auto;
+	height:100%;
+	vertical-align:top; 
+}
+.multiSelect{
+	overflow: hidden;
+	height: auto;
+}
+/*VERO*/
+#pageTitle{
+  margin-top:20px;
+  border-bottom:1px solid #036;
+  font-size:x-large;
+  color:#369;	
+}
+
+div.buttonsDiv{
+	text-align:center;
+}
+input.button{
+	background:#DEE;
+	border:1px solid #258;
+}
+div.fieldDescription{
+	padding:3px;
+	margin-bottom:5px;
+	color:#678;
+	font-style:italic;
+	font-size:medium;
+	background:#EEE;
+	border:1px solid #CCC;
+}
+div.fieldErrors{
+	margin-bottom:5px;
+	padding:3px;
+	border:1px solid #933;
+	background:#F99;
+	color:#933;
+	display:none;
+}
+div.fieldOptions{
+	margin-bottom:5px;
+	border-top:1px solid #9CF;
+	background:#EEF;
+	font-size:small;
+	color: #036;
+}	
+div.fieldOptions a{
+	text-decoration:none;
+	font-size:small;
+	color: #036;	
+}	
+div.fieldOptions a:hover{
+	text-decoration:none;
+	font-size:small;
+	color: #369;	
+}
+div.roundHeader{
+	float:left;
+	padding:3px;
+	margin-right:10px;
+	margin-bottom:5px;
+	font-size:medium;
+	color: #336699;
+}
+div.roundField{
+	padding:3px;
+	margin-bottom:5px;
+	font-size:medium;
+	border-bottom: 1px solid #336699;
+	color:#336699;
+	font-size:small;
+}
+div.roundField input.date{
+	margin-right:15px;
+	margin-left:10px;
+	width:100px;
+}
+div.roundField a{
+	color: #F50000;
+	text-decoration:none;
+
+}
+div.roundField a:hover{
+	color:#8d0000;
+}
+
+/*validation*/
+input.ok{
+}
+input.error{
+	border:2px solid #F99;
+}
+/* LOGIN BOX */
+div#loginBox{
+	margin-top:40px;
+	width:450px;
+	margin-left:auto;
+	margin-right:auto;
+}
+div#loginBox form{
+	font-size:large;
+	padding:0px;
+	margin:0px;
+}
+
+div#loginBox form input{
+	font-size:medium;
+	background:#DEE;
+	border:1px solid #258;
+}
+
+div#loginBox form label{
+	padding-top:5px;
+	display:block;
+	text-align:right;
+	margin-right:15px;
+	float:left;
+	width:150px;
+	height:30px;
+	color:#258;	
+}
+
+div#loginBox form input[type="submit"]{
+	float:right;
+}
+div#loginBox form fieldset{
+	margin:0px;
+	border:1px solid #369;
+	color:#369;
+}
+
+/* REGISTER BOX */
+div#registerBox{
+	margin-top:40px;
+	width:500px;
+	margin-left:auto;
+	margin-right:auto;
+}
+div#registerBox form{
+	font-size:large;
+	padding:0px;
+	margin:0px;
+}
+
+div#registerBox form input{
+	background:#DEE;
+	border:1px solid #258;
+}
+
+div#registerBox form label{
+	display:block;
+	text-align:right;
+	margin-right:15px;
+	float:left;
+	width:170px;
+	height:30px;
+	color:#258;	
+}
+
+div#registerBox form input[type="submit"]{
+	float:right;
+}
+div#registerBox form fieldset{
+	margin:0px;
+	border:1px solid #369;
+	color:#369;
+}
+
+/* SELECCIONABLES */
+
+select {
+		color:#369;
+}
+
+
+.left {
+    padding-left: 10px;
+    padding-top: 10px;
+    margin-left: 57px;
+    float: left;
+    position: relative;
+    width: 45%;
+    border: steelblue solid 1px;
+    height: auto;
+}
+
+.right {
+    padding-top: 10px;
+    padding-left: 10px;
+    margin-left: 10px;
+    position: relative;
+    float: left;
+    width: 45%;
+    border: steelblue solid 1px;
+    height: auto;
+}

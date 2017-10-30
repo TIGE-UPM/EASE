@@ -1,0 +1,54 @@
+#menu_rondas .ui-widget-header{
+	background: #FFFFFF;
+	border:none;
+}
+.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited {
+	color: #FFFFFF;
+	background-color: #336699;
+}
+
+.ui-widget-content .ui-state-active {
+	background-color: #336699 !important;
+}
+
+#general-button{
+	position: fixed;
+	left:10px;
+	top:250px;
+	width: 110px;
+	border-bottom-width: 1px !important;
+}
+
+#general-button .ui-state-default, .ui-widget-content .ui-state-default{
+	border: 1px solid #336699;
+	background: #FFFFFF;
+	color: #336699;
+
+}
+#parametros-button{
+	position: fixed;
+	left:10px;
+	top:290px;
+	width: 110px;
+	border-bottom-width: 1px !important;
+}
+#modulos-button{
+	position: fixed;
+	left:10px;
+	top:330px;
+	width: 110px;
+	border-bottom-width: 1px !important;
+}
+
+#menu_general .ui-widget-header, #menu_parametros .ui-widget-header, #menu_modulos .ui-widget-header {
+	background: none;
+	border-top: none;
+	border-right: none;
+	border-left: none;
+}
+
+#botones {
+	width:500px;
+	margin-left: auto;
+	margin-right: auto;
+}

@@ -1,0 +1,376 @@
+#outcomes_container{
+	padding-left: 100px;
+	
+}
+
+/*Modificaciones a los menús jQuery*/
+
+/*Modificaciones a los menús jQuery - MENU NIVEL 2*/ menu_stocks
+#menu_produccion .ui-tabs-nav li, #menu_mkt_research .ui-tabs-nav li, #menu_ventas .ui-tabs-nav li, 
+#menu_stocks .ui-tabs-nav li, #menu_salesMain .ui-tabs-nav li, #menu_salesByRegion .ui-tabs-nav li,
+#salesByChannelAndRegion .ui-tabs-nav li, #salesByProductAndChannel .ui-tabs-nav li { 
+    margin-top: 0px; 
+    font-size: 16px; 
+} 
+
+
+#menu_produccion .ui-corner-all, #menu_produccion .ui-corner-top, #menu_mkt_research .ui-corner-all, #menu_mkt_research .ui-corner-top, 
+#menu_ventas .ui-corner-all, #menu_ventas .ui-corner-top , #menu_stocks .ui-corner-all, #menu_stocks .ui-corner-top,
+#menu_salesMain .ui-corner-all, #menu_salesMain .ui-corner-top, #menu_salesByRegion .ui-corner-all, #menu_salesByRegion .ui-corner-top,
+#salesByChannelAndRegion .ui-corner-all, #salesByChannelAndRegion .ui-corner-top, #salesByProductAndChannel .ui-corner-all, #salesByProductAndChannel .ui-corner-top {
+	border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 0px;
+	border-top-right-radius: 0px;
+	border-top-left-radius: 0px;
+	
+}
+
+#menu_produccion .ui-widget-header, #menu_mkt_research .ui-widget-header, #menu_ventas .ui-widget-header, 
+#menu_stocks .ui-widget-header, #menu_salesMain .ui-widget-header, #menu_salesByRegion .ui-widget-header,
+#salesByChannelAndRegion .ui-widget-header, #salesByProductAndChannel .ui-widget-header {
+	border-top: 0px;
+	border-right: 0px;
+	border-left: 0px;
+	border-bottom: 0px;
+}
+
+
+#menu_salesMain .ui-tabs-nav li a, #menu_salesByRegion .ui-tabs-nav li a, #salesByChannelAndRegion .ui-tabs-nav li a, #salesByProductAndChannel .ui-tabs-nav li a {
+	height: 20px;
+	padding-bottom: 1px;
+	padding-top: 1px;
+}
+
+#menu_salesMain .ui-tabs-nav li, #menu_salesByRegion .ui-tabs-nav li, #salesByChannelAndRegion .ui-tabs-nav li, #salesByProductAndChannel .ui-tabs-nav li {
+	border: 0px;
+}
+
+#menu_salesMain li.ui-tabs-active, #menu_salesByRegion li.ui-tabs-active, #salesByChannelAndRegion li.ui-tabs-active, #salesByProductAndChannel li.ui-tabs-active  {
+	border-bottom: 1px solid #336699;
+}
+
+#menu_salesMain .ui-state-hover, #menu_salesByRegion .ui-state-hover, #salesByChannelAndRegion .ui-state-hover, #salesByProductAndChannel .ui-state-hover {
+	background-color: #FFFFFF;
+	font-weight: normal;
+}
+
+#menu_salesMain .ui-state-hover a, #menu_salesByRegion .ui-state-hover a, #salesByChannelAndRegion .ui-state-hover a, #salesByProductAndChannel .ui-state-hover a,
+#menu_salesMain .ui-state-hover a:hover, #menu_salesByRegion .ui-state-hover a:hover, #salesByChannelAndRegion .ui-state-hover a:hover, #salesByProductAndChannel .ui-state-hover a:hover,
+#menu_salesMain .ui-state-hover a:link, #menu_salesByRegion .ui-state-hover a:link, #salesByChannelAndRegion .ui-state-hover a:link, #salesByProductAndChannel .ui-state-hover a:link,
+#menu_salesMain .ui-state-hover a:visited, #menu_salesByRegion .ui-state-hover a:visited, #salesByChannelAndRegion .ui-state-hover a:visited, #salesByProductAndChannel .ui-state-hover a:visited {
+	color: #336699;
+	text-decoration: none;
+	border-bottom: 1px solid #336699;
+}
+
+#menu_salesMain .ui-state-active a, #menu_salesByRegion .ui-state-active a, #salesByChannelAndRegion .ui-state-active a, #salesByProductAndChannel .ui-state-active a,
+#menu_salesMain .ui-state-active a:link, #menu_salesByRegion .ui-state-active a:link, #salesByChannelAndRegion .ui-state-active a:link, #salesByProductAndChannel .ui-state-active a:link,
+#menu_salesMain .ui-state-active a:visited, #menu_salesByRegion .ui-state-active a:visited, #salesByChannelAndRegion .ui-state-active a:visited, #salesByProductAndChannel .ui-state-active a:visited {
+	color: #336699;
+	background-color: #FFFFFF;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+/*Indicadores internos*/
+
+#atmosphere_bar .ui-widget-header, .atmosphere_bar .ui-widget-header, #qualification_bar .ui-widget-header, .qualification_bar .ui-widget-header, #deterioration_bar_1 .ui-widget-header, .deterioration_bar .ui-widget-header, #deterioration_bar_2 .ui-widget-header, #deterioration_bar_3 .ui-widget-header, #development_success_bar_1 .ui-widget-header, .development_success_bar .ui-widget-header, #development_success_bar_2 .ui-widget-header, #development_success_bar_3 .ui-widget-header, #development_success_bar_4 .ui-widget-header {
+	background: #FFFF00;
+}
+
+
+/*Modificaciones a los estilos de la API de Google Charts*/
+.google-visualization-table-table {
+	width: 100%;
+}
+
+/*Imagen inicial y botón de exportar a la derecha y de ancho definido*/
+#image_and_button {
+	float:right; 
+	width:90px;
+}
+
+/*Menús de ancho definido (principal y secundario) */
+.outcomes_header1, #results_outcomes, #production_outcomes, #sales_outcomes, #stock_outcomes, #performance_outcomes, #balance_sheet_outcomes, #display_outcomes, #mkt_reasearch_outcomes, #graphic_outcomes{
+	
+}
+
+/*Menú secundario centrado, punteado y de tamaño menor que el principal*/
+.outcomes_header2{
+	width: 800px;
+	padding-top: 7px;
+	margin-left: auto; 
+	margin-right: auto;
+	border:1px dotted #336699;
+	font-style:italic;
+}
+
+
+/*Propiedades de los menus*/
+#outcomes_nav ul{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	text-align:center;
+}
+
+#outcomes_nav ul li{
+	display: inline-block; 
+	margin-bottom: 9px;
+}
+
+#outcomes_nav ul li a{
+	padding: 3px 10px;
+	border:1px solid #336699;
+	color: #336699;
+	width: 150px;
+
+}
+
+
+
+
+
+
+/*Propiedades del menú fijo a la izquierda*/
+#pr_tab{
+	position: fixed;
+	left:10px;
+	top: 250px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#sales_tab{
+	position: fixed;
+	left:10px;
+	top: 280px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#graphics_tab{
+	position: fixed;
+	left:10px;
+	top: 310px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#display_evolution_tab{
+	position: fixed;
+	left:10px;
+	top: 310px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#stocks_tab{
+	position: fixed;
+	left:10px;
+	top: 340px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#display_tab{
+	position: fixed;
+	left:10px;
+	top: 370px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#res_tab{
+	position: fixed;
+	left:10px;
+	top: 400px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#balance_sheet_tab{
+	position: fixed;
+	left:10px;
+	top: 430px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#performance_tab{
+	position: fixed;
+	left:10px;
+	top: 460px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#market_researches_tab{
+	position: fixed;
+	left:10px;
+	top: 490px;
+	z-index: 1000;
+	background-color: white;
+}
+
+#image_and_button {
+	z-index: 1000;
+}
+
+#outcomes_nav ul li a:hover{
+	background-color: #336699;
+	color: #FFFFFF;
+}
+
+.isActive {
+	background-color: #336699 !important;
+	color: white !important;
+}
+
+
+/*Título de la sección en la que se encuentra el usuario*/
+.section_title {
+	text-align: center; 
+	font-size: 25px; 
+	color: #336699;
+	width: 800px;
+	margin-left:auto;
+	margin-right:auto;
+}
+/**/
+.invisible{
+	border:0px;
+	background:transparent;
+}
+
+.categories{
+	text-align:left;
+}
+
+/*Propiedades de las tablas*/
+
+/*Centradas*/
+
+/*outcomes_table es para las tablas de Stocks y ventas*/
+table.outcomes_table{
+	margin-left:auto; 
+    margin-right:auto;
+	border: rgb(238,238,238) 1px solid;
+}
+
+table.outcomes_table th{
+	background:#FFF;
+	padding:3px;
+	font-size:14px;
+	border-bottom:#369 2px solid;
+}
+
+
+/*filas de diferente color para las tablas*/
+td.hor_group_even{
+	background:#fff;
+}
+td.hor_group_odd{
+	background: rgb(250,250,250);
+}
+
+/*Cabecera 1 de las tablas (STOCKS Y VENTAS)*/
+thead.outcomes_table_header th{
+	font-size: 18px;
+	font-weight: bold;
+}
+
+/*Cabecera 2 de las tablas (STOCKS Y VENTAS)*/
+thead.outcomes_table_header2 th{
+	font-size: 14px;
+	font-weight: bold;
+}
+
+/*Cabecera 2 de las tablas (STOCKS Y VENTAS)*/
+thead.outcomes_table_header3 th{
+	font-style: italic;
+	font-weight: bold;
+}
+
+.vertical_group_open{
+	border-left:2px solid rgb(238,238,238);
+}
+
+/*Cuentas de resultados:TITULOS*/
+#titulo_cuentas_resultados {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+#titulo_cuentas_resultados ul{
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	text-align:center;
+}
+
+#titulo_cuentas_resultados ul li {
+	display: inline-block;
+	padding: 0px 30px;
+}
+
+/*Estilos de las cuentas de resultados*/
+.titulo_cuenta_resultados {
+	font-size: 18px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.titulo_cuenta_resultados2{
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.titulo_cuenta_resultados3{
+	font-size: 12px;
+	font-weight: bold;
+	text-align: left;
+}
+
+.resultados_parcial{
+}
+
+.col1 {
+	width: 5px;
+}
+
+.col2 {
+	width: 185px;
+}
+.col3 {
+	width: 135px;
+}
+
+tr.resultados_total td{
+	font-weight: bold;
+	color: black;
+	font-size: 16px;
+}
+
+tr.resultados_total { 
+
+}
+
+tr.resultados_subtotal td{
+	color: black;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+tr.resultados_subtotal { 
+
+}
+
+.tabla_cuentas_resultados  { 
+	padding: 5px 5px;
+	width: 800px;
+	margin-left:auto;
+	margin-right:auto;
+	border-bottom: 1px solid #336699;
+}

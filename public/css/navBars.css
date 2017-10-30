@@ -1,0 +1,52 @@
+div#userBox {
+	float:right;
+	font-family: calibri;
+	font-size:medium;
+	color:#999;
+	padding:2px;
+}
+
+
+/* NAVBAR */
+div#navBar {
+}
+
+div#navBar ul {
+  margin: 0px;
+  padding: 2px;
+  font-family: calibri;
+  font-size: medium;
+  white-space: nowrap;
+
+}
+
+div#navBar li {
+  list-style-type: none;
+  display: inline;
+  padding: 0px 10px 2px;
+}
+
+
+li a#currentTab{
+	color:#369;
+}
+/* SUBBAR */
+
+div#subBar {
+  width: 100%;
+
+}
+
+div#subBar ul {
+  margin: 0px;
+  padding: 0px;
+  font-family: calibri;
+  font-size: small;
+  white-space: nowrap;
+}
+
+div#subBar li {
+  list-style-type: none;
+  display: inline;
+  padding: 0px 8px;
+}
