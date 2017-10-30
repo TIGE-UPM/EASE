@@ -38,7 +38,7 @@
 			<br/>
 			<div id="pricesFieldContainer" class="fieldDiv">
 				<div id="pricesFieldDescription" class="fieldDescription">
-					Determine la pol&iacute;tica de precios de sus productos para cada regi&oacute;n y canal:
+					Determine la política de precios de sus productos para cada región y canal:
 				</div>
 				<div id="pricesFieldsErrors" class="fieldErrors">
 				</div>
@@ -114,10 +114,6 @@
 				width: 150px;
 				float: right;
 			
-			}
-			.mkt_trade_region{
-			text-align:center; 
-				float:right
 			}
 			
 			.subslider_container {
@@ -215,7 +211,7 @@
 			<div id="advertisingbudgetDistributionField" class="fieldDiv">
 				<br />
 				<div id="advertisingbudgetDistributionFieldDescription" class="fieldDescription" align="center">
-					Determine la distribuci&oacute;n del presupuesto de Publicidad por productos(%) y posteriormente para cada producto su distribuci&oacute;n por canales y regiones (%):
+					Determine la distribución del presupuesto de Publicidad por productos(%) y posteriormente para cada producto su distribución por canales y regiones (%):
 				</div>
 				<div id="advertisingbudgetDistributionFieldsErrors" class="fieldErrors">
 				</div>
@@ -306,7 +302,7 @@
 					$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + ' €');
 						<?php foreach ($this->media as $media){ ?>
 							<?php foreach ($this->regions as $region){?>
-						$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+						$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 
 					<?php }}}?>
 					
@@ -316,10 +312,10 @@
 								
 								//Para actualizar el valor de los spans de los sliders de publicidad al cambiar el presupuesto de publicidad
 								$("#advertisingBudget").keyup(function() {
-									$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>").val())/100).toFixed(0)).toString() + '  €');
+									$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>").val())/100).toFixed(0)).toString() + ' €');
 									<?php foreach ($this->media as $media){ ?>
 										<?php foreach ($this->regions as $region){?>
-										$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+										$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 									<?php }}?>
 								})
 								
@@ -336,10 +332,10 @@
 									slide: function(e,ui) {
 										$('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val(ui.value);
 										$(ui.value).val($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val());
-										$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + '  €');
+										$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + ' €');
 										<?php foreach ($this->media as $media){ ?>
 											<?php foreach ($this->regions as $region){?>
-												$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+												$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 										<?php }}?>
 									}
 								});
@@ -353,10 +349,10 @@
 									}
 									$('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val($(this).val());
 									$("#defaultslide_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>").slider("value" , $(this).val());
-									$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($(this).val())/100).toFixed(0)).toString() + '  €');
+									$("#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#advertisingBudget").val())*($(this).val())/100).toFixed(0)).toString() + ' €');
 									<?php foreach ($this->media as $media){ ?>
 										<?php foreach ($this->regions as $region){?>
-										$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($(this).val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+										$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($(this).val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 									<?php }}?>
 								})
 							
@@ -377,7 +373,7 @@
 											slide: function(e,ui) {
 												$('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val(ui.value);
 												$(ui.value).val($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val());
-												$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+												$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text(((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 											}
 										});	
 										//Cambios en los sliders y spans e input de publicidad al introducir un valor en el input que no sea de productos
@@ -390,7 +386,7 @@
 											}
 											$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>").val($(this).val());
 											$("#defaultslide_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>").slider("value" , $(this).val())
-											$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text((((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($(this).val())/10000)).toFixed(0)).toString() + '  €');
+											$("#currentval_marketing_advertising_percentage_distribution_product_<?php echo $product['product_number']?>_media_<?php echo $media['media_number']?>_region_<?php echo $region['region_number']?>_value").text((((($("#advertisingBudget").val())*($('#currentval_marketing_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val())*($(this).val())/10000)).toFixed(0)).toString() + ' €');
 										})
 								<?php }
 								}?>
@@ -400,25 +396,6 @@
 
 				</script>
 			</div>
-				<!-- JESUS -- Selector de campa�as de trade marketing-->
-
-
-				<div id="marketingCampaignField" class="fieldDiv">
-					<div id="campaignFieldDescription" class="fieldDescription" align="center">
-						Elija campa&ntilde;a de publicidad que quiere que se lleve su empresa.
-					</div>
-					<br><br/>
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Campa&ntilde;a:&nbsp;
-						<select name="marketing[campaign]" id="marketingCampaign" display="block" align="center">
-						<?php foreach ($this->marketingCampaign as $marketingCampaign){?>
-								<option value="<?php echo $marketingCampaign['campaign_value']?>" <?php echo (isset($this->campaignDecision) && $this->campaignDecision==$marketingCampaign['campaign_value'])? "selected":""?>>
-								<?php echo $marketingCampaign['name']?>
-								</option>
-							<?php } ?>
-					</select>
-				</div>
-				<br><br/>
-			
 		</div>
 		<br/>
 		<div class="fieldContainer">
@@ -438,44 +415,11 @@
 				</br>
 			</div>
 			
-<!--JESUS-> Codigo para meter una tabla al estilo de las antiguas, con divisi�n por regi�n -->
-
-
-			<div id="trademktRegionField" class="fieldDiv">
-				<div id="trademktRegionDistributionFieldDescription" class="fieldDescription" align="center">
-					Determine la distriuci&oacute;n del presupuesto de Trade Marketing por regi&oacute;n (%):
-				</div>
-				<div id="trademktRegionDistributionFieldsErrors" class="fieldErrors">
-				</div>
-				
-				<div id = "trademktregion">
-					<table border="3" bordercolor="brown" align="center">
-					<thead>
-						<th>Regi&oacute;n</th>
-						<th>(%)</th>
-					</thead>
-						<?php foreach ($this->regions as $region){ ?>	
-						<tr>
-						<td><?php echo $region['name']?></td>
-						<td><input type="text" name="marketing[trademkt_budget_region][region_<?php echo $region['region_number']?>]" class="small mkt_trade_region"
-										<?php echo isset($this->trademktBudgetRegionDecision)?
-											'value = "'.$this->trademktBudgetRegionDecision['region_'.$region['region_number']] 
-													.'"':'value = "0"'?></input>
-									 		
-						</td>
-						</tr>
-						<?php }
-							 //for trademedia?>
-					</table>
-				</div>
 			
-			</div>
-			
-
 			<div id="trademktbudgetDistributionField" class="fieldDiv">
 				<br />
 				<div id="trademktbudgetDistributionFieldDescription" class="fieldDescription">
-					Determine la distriuci&oacute;n del presupuesto de Trade Mkt por productos (%) y posteriormente para cada producto su distribuci&oacute;n por canales y trade media (%):
+					Determine la distriuci&oacute;n del presupuesto de Trade Mkt por productos (%) y posteriormente para cada producto su distribución por canales y trade media (%):
 				</div>
 				<div id="trademktbudgetDistributionFieldsErrors" class="fieldErrors">
 				</div>
@@ -534,13 +478,13 @@
 								}?>
 								</div>
 							</div>
-								</div>
+							
 							
 							<div style="clear: both"></div>
 							<br />
 							
 						<?php }?>
-					
+					</div>
 				<?php } ?>
 				</div>
 				
@@ -561,10 +505,10 @@
 					});
 					
 					//Pone el valor inicial a los span de los sliders
-					$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + '  €');
+					$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + ' €');
 						<?php foreach ($this->trademedia as $trademedia){ ?>
 							<?php foreach ($this->channels as $channel){?>
-						$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+						$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 
 					<?php }}}?>
 					
@@ -574,10 +518,10 @@
 								
 								//Para actualizar el valor de los spans de los sliders de publicidad al cambiar el presupuesto de publicidad
 								$("#trademkt").keyup(function() {
-									$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>").val())/100).toFixed(0)).toString() + '  €');
+									$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>").val())/100).toFixed(0)).toString() + ' €');
 									<?php foreach ($this->trademedia as $trademedia){ ?>
 										<?php foreach ($this->channels as $channel){?>
-										$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+										$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 									<?php }}?>
 								})
 								
@@ -594,10 +538,10 @@
 									slide: function(e,ui) {
 										$('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val(ui.value);
 										$(ui.value).val($('#currentval_trade_mkt_advertising_budget_distribution_product_<?php echo $product['product_number']?>').val());
-										$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + '  €');
+										$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())/100).toFixed(0)).toString() + ' €');
 										<?php foreach ($this->trademedia as $trademedia){ ?>
 										<?php foreach ($this->channels as $channel){?>
-												$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+												$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 										<?php }}?>
 									}
 								});
@@ -611,10 +555,10 @@
 									}
 									$('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val($(this).val());
 									$("#defaultslide_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>").slider("value" , $(this).val());
-									$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($(this).val())/100).toFixed(0)).toString() + '  €');
+									$("#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>_value").text(((($("#trademkt").val())*($(this).val())/100).toFixed(0)).toString() + ' €');
 									<?php foreach ($this->trademedia as $trademedia){ ?>
 										<?php foreach ($this->channels as $channel){?>
-										$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($(this).val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+										$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($(this).val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 									<?php }}?>
 								})
 							
@@ -635,7 +579,7 @@
 											slide: function(e,ui) {
 												$('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val(ui.value);
 												$(ui.value).val($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val());
-												$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + '  €');
+												$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text(((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($('#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>').val())/10000).toFixed(0)).toString() + ' €');
 											}
 										});	
 										//Cambios en los sliders y spans e input de publicidad al introducir un valor en el input que no sea de productos
@@ -648,7 +592,7 @@
 											}
 											$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>").val($(this).val());
 											$("#defaultslide_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>").slider("value" , $(this).val())
-											$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text((((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($(this).val())/10000)).toFixed(0)).toString() + '  €');
+											$("#currentval_marketing_trade_mkt_percentage_distribution_product_<?php echo $product['product_number']?>_trademedia_<?php echo $trademedia['trademedia_number']?>_channel_<?php echo $channel['channel_number']?>_value").text((((($("#trademkt").val())*($('#currentval_marketing_trade_mkt_budget_distribution_product_<?php echo $product['product_number']?>').val())*($(this).val())/10000)).toFixed(0)).toString() + ' €');
 										})
 								<?php }
 								}?>
@@ -656,12 +600,9 @@
 						}?>
 					});
 				</script>
-
-	
-
 				
-				</div>
-			
+				
+			</div>
 			
 			
 			<script>
@@ -679,14 +620,13 @@
 					$( "#trademediaField" ).toggle( "easeInElastic" );
 				});
 			</script>
-		
+		</div>
 		<br/>
 		<div class="buttonsDiv">
 			<input class="button" type="submit" value="Guardar">
 		</div>
-	
 	</form>
 </div>
 
-</div>
+
 	

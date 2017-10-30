@@ -22,46 +22,44 @@
 						<div id="modificationIdiFieldDescription" class="fieldDescription" align="center">
 							Esta acción le permite modificar las características con las que est&aacute;n siendo fabricados sus productos.
 						</div>
+						
 						<?php foreach ($this->products as $product){?>
 							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
 								<div class="fieldSubHeader" style="color:#F2610D">
-									<br />
+									<br/>
 									<?php echo $product['name']?>
 								</div>
 								<div id="changeIdiFieldDescription" class="fieldDescription">
-								<br />
-								<div class="fieldDiv" style="color:#4169E1;text-align:right;padding-right:500px">
-									  <?php foreach ($this->qualityParams as $qualityParam){?>
-									  <?php echo $qualityParam['name'] ?> : &nbsp;
-									<select name="idi[changeIdi][product_<?php echo $product['product_number'];?>][product_quality_<?php echo $qualityParam['quality_param_number'];?>]">
-										<?php if (isset($this->changeIdiDecision)) { ?>
-												<?php foreach ($this->changeidi as $changeidi){?> 
-													<option value="<?php echo $changeidi['value']?>" 
-														<?php echo (isset($this->changeIdiDecision) && $this->changeIdiDecision['product_'.$product['product_number']]['product_quality_'.$qualityParam['quality_param_number']]==$changeidi['value'])? "selected":""?>>
-														<?php echo $changeidi['descriptor']?>
-													</option>
-												<?php } } else { ?>
-												<?php foreach ($this->changeidi as $changeidi){?> 
-													<option value="<?php echo $changeidi['value']?>" 
-														<?php echo ($changeidi['value']==0? "selected":"")?>>
-														<?php echo $changeidi['descriptor']?>
-													</option>
-												<?php } //chageidi ?>				
-										<?php }//else?>
-									</select><br />
-									&nbsp;&nbsp;
+									<br />
+									<div class="fieldDiv" style="color:#4169E1;text-align:right;padding-right:500px">
+									  <?php foreach ($this->qualityParams as $qualityParam){ ?>
+										  <?php if ($qualityParam['product_number'] == $product['product_number']) { ?>
+											<?php echo $qualityParam['name'] ?> : &nbsp; 
+											<select name="idi[changeIdi][product_<?php echo $product['product_number'];?>][product_quality_<?php echo $qualityParam['quality_param_number'];?>]">
+												<?php if (isset($this->changeIdiDecision)) { ?>
+													<?php foreach ($this->changeidi as $changeidi){ ?> 
+														<option value="<?php echo $changeidi['value'] ?>" <?php echo (isset($this->changeIdiDecision) && $this->changeIdiDecision['product_'.$product['product_number']]['product_quality_'.$qualityParam['quality_param_number']]==$changeidi['value'])? " selected":"" ?>><?php echo $changeidi['descriptor']?></option>
+													<?php } ?>
+												<?php } else { ?> 
+													<?php foreach ($this->changeidi as $changeidi){ ?> 
+														<option value="<?php echo $changeidi['value'] ?>"<?php echo ($changeidi['value']==0? " selected":"") ?>><?php echo $changeidi['descriptor'] ?></option>
+													<?php } //changeidi ?>				
+												<?php } //else ?>
+											</select><br />
+											&nbsp;&nbsp;
+										<?php } ?>
 									<?php } ?>
+									</div>
 								</div>
-								</div>
-							<?php } // if?>
-						<?php } //products?>
+							<?php } // if ?>
+						<?php } //products ?>
 					</div>
 				</div>
 			</div>
 			<br/>
 			<div class="fieldContainer">
 				<div class="fieldHeader" id="newIdiFieldButton">
-					Nuevos productos		
+					<?php if ($this->round_number<3){?> Otras decisiones <?php } else { ?>Nuevos productos <?php } ?>		
 				</div>
 				<div id="newIdiFieldContainer">
 					<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">No disponible para esta ronda</h3><?php }?>

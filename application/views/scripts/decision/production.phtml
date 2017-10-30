@@ -11,11 +11,9 @@
 <?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/jquery-ui.1.10.3.min.js', $type = 'text/javascript');?>
 <?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/edit-decisions.js', $type = 'text/javascript');?>
 <?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/build_factory_confirm.js', $type = 'text/javascript');?>
-<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/sellFactory.js', $type = 'text/javascript');?>
 
 <?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.progressbar.js', $type = 'text/javascript');?>
 <?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/jquery.progressbar.min.js', $type = 'text/javascript');?>
-
 
 <!--http://simeydotme.github.io/jQuery-ui-Slider-Pips/-->
 <?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/lib/pips-slider/jquery-ui-slider-pips.min.js', $type = 'text/javascript');?>
@@ -35,64 +33,13 @@
 <div id='content'>
 	<img src="/images/factory.gif" alt="factory" width="85" height="98" style="float:right" />	
 	<form name="production" id="formProduction" onsubmit="return validateProductionForm();" method="post">
-
-		<!-- JESUS-->
-
-		<div class="fieldContainer">
-			<div class="fieldHeader" id="suppliersFieldButton">
-				Selecci&oacute;n de la Sede
-			</div>
-			<img src="/images/truck_2.gif" alt="finance" width="120" height="75" style="float:right" />
-			<div id="suppliersField" class="fieldDiv">
-				<div id="SuppliersFieldDescription" class="fieldDescription" align="center">
-						Determine la sede econ&oacute;mica de la empresa
-					</div>
-				
-				<div style="clear: both"></div>
-				
-						<div id="suppliersNumberField" class="fieldDiv"  align="center">
-						Regi&oacute;n:
-						
-							<?php if ($this->round_number == 1) {?>
-							<select name="production_decision[companyHQ]" id="companyHQName" display="block">
-							
-							<?php foreach ($this->regions as $region){?>
-
-								<option value="<?php echo $region['region_number']?>" <?php echo (isset($this->companyHQs) && ($this->companyHQs==$region['region_number']))? "selected":""?>>
-									<?php echo $region['name']?></option>
-
-
-							<?php } ?>
-							<?php } ?>
-							<?php if ($this->round_number != 1) {?>
-								<?php foreach ($this->regions as $region){?>
-									<?php if ($region['region_number']==$this->companyHQs) {?>
-
-										<?php echo $region['name']; ?>
-
-									<?php } ?>
-								<?php } ?>
-							<?php } ?>
-
-
-							</select>
-					
-				</div>
-			<div style="clear: both"></div>
-			</div>
-		</div>
-
-
-	<br />
-	
-		
 		<div class="fieldContainer">
 			<div class="fieldHeader" id="regionFieldButton">
-				Regi&oacute;n de Fabricaci&oacute;n			
+				Región de Fabricación			
 			</div>
 			<div id="regionField" class="fieldDiv">
 				<div id="regionFieldDescription" class="fieldDescription" align="center">
-					Elija la regi&oacute;n de fabricaci&oacute;n de sus productos.
+					Elija la región de fabricación de sus productos.
 				</div >
 				<br />
 				<?php $factory_number=1;?>
@@ -100,7 +47,7 @@
 				<input type="hidden" value="<?php echo ($this->numberOfFactories);?>" id="numberOfFactories" />			
 				<div id='newFactoryFieldDiv'>
 				
-				   N&uacute;mero de F&aacute;bricas: 
+				   Número de F&aacute;bricas: 
 					<?php echo ($this->numberOfFactories);
 					$factory_counter=$this->numberOfFactories;
 					if ($factory_counter==0)
@@ -125,14 +72,14 @@
 						<div class="factoryHeader">
 							F&aacute;brica <?php echo $factory['factory_number'];?>
 						</div>
-							<div style="margin-left:10px">Regi&oacute;n:&nbsp;
+							<div style="margin-left:10px">Región:&nbsp;
 							<?php $constructed=$this->lastFactory;
 								$round_constructed=$this->roundFactory;
 								if ($factory_number<$constructed && (($this->round_number>$round_constructed['factory_number_'.$factory_number])||($round_constructed['factory_number_'.$factory_number]>$this->round_number))){
 									$existing_factory=1;
 								}
 							?>
-							<!-- Desde aqu� -->
+							<!-- Desde aquí -->
 							<?php if ($existing_factory==1) {?>
 								<select disabled="disabled" name="production_decision[factories][factory_number_<?php echo $factory_number?>][region]" id="regionField" display="block">	
 									<?php foreach ($this->regions as $region){?>
@@ -160,7 +107,7 @@
 									<?php } ?>
 									</select>
 							<?php } ?>
-							<!-- Hasta aqu� -->
+							<!-- Hasta aquí -->
 						<?php
 							//var_dump($this->addCapacityDecision['factory_number_'.$factory_number]);die();
 							if (isset($this->addCapacityDecision)&&count($this->addCapacityDecision)>0) { 
@@ -169,7 +116,7 @@
 									<div class="factoryCapacityHeader">Ampliar F&aacute;brica <?php echo $factory_number?></div>
 									<div id="addCapacity<?php echo $factory_number ?>" class="fieldOptions">
 										<div class="factoryCapacityField" id="factoryCapacityField_<?php echo $factory_number ?>">
-											&nbsp;&nbsp;N&uacute;mero de m&aacute;quinas:&nbsp;
+											&nbsp;&nbsp;Número de m&aacute;quinas:&nbsp;
 											<input type="text" name="production_decision[capacity][factory_number_<?php echo $factory_number ?>]" class="small" value="<?php echo($this->addCapacityDecision['factory_number_'.$factory_number]); ?>"></input>
 											
 										</div>
@@ -182,7 +129,7 @@
 										<!-- <a href="javascript:void(0);" OnClick="addCapacity(<?php //echo $factory_number ?>);return false;">(+) Ampliar F&aacute;brica <?php //echo $factory_number?></a> -->
 										<a href="javascript:void(0);" OnClick="addCapacity('factoryCapacityField_<?php echo $factory_number ?>');return false;">(+) Ampliar F&aacute;brica</a>
 										<div class="factoryCapacityField" id="factoryCapacityField_<?php echo $factory_number ?>" style="visibility:hidden;">
-											&nbsp;&nbsp;N�mero de m&aacute;quinas:&nbsp;
+											&nbsp;&nbsp;Número de m&aacute;quinas:&nbsp;
 											<input type="text" name="production_decision[capacity][factory_number_<?php echo $factory_number ?>]" class="small"></input>
 											
 										</div>
@@ -203,9 +150,9 @@
 						
 						<?php $factory_number++;?>
 					<?php } ?>	
-			
+				</div>	
 				<div style="clear:both;"></div>
-				</div>
+				
 			<?php /* if($this->round_number>1){?>
 				<?php $capacity_number=1;?>
 				<?php foreach ($this->game_factories as $factory){?>
@@ -226,62 +173,32 @@
 				<input class="button" type="submit" value="Construir" OnClick="javascript:buildFactoryConfirm();">
 				<input id="buildValidate" type="hidden" name="buildValidate" value="1">
 				</div>
-			</div>	
-			</div>
-			</div>		
-
-			<br/>
-	<!--JEsus
-			<div class="fieldContainer" <?php if ($this->numberOfFactories != 0){?> style="display: none" <?php } ?>>
-				<div class="fieldHeader" id="sellFactoryFieldButton" >
-					Venta de f�bricas <?php echo $this->numberOfFactories ?>
-				</div>
-				<div id="sellFactoyField" class="fieldDiv" style="display: none">
-					<div id="sellFactoryFieldDescription" class="fieldDescription" align="center">
-						Elija la f�brica que desea vender.
-					</div>
-					<br />
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fabricas a vender:&nbsp;
-						<select name="production_decision[sell_factory]" id="sellFactory" display="block" style="margin-left:50px;">
-							<option value="nignuna"> Ninguna </option>
-						<?php foreach ($this->game_factories as $factories){?>
-								<option value="<?php echo $factories['region_number']?>" <?php echo (isset($this->factories) && $this->factories==$factories['region_number'])? "selected":""?>>
-								<?php foreach ($this->regions as $regions) {
-									foreach ($this->ofertaFabrica as $ofertaFabrica) {
-										
-									
-									if ($regions['region_number']==$factories['region_number'] && $ofertaFabrica['region_number'] == $factories['region_number']){?>
-								
-
-								<?php echo $regions['name']." - " .$ofertaFabrica['oferta'];}}}?>
-								</option>
-							<?php } ?>
-					</select>
-				</div>
-			</div>
-
-		<br/> -->
-
-	<div class="fieldContainer">
-		<div class="fieldHeader" id="qualityFieldButton">
-				Calidad			
+			</div>					
 		</div>
-		<div id="qualityField" class="fieldDiv">
-			<div id="qualityFieldDescription" class="fieldDescription" align="center">
-				Elija la calidad de fabricaci&oacute;n de sus productos.
+		</div>
+
+		<br/>
+
+		<div class="fieldContainer">
+			<div class="fieldHeader" id="qualityFieldButton">
+				Calidad			
 			</div>
-			<?php $id=1;?>
-			<?php foreach ($this->products as $product){?>
-			<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
-			
-			<div class="fieldSubHeader" style="color:#F2610D">
-			<br />
-					<?php echo $product['name']?>
-			</div>
-			<div id="calidadFieldDescription" class="fieldDescription">
-			<br />
-			<div class="fieldDiv" style="color:#4169E1" align="center">
-		 	 <?php 
+			<div id="qualityField" class="fieldDiv">
+	<div id="qualityFieldDescription" class="fieldDescription" align="center">
+		Elija la calidad de fabricación de sus productos.
+	</div>
+	<?php $id=1;?>
+	<?php foreach ($this->products as $product){?>
+	<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+	
+	<div class="fieldSubHeader" style="color:#F2610D">
+	<br />
+			<?php echo $product['name']?>
+	</div>
+	<div id="calidadFieldDescription" class="fieldDescription">
+	<br />
+	<div class="fieldDiv" style="color:#4169E1" align="center">
+		  <?php 
 			$new_launch=0;
 			//$myproduct=new Model_DbTable_Games_Evolution_Np_NewProducts();
 			//echo($this->game_id."-".$this->company_id."-".$this->round_number."-".$product['product_number']);
@@ -299,39 +216,39 @@
 					<?php echo $i?>
 				</option>
 			<?php }//for?>
-			</select>
-			&nbsp;&nbsp;
-	 
+		</select>
+		&nbsp;&nbsp;
+ 
+		<?php } ?>
+		<?php } ?>
+		</div>
+			
+		<!-- VERO-->
+		<div class="multiSelectDiv" style="color:#4169E1;" align="center">
+		Funcionalidades:&nbsp;<br />
+		<?php 
+			$new_launch=0;
+			if ($this->new_product[$product['product_number']]==1 && $this->prev_rnd_new_product[$product['product_number']]!=1){
+				$new_launch=1;
+			}
+		?>
+		<select multiple="multiple"  style="overflow: hidden;"  class="multiSelect" display="block" <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[functionality_params][product_number_<?php echo $product['product_number'];?>]"  id="funcionalities_param_<?php echo $id?>" >	
+			<?php foreach ($this->functionalities as $functionalities){?> 
+					<option value="<?php echo $functionalities['value']?>" <?php for($i=0; $i<count($this->functionalities); $i++){?> <?php echo  (isset($this->FunctionalitiesDecision) && $this->FunctionalitiesDecision['product_number_'.$product['product_number']][$i]==$functionalities['value'])? "selected":""?><?php }//for?>>
+					<?php echo $functionalities['descriptor']?>
+					</option>
 			<?php } ?>
-			<?php } ?>
-			</div>
-				</div>
-			<!-- VERO-->
-			<div class="multiSelectDiv" style="color:#4169E1;" align="center">
-				Funcionalidades:&nbsp;<br />
-				<?php 
-					$new_launch=0;
-					if ($this->new_product[$product['product_number']]==1 && $this->prev_rnd_new_product[$product['product_number']]!=1){
-						$new_launch=1;
-					}
-				?>
-				<select multiple="multiple"  style="overflow: hidden;"  class="multiSelect" display="block" <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[functionality_params][product_number_<?php echo $product['product_number'];?>][]]"  id="funcionalities_param_<?php echo $id?>" >	
-					<?php foreach ($this->functionalities as $functionalities){?> 
-							<option value="<?php echo $functionalities['value']?>" <?php for($i=0; $i<count($this->functionalities); $i++){?> <?php echo  (isset($this->FunctionalitiesDecision) && $this->FunctionalitiesDecision['product_number_'.$product['product_number']][$i]==$functionalities['value'])? "selected":""?><?php }//for?>>
-							<?php echo $functionalities['descriptor']?>
-							</option>
-					<?php } ?>
-				</select>
-				&nbsp;&nbsp;
+		</select>
+		&nbsp;&nbsp;
 
-			</div>
+		</div>
 		
 		<?php } ?>
 		</div>
 		<?php $id++;?>
-		<?php }//for product ?>	
-		<div id="nProduct"><input type ="hidden" value="<?php echo $id;?>"></div>
-	
+	<?php }//for product ?>	
+	<div id="nProduct"><input type ="hidden" value="<?php echo $id;?>"></div>
+</div>
 			<script>
 				$(function(){
 					$("#popupForm").hide();
@@ -346,7 +263,7 @@
 				});
 
 				
-			
+				
 				
 				$(document).ready(function(){
 					var nProduct;
@@ -452,7 +369,7 @@
 						contador+= parseInt(unitsInputs[i].value);
 
 						if(unitsInputs[i].value <0){
-							alert("No se aceptan n�mero negativos. Por favor, distribuya correctamente el stock");
+							alert("No se aceptan número negativos. Por favor, distribuya correctamente el stock");
 							boolean= false;
 						}
 						else{
@@ -544,7 +461,7 @@
 			</div>
 			<div id="unitsFields" class="fieldDiv">
 				<div id="unitsFieldDescription" class="fieldDescription" align="center">
-					Determine la cantidad de unidades a producir y distribuir en cada canal y para cada regi&oacute;n.
+					Determine la cantidad de unidades a producir y distribuir en cada canal y para cada región.
 				</div>
 				<div id="unitsFieldsErrors" class="fieldErrors">
 				</div>
@@ -609,16 +526,16 @@
 			<img src="/images/truck_2.gif" alt="finance" width="120" height="75" style="float:right" />
 			<div id="suppliersField" class="fieldDiv">
 				<div id="SuppliersFieldDescription" class="fieldDescription" align="center">
-						Determine la pol�tica para la gesti&oacute;n de los proveedores.
+						Determine la política para la gesti&oacute;n de los proveedores.
 					</div>
 				<div class="fieldHeader">
-					N&uacute;mero de Proveedores			
+					Número de Proveedores			
 				</div>
 				<div style="clear: both"></div>
 				<div style="width: 600px; margin-left: auto; margin-right: auto;">
 					<div id="suppliersNumberslider" style="width: 350px; float: left;"></div>	
 					<div id="suppliersNumberField" class="fieldDiv" style="width: 150px; float: left;">
-						N�mero:&nbsp
+						Número:&nbsp
 						<select name="suppliers[number]" id="suppliersNumber" display="block">
 							<?php for($i=1;$i<=5;$i++){?>
 								<option value="<?php echo $i?>" <?php echo (isset($this->numberDecision) && $this->numberDecision['number']==$i)? "selected":""?>><?php echo $i?></option>
@@ -632,7 +549,7 @@
 				</div>
 				<div style="width: 600px; margin-left: auto; margin-right: auto;">
 					<div style="width: 600px;">
-						Canales de distribuci&oacute;n:
+						Canales de distribución:
 						<br/>
 					</div>
 					<div id="payTermsFieldslider" style="width: 350px; float: left;"></div>	
@@ -653,12 +570,12 @@
 		<!-- VERO-->
 		<div class="fieldContainer">
 			<div class="fieldHeader" id="unitsStockField")=>
-				Distribuci&oacute;n del stock		
+				Distribución del stock		
 			</div>
 			<div id="unitsStockField" class="fieldDiv">
 
 				<div id="unitsStockFieldDescription" class="fieldDescription" align="center">
-					Determine la cantidad de unidades de stock a distribuir en cada canal y para cada regi�n.
+					Determine la cantidad de unidades de stock a distribuir en cada canal y para cada región.
 				</div>
 
 			<div id="unitsStockField" class="content">
@@ -666,7 +583,7 @@
 				<div id = "unitsStockLeftField" class='left'>
 				<?php $id=1; $regionN=1; $channelN=1; ?>
 					<div id="unitsStockLeftFieldDescription" align="center">
-						Distribuci&oacute;n original
+						Distribución original
 					</div>
 					<div id="unitsStockLeftFieldsErrors" class="fieldErrors">
 					</div>
@@ -706,7 +623,7 @@
 						</table>
 					</div>
 					<div class="buttonsDiv">
-						<input type="button" id="copy_button" class="button" value="Mantener distribuci&oacute;n original" onclick="save_stock('<?php echo $id;  echo $regionN; echo $channelN;?>')" />
+						<input type="button" id="copy_button" class="button" value="Mantener distribución original" onclick="save_stock('<?php echo $id;  echo $regionN; echo $channelN;?>')" />
 					</div>
 					<?php } ?>
 					<?php $id=$id+1; ?>
@@ -717,7 +634,7 @@
 				<div id="unitsStockRightField" class="right">
 				<?php $id=1; ?>
 					<div id="unitsStockRightFieldDescription" align="center">
-						Distribuci&oacute;n final
+						Distribución final
 					</div>
 					<div id="unitsStockRightFieldsErrors" class="fieldErrors">
 					</div>
@@ -769,7 +686,7 @@
 			<div id="unitsStockCacheField" class="small" style="display: none;">
 				<?php $id=1; ?>
 					<div id="unitsStockCacheFieldDescription" align="center">
-						Distribuci&oacute;n final
+						Distribución final
 					</div>
 					<?php foreach ($this->products as $product){?>
 					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
@@ -880,7 +797,7 @@
 		<div id="popupForm" style="position:relative;border: 0px;">
 	<div name="stockDistribution" onload="" style="width: auto;"/>
 		<div class="fieldHeader">
-			Distribuci&oacute;n del stock	
+			Distribución del stock	
 		</div>
 		<div id="unitsStockDistributionField" class="fieldDiv" style="width: auto;">
 					<td><label >Cantidad de productos a distribuir&nbsp</label>
@@ -928,8 +845,7 @@
 		<div class="buttonsDiv">
 			<input class="button" type="submit" value="Guardar">
 		</div>
-		</div>
-		</form>
+	</form>
 	
 	<script>
 		$( "#regionFieldButton" ).click(function() {
@@ -950,7 +866,7 @@
 			$( "#unitsStockField" ).toggle( "easeInElastic" );
 		});
 
-		//Slider n�mero de proveedores
+		//Slider número de proveedores
 		var suppliersNumber = $('#suppliersNumber');
 		var slider = $('#suppliersNumberslider').slider({
 			min: 1,

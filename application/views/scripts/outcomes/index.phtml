@@ -1370,12 +1370,6 @@
 							<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_wages_costs']?>
 							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_wages_costs'],2, '.', ',').' €'?></td>
 						</tr>
-						<tr>
-							<td class="hor_group_odd categories col1"></td>
-							<td class="hor_group_odd categories col2">Despidos</td>
-							<?php $hr_costs[$this->company['id']]+=$this->outcomes_costs[$this->company['id']]['hr_dismissals_costs']?>
-							<td class="hor_group_odd vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_costs[$this->company['id']]['hr_dismissals_costs'],2, '.', ',').' €'?></td>
-						</tr>
 					</table>
 					
 					<table class="resultados_parcial">
@@ -1614,7 +1608,12 @@
 														$fi_costs[$this->company['id']]+
 														$fi_investment_losses[$this->company['id']]-
 														$fi_investment_earnings[$this->company['id']];?>					
-						<td class="col3"><?php echo number_format($total_fi_cost[$this->company['id']],2, '.', ',').' €'?></td>
+
+							<?php if ($total_fi_cost[$this->company['id']]>0) { ?>
+								<td class="col3" style="color:#A52A2A;"><strong><?php echo number_format(abs($total_fi_cost[$this->company['id']]),2, '.', ',').' €'?></strong></td>
+							<?php } else { ?>
+								<td class="col3" style="color:#000000"><strong><?php echo number_format(abs($total_fi_cost[$this->company['id']]),2, '.', ',').' €'?></strong></td>
+							<?php } ?>
 					</tr>
 				</table>
 				
@@ -1631,13 +1630,13 @@
 					<tr class="resultados_total">
 						<td class="col1"></th>
 						<td class="col2">
-							 Impuestos: <?php echo $this->taxRate*100; ?>%
+							 Impuestos (25%):
 						</td>
 							<?php if ($ebt[$this->company['id']]<=0) {
 								$taxes[$this->company['id']]=0;
 							} 
 							else{
-								$taxes[$this->company['id']]=($ebt[$this->company['id']]) * $this->taxRate;
+								$taxes[$this->company['id']]=($ebt[$this->company['id']]) *0.25;
 							}?>
 						<td class="col3"><?php echo number_format($taxes[$this->company['id']],2, '.', ',').' €'?></td>
 					</tr>
@@ -1871,7 +1870,7 @@
 						</tr>
 						<tr>
 							<td class="hor_group_even categories col1"></td>
-							<td class="hor_group_even categories col2">II. Reservas</td>
+							<td class="hor_group_even categories col2">II. Resultados de ejercicios anteriores</td>
 							<?php $liabilities_total[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['reserves'];?>
 							<td class="hor_group_even vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_balance_sheet[$this->company['id']]['reserves'],2, '.', ',').' €'?></td>
 						</tr>
