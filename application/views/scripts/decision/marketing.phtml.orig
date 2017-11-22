@@ -1,0 +1,242 @@
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/jquery-ui/jquery-ui.css');?>
+<?php echo $this->headLink()->setStylesheet($this->baseUrl().'/css/forms.css');?>
+
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/generalScripts.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/marketing.js', $type = 'text/javascript')?>
+<?php echo $this->headScript()->setFile($this->baseUrl().'/javascripts/validators/validation.js', $type = 'text/javascript')?>
+
+<div id='content'>
+<img src="/images/marketing.gif" alt="finance" width="155" height="95" style="float:right" />
+		<form name="marketing" onsubmit="return validateMarketingForm(<?php echo $this->n_products?>);" method="post">
+			<div class="fieldHeader">
+				Precios<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"pricesField")))?>			
+			</div>
+			<div id="pricesField" class="fieldDiv">
+				<div id="pricesFieldDescription" class="fieldDescription" align="center">
+					Determine la política de precios de sus productos.
+				</div>
+				<div id="pricesFieldsErrors" class="fieldErrors">
+				</div>
+			<?php foreach ($this->products as $product){?>
+			<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+				<div class="fieldSubHeader" style="color:#F2610D">
+					<br />
+					<?php echo $product['name']?>
+				</div>
+				<div class="fieldDiv">
+					<table align="center">
+						<thead>
+							<th class="small"></th>
+						<?php foreach ($this->regions as $region){?>
+							<th class="small"><?php echo $region['name']?></th>
+						<?php } //for region?>
+						</thead>
+						<?php foreach ($this->channels as $channel){ ?>	
+						<tr>
+							<td><?php echo $channel['name']?></td>
+							<?php foreach ($this->regions as $region){?>
+							<td><input type="text" name="marketing[prices][product_<?php echo $product['product_number']?>][channel_<?php echo $channel['channel_number']?>][region_<?php echo $region['region_number']?>]" class="small"
+								<?php echo isset($this->pricesDecision)? 
+									  'value = "'.$this->pricesDecision['product_'.$product['product_number']]
+																	  ['channel_'.$channel['channel_number']]
+																	  ['region_'.$region['region_number']]
+											 .'"':'value = "0"'?></input>
+								</td>
+							<?php } //for region?>
+						</tr>
+							<?php } //for channel?>
+					</table>
+				</div>
+				<?php } ?>
+			<?php } // product?>
+			</div>
+			<br />
+			<br />
+			<div class="fieldHeader">
+				Publicidad<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"advertisingField",'id'=>"mediaField")))?>			
+			</div>
+				<div id="advertisingbudgetField" class="fieldDiv">
+					<div id="advertisingbudgetFieldDescription" class="fieldDescription" align="center">
+					Determine el presupuesto asignado a Publicidad.
+					</div>
+					<div id="advertisingbudgetFieldsErrors" class="fieldErrors">
+					</div>
+				<br />
+					<table  border="3" bordercolor="brown" align="center">
+					<td><label for="advertisingBudget">Presupuesto Publicidad&nbsp</label>
+					<input type="text" name="marketing[advertising_budget]" id="advertisingBudget" display="block"
+						<?php echo isset($this->advertisingbudgetDecision)? 
+							'value = "'.$this->advertisingbudgetDecision
+							.'"':""?></input>
+				</td>
+				</table>
+				</div>
+				<div id="advertisingbudgetDistributionField" class="fieldDiv">
+				<br />
+					<div id="advertisingbudgetDistributionFieldDescription" class="fieldDescription" align="center">
+					Determine la distriuci&oacute;n del presupuesto de Publicidad por productos (%).
+					</div>
+					<div id="advertisingbudgetDistributionFieldsErrors" class="fieldErrors">
+					</div>
+					<br />
+					<table border="3" bordercolor="brown" align="center">
+						<thead>
+							<th>Producto</th>
+							<th>(%)</th>
+						</thead>
+							<?php foreach ($this->products as $product){ ?>
+							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>	
+							<tr>
+							<td><?php echo $product['name']?></td>
+							<td><input type="text" name="marketing[advertising_budget_distribution][product_<?php echo $product['product_number']?>]" class="small"
+											<?php echo isset($this->advertisingbudgetProductsDecision)?
+												'value = "'.$this->advertisingbudgetProductsDecision['product_'.$product['product_number']] 
+														.'"':'value = "0"'?></input>
+									 		
+							</td>
+							</tr>
+							<?php }
+							} //for product?>
+						</table>
+				</div>
+				<div id="mediaField" class="fieldDiv">
+					<div id="mediaFieldDescription" class="fieldDescription" align="center">
+						Determine la política de publicidad para cada uno de sus productos (%).
+					</div>
+						<div id="mediaFieldsErrors" class="fieldErrors">
+						</div>
+						<?php foreach ($this->products as $product){
+						$number_counter=$product['product_number']-1;?>
+						<div id="mediaProductField_<?php echo $number_counter?>">
+						<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+						<div class="fieldSubHeader" style="color:#F2610D">
+							<br />
+							<?php echo $product['name']?>
+						</div>
+						
+						<div class="fieldDiv">
+						<table align="center">
+						<thead>
+							<th class="small"></th>
+						<?php foreach ($this->regions as $region){?>
+							<th class="small"><?php echo $region['name']?></th>
+						<?php } //for region?>
+						</thead>
+							<?php foreach ($this->media as $media){ ?>	
+							<tr>
+							<td><?php echo $media['name']?></td>
+								<?php foreach ($this->regions as $region){?>
+							<td><input type="text" name="marketing[advertising_percentage][product_<?php echo $product['product_number']?>][media_<?php echo $media['media_number']?>][region_<?php echo $region['region_number']?>]" class="small"
+											<?php echo isset($this->advertisingpercentageDecision)?
+												'value = "'.$this->advertisingpercentageDecision['product_'.$product['product_number']]
+																							['media_'.$media['media_number']]
+																							['region_'.$region['region_number']] 
+														.'"':'value = "0"'?></input>
+											
+							</td>
+								<?php } //for region?>
+							</tr>
+							<?php } //for media?>
+						</table>
+						</div>
+						<?php } ?>
+						</div>
+						<?php } // product?>
+					</div>
+				<br />
+			
+			<div class="fieldHeader">
+				Trade MKT<?php echo ($this->scriptGenerator('show_hide_links',array ('id'=>"trademktField",'id'=>"trademediaField")))?>			
+			</div>
+				<div id="trademktField" class="fieldDiv">
+					<div id="trademktFieldDescription" class="fieldDescription" align="center">
+					Determine el presupuesto asignado a Trade MKT.
+					</div>
+					<div id="trademktbudgetFieldsErrors" class="fieldErrors">
+					</div>
+				<br />
+					<table border="3" bordercolor="brown" align="center">
+					<td><label for="trademktBudget">Presupuesto Trade MKT&nbsp;</label>
+						<input type="text" name="marketing[trademkt_budget]" id="trademkt" class="normal"
+									<?php echo isset($this->trademktbudgetDecision)? 'value = "'.$this->trademktbudgetDecision.'"':""?>
+						</input>
+				</td>
+				</table>
+				</div>
+				<div id="trademktbudgetDistributionField" class="fieldDiv">
+				<br />
+					<div id="trademktbudgetDistributionFieldDescription" class="fieldDescription" align="center">
+					Determine la distriuci&oacute;n del presupuesto de Trade Mkt por productos (%).
+					</div>
+					<div id="trademktbudgetDistributionFieldsErrors" class="fieldErrors">
+					</div>
+					<br />
+					<table border="3" bordercolor="brown" align="center">
+						<thead>
+							<th>Producto</th>
+							<th>(%)</th>
+						</thead>
+							<?php foreach ($this->products as $product){ ?>
+							<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>	
+							<tr>
+							<td><?php echo $product['name']?></td>
+							<td><input type="text" name="marketing[trademkt_budget_distribution][product_<?php echo $product['product_number']?>]" class="small"
+											<?php echo isset($this->trademktbudgetProductsDecision)?
+												'value = "'.$this->trademktbudgetProductsDecision['product_'.$product['product_number']] 
+														.'"':'value = "0"'?></input>
+											
+							</td>
+							</tr>
+							<?php }
+							} //for product?>
+						</table>
+				</div>
+			<div id="trademediaField" class="fieldDiv">
+				<div id="trademediaFieldDescription" class="fieldDescription" align="center">
+					Determine la política de Trade MKT para cada uno de sus productos (%).
+				</div>
+				<div id="trademediaFieldsErrors" class="fieldErrors">
+				</div>
+					<?php foreach ($this->products as $product){
+					$number_counter=$product['product_number']-1;?>
+					<div id="trademediaProductField_<?php echo $number_counter?>">
+					<?php if($this->product_availability['product_number_'.$product['product_number']]==1) {?>
+					<div class="fieldSubHeader" style="color:#F2610D">
+						<br />	
+						<?php echo $product['name']?>
+					</div>
+					<div class="fieldDiv">
+						<table align="center">
+							<thead>
+								<th class="small"></th>
+							<?php foreach ($this->channels as $channel){?>
+								<th class="small"><?php echo $channel['name']?>&nbsp;&nbsp;</th>
+							<?php } //for region?>
+							</thead>
+							<?php foreach ($this->trademedia as $trademedia){ ?>	
+							<tr>
+								<td><?php echo $trademedia['name']?></td>
+								<?php foreach ($this->channels as $channel){?>
+								<td>							
+									<input type="text" name="marketing[trademkt_percentage][product_<?php echo $product['product_number']?>][trademedia_<?php echo $trademedia['trademedia_number']?>][channel_<?php echo $channel['channel_number']?>]" class="small"
+										   <?php echo isset($this->trademktpercentageDecision)? 
+										   'value = "'.$this->trademktpercentageDecision['product_'.$product['product_number']]
+										   												['trademedia_'.$trademedia['trademedia_number']]
+										   												['channel_'.$channel['channel_number']]
+										   	.'"':'value = "0"'?>
+									</input>
+								</td>
+								<?php } //for region?>
+							</tr>
+								<?php } //for media?>
+						</table>
+					</div>
+					<?php } ?>
+					</div>
+					<?php } // product?>
+					</div>				
+			<div class="buttonsDiv">
+				<input class="button" type="submit" value="Guardar">
+			</div>
+		</form>
+	</div>
