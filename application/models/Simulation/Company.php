@@ -1152,9 +1152,11 @@
 			//print_r('c'.$channel_number.'/r'.$region_number.'/p'.$product_number.'::'.($incomes*$fare/100).'<br>');
 			return $incomes*$fare*0.01;
 		}
-		function getMkFixedCost($channel_number, $region_number){
+		function getMkFixedCost($channel_number, $region_number){		// ¡Notar que cuando se llama desde Core.php enviamos el producto como tercer argumento!
 			$units=0;
-			foreach ($this->_core->_products as $product){
+			foreach ($this->_core->_products as $product){		// El problema con el modo de funcionamiento viene aquí. Este bucle devuelve el coste para todos los productos tan pronto como haya un producto a la venta.
+																// ¿Por qué no utilizamos el tercer argumento en su lugar para cambiar de modo? 
+																// La llamada a getMkChannelCost() en Games.php no toma producto como argumento.
 				$units+=$this->getUnitsAvailable($product->getProductNumber(), $channel_number, $region_number);
 			}
 			if ($units>0){

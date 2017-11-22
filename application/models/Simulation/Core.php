@@ -1534,7 +1534,8 @@
 								if (! isset($this->_costs[$company->getId()]['mk_fixed_costs'][$channel->getChannelNumber()])){
 									$this->_costs[$company->getId()]['mk_fixed_costs'][$channel->getChannelNumber()]=0;
 								}							
-								$this->_costs[$company->getId()]['mk_fixed_costs'][$channel->getChannelNumber()]+=$company->getMkFixedCost($channel->getChannelNumber(), $region->getRegionNumber(), $product->getProductNumber());
+								$this->_costs[$company->getId()]['mk_fixed_costs'][$channel->getChannelNumber()]+=$company->getMkFixedCost($channel->getChannelNumber(), $region->getRegionNumber(), $product->getProductNumber()); // getMkFixedCost does not have $product as argument!
+								// AHG 20171122 Mode change can be done by providing or not $product as argument
 							}																																		
 						}
 					}					
