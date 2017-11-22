@@ -604,7 +604,7 @@
 			foreach ($factories as $factory){
 				if(($round_number>$constructed['factory_number_'.$factory['factory_number']])||($constructed['factory_number_'.$factory['factory_number']]==1)){
 					$machines=$result['machines'];
-					$machines_extension=$this->getExtensionFactory($game_id, $round_number, $company_id, $factory['factory_number']);
+					$machines_extension=$this->getExtensionFactory($game_id, $round_number, $company_id, $factory['factory_number'], 0); //El último parámetro es 0 para que considere los sueldos de las ampliaciones de todas las rondas.
 					echo("<br>Factory: ".$factory['factory_number']."<br>");
 					echo("<br>Machines extension".$machines_extension."<br>");
 					$nominal_time['factory_number_'.$factory['factory_number']]=$work_shifts*($machines+$machines_extension)*$work_hours_per_week*52*60;
@@ -688,8 +688,8 @@
 			$umbral_db=new Model_DbTable_Games_Param_Idi_Threshold();
 			$threshold=$umbral_db->getProductThreshold($game_id, $product_number);
 			$availability_all=$this->getProductsAvailibilityBySomeone($game_id, $round_number);
-			$availabilty=$availability_all['product_number_'.$product_number];
-			if($availabilty==1){
+			$availability=$availability_all['product_number_'.$product_number];
+			if($availability==1){
 				$threshold=0.96*(1-(3*($round_number/100)));
 			}
 			return $threshold;
@@ -701,7 +701,7 @@
 			$result=$budget->getProductBudget($game_id, $product_number);
 			return $result;
 		}
-		// Devuelve la disponivilidad de los productos de una compa–ia
+		// Devuelve la disponibilidad de los productos de una compa–ia
 		function getProductsAvailibility($game_id, $round_number, $company_id){
 			$ProductsNumber=$this->getNumberOfProducts($game_id);
 			for ($product_number = 1; $product_number <= $ProductsNumber; $product_number++) {
@@ -709,7 +709,7 @@
 			}
 			return $availabilty;
 		}
-		//Devuelve $availability=1 de cada producto si al menos un equipo lo tiene disponible, si no esta disponible para ningun equipo $availabiliy=0
+		//Devuelve $availability=1 de cada producto si al menos un equipo lo tiene disponible, si no esta disponible para ningun equipo $availability=0
 		function getProductsAvailibilityBySomeone($game_id, $round_number){
 			$ProductsNumber=$this->getNumberOfProducts($game_id);
 			$products=$this->getProducts($game_id);
@@ -785,7 +785,7 @@
 			}
 			return $array;
 		}
-		//Devuelve WorkAtmosphere para outcomes
+		//Devuelve WorkAtmosphere para outcomes AHG 20171106: ¿Por qué la condición de 0.87?
 		function getWorkAtmosphere($game_id, $round_number, $company_id){
 			$atmosphere=new Model_DbTable_Outcomes_Rd_HrData();
 			$results=$atmosphere->getHrDataCompanyAtmosphere($game_id, $round_number, $company_id);
@@ -941,8 +941,8 @@
 			} else {
 				$stock_var_value=($stock_var->getCompanyStockValue($game_id, $round_number, $company_id))-($stock_var->getCompanyStockValue($game_id, ($round_number-1), $company_id));
 			}
-			echo("CHECK POINT 2: stock_var->getCompanyStockValue($game_id, $round_number, $company_id)) = ".$stock_var->getCompanyStockValue($game_id, $round_number, $company_id)."<br>CHECK POINT 2: stock_var->getCompanyStockValue($game_id, ($round_number-1), $company_id) = ".$stock_var->getCompanyStockValue($game_id, ($round_number-1), $company_id)."<br>");			
-			echo("CHECK POINT 2: stock_var_value = ".$stock_var_value."<br>");
+			//echo("CHECK POINT 2: stock_var->getCompanyStockValue($game_id, $round_number, $company_id)) = ".$stock_var->getCompanyStockValue($game_id, $round_number, $company_id)."<br>CHECK POINT 2: stock_var->getCompanyStockValue($game_id, ($round_number-1), $company_id) = ".$stock_var->getCompanyStockValue($game_id, ($round_number-1), $company_id)."<br>");			
+			//echo("CHECK POINT 2: stock_var_value = ".$stock_var_value."<br>");
 			/*$stocks=new Model_DbTable_Games_Evolution_St_Stocks();
 			$product_number=$this->getNumberOfProducts($game_id);
 			$region_number=$this->getNumberOfRegions($game_id);
@@ -994,37 +994,41 @@
 		
 		//Devuelve la extension de la fabrica efectiva para el numero de ronda en el que estemos
 		// (si hay ampliaciones creadas en esta ronda no estaran disponibles hasta la siguiente)
-		function getExtensionFactory($game_id, $round_number, $company_id, $factory_number){
+		function getExtensionFactory($game_id, $round_number, $company_id, $factory_number, $single_round){
 			$result = 0;
 			$capacity=new Model_DbTable_Decisions_Pr_Capacity();
 			$extension_factory=$capacity->getExtensionWasCreated($game_id, $company_id, $factory_number);
-			for ($round = 2; $round < $round_number; $round++) {
-				$result+=$extension_factory['factory_number_'.$factory_number]['capacity_'.$round];
-				// $round_created=$extension_factory['factory_number_'.$factory_number]['round_number_created_'.$round];
-				// //var_dump($round_created);
-				// if($round_number>$round_created){
-					// $extension[$round]=$extension_factory['factory_number_'.$factory_number]['capacity_'.$round];
-					// //var_dump($extension);
-				// }
-				// else {
-					// $extension[$round]=0;
-				// }
-				// $result+=$extension[$round];
-				// if($result==null){
-					// $result=0;
-				// }
+			if ($single_round==0) {		//Ampliaciones de todas las rondas
+				for ($round = 2; $round < $round_number; $round++) {
+					$result+=$extension_factory['factory_number_'.$factory_number]['capacity_'.$round];
+					// $round_created=$extension_factory['factory_number_'.$factory_number]['round_number_created_'.$round];
+					// //var_dump($round_created);
+					// if($round_number>$round_created){
+						// $extension[$round]=$extension_factory['factory_number_'.$factory_number]['capacity_'.$round];
+						// //var_dump($extension);
+					// }
+					// else {
+						// $extension[$round]=0;
+					// }
+					// $result+=$extension[$round];
+					// if($result==null){
+						// $result=0;
+					// }
+				}
+			} elseif ($single_round==1) {
+				$result+=$extension_factory['factory_number_'.$factory_number]['capacity_'.($round_number-1)];
 			}
 			return $result;		
 		}
 		//Devuelve el numero de empleados necesarios para la ampliacion de fabrica existente
-		function getExtensionEmployees($game_id, $round_number, $company_id, $factory_number){
+		function getExtensionEmployees($game_id, $round_number, $company_id, $factory_number, $single_round){
 			$machines=$this->getOrganizationParam($game_id, 'machines');
 			$production_workers=$this->getOrganizationParam($game_id, 'production_workers');
 			$packaging_workers=$this->getOrganizationParam($game_id, 'packaging_workers');
 			$quality_workers=$this->getOrganizationParam($game_id, 'quality_workers');
 			$maintenance_workers=$this->getOrganizationParam($game_id, 'maintenance_workers');
 			
-			$extension_factory=$this->getExtensionFactory($game_id, $round_number, $company_id, $factory_number);
+			$extension_factory=$this->getExtensionFactory($game_id, $round_number, $company_id, $factory_number, $single_round);
 			$production_workers_extension=ceil(($production_workers/$machines)*$extension_factory);
 			$packaging_workers_extension=ceil(($packaging_workers/$machines)*$extension_factory);
 			$quality_workers_extension=ceil(($quality_workers/$machines)*$extension_factory);

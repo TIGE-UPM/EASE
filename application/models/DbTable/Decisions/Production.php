@@ -25,7 +25,7 @@
 			$pr_functionality= new Model_DbTable_Decisions_Pr_ProductsFunctionality();
 			//VERO
 			$pr_units= new Model_DbTable_Decisions_Pr_Units();
-			// si no existe ya una decisiÃ³n para esta ronda se crea
+			// si no existe ya una decisi¨®n para esta ronda se crea
 			if ($this->fetchRow('game_id = '.$game_id.
 								' AND company_id = '.$company_id.
 								' AND round_number = '.$round_number)==null){
@@ -35,6 +35,7 @@
 				$pr_capacities->add($decisionData, $game_id, $company_id, $round_number);
 				$pr_quality->add($decisionData, $game_id, $company_id, $round_number);
 				//VERO
+				
 				$pr_functionality->add($decisionData, $game_id, $company_id, $round_number);
 				//VERO
 				$pr_units->add($decisionData, $game_id, $company_id, $round_number);
@@ -43,19 +44,17 @@
 									'round_number' => $round_number, 
 									'date'=>$date));
 			}
-			else{ //si ya se tomÃ³ con anterioridad se sobreescribe
+			else{ //si ya se tom¨® con anterioridad se sobreescribe
 				$pr_regions->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				//die("2");	
 				$pr_capacities->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				$pr_quality->updateDecision($decisionData, $game_id, $company_id, $round_number);
 				//VERO
 				$pr_functionality->updateDecision($decisionData, $game_id, $company_id, $round_number);
+				// AHG 20171114 Revisar porque falla con nuevos productos, dado que puede que haya decisi¨®n y pasa directamente a update
 				//VERO
 				$pr_units->updateDecision($decisionData, $game_id, $company_id, $round_number);
-				$this->update(array('date'=>$date), 
-							  'game_id = '.$game_id.
-							  ' AND company_id = '.$company_id.
-							  ' AND round_number = '.$round_number);
+				$this->update(array('date'=>$date), 'game_id = '.$game_id. ' AND company_id = '.$company_id. ' AND round_number = '.$round_number);
 			}
 		}
 		function existsPrevious($game_id=null, $company_id=null, $round_number=null){

@@ -21,13 +21,13 @@
 			$productionFunctionalitiesData=$parameters['functionality_params'];
 
 			$product_number=1;
+			//var_dump($productionFunctionalitiesData);die();
 			while (isset($productionFunctionalitiesData['product_number_'.$product_number])){
 				$production_product=$productionFunctionalitiesData['product_number_'.$product_number];
 				$functionality_number=1;
 				while (isset($production_product['functionality_param_number_'.$functionality_number])){
 					$production_functionality=$production_product['functionality_param_number_'.$functionality_number];
-					self::insert(array('game_id'=>$game_id, 'company_id' => $company_id, 
-							   'product_number' => $product_number, 'functionality_param_number'=>$functionality_number, 'functionality_param_value'=>$production_functionality));
+					self::insert(array('game_id'=>$game_id, 'company_id' => $company_id, 'product_number' => $product_number, 'functionality_param_number'=>$functionality_number, 'functionality_param_value'=>$production_functionality));
 					$functionality_number++;
 				}
 				$product_number++;

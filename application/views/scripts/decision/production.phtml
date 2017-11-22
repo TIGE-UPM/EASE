@@ -232,7 +232,7 @@
 				$new_launch=1;
 			}
 		?>
-		<select multiple="multiple"  style="overflow: hidden;"  class="multiSelect" display="block" <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[functionality_params][product_number_<?php echo $product['product_number'];?>]"  id="funcionalities_param_<?php echo $id?>" >	
+		<select multiple="multiple"  style="overflow: hidden;"  class="multiSelect" display="block" <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[functionality_params][product_number_<?php echo $product['product_number'];?>][]"  id="funcionalities_param_<?php echo $id?>" >	
 			<?php foreach ($this->functionalities as $functionalities){?> 
 					<option value="<?php echo $functionalities['value']?>" <?php for($i=0; $i<count($this->functionalities); $i++){?> <?php echo  (isset($this->FunctionalitiesDecision) && $this->FunctionalitiesDecision['product_number_'.$product['product_number']][$i]==$functionalities['value'])? "selected":""?><?php }//for?>>
 					<?php echo $functionalities['descriptor']?>

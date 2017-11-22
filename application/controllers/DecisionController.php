@@ -307,8 +307,12 @@
 					if(!$error){				
 						$postData=$this->getRequest()->getPost();
 						$decisionData=$postData['production_decision'];
-						//VERO
+						//VERO						
 						$productionFunctionalities=$decisionData['functionality_params'];
+						// var_dump($decisionData);
+						// echo("<br/>");
+						// var_dump($productionFunctionalities);
+						// die();
 						$functionalityInformation=array();
 
 
@@ -318,31 +322,26 @@
 						for ($product=1; $product<=$n_products; $product++){
 							$productionFSet=$productionFunctionalities['product_number_'.$product];
 							for ($functionality_param_number=1; $functionality_param_number<=$nFunct; $functionality_param_number++){
-								if(count($productionFSet)==0){
-									$functionalityInformation['product_number_'.$product]
-													['functionality_param_number_'.$functionality_param_number] = "0";
-									}else{
-								$product_numberLoop=1;
-								foreach ($productionFunctionalities as $productionFunctionality){
-									foreach($productionFunctionality as $j ){
-										if($product==$product_numberLoop && $j==$functionality_param_number){
-											$functionalityInformation['product_number_'.$product]
-											['functionality_param_number_'.$functionality_param_number] = "1";
+								if(count($productionFSet)==0){$functionalityInformation['product_number_'.$product]['functionality_param_number_'.$functionality_param_number] = "0";
+								} else {
+									$product_numberLoop=1;
+									//var_dump($productionFunctionalities);
+									foreach ($productionFunctionalities as $productionFunctionality){									
+										foreach($productionFunctionality as $j ){
+											if (($product==$product_numberLoop) && ($j==$functionality_param_number)){
+												$functionalityInformation['product_number_'.$product]['functionality_param_number_'.$functionality_param_number] = "1";
+											}
+											elseif (($functionalityInformation['product_number_'.$product]['functionality_param_number_'.$functionality_param_number] == null) or ($functionalityInformation['product_number_'.$product]['functionality_param_number_'.$functionality_param_number] == "")){
+												$functionalityInformation['product_number_'.$product]['functionality_param_number_'.$functionality_param_number]= "0";
+											}
 										}
-										elseif($functionalityInformation['product_number_'.$product]
-											['functionality_param_number_'.$functionality_param_number] == null or
-											$functionalityInformation['product_number_'.$product]
-											['functionality_param_number_'.$functionality_param_number] == ""){
-											$functionalityInformation['product_number_'.$product]
-											['functionality_param_number_'.$functionality_param_number]= "0";
-										}
+										$product_numberLoop++;							
 									}
-									$product_numberLoop++;							
 								}
 							}
 						}
-						}
-						$decisionData['functionality_params']=$functionalityInformation;		
+						$decisionData['functionality_params']=$functionalityInformation;	
+						//var_dump($functionalityInformation);die();						
 						//VERO
 						$decisionData_sup=$postData['suppliers'];
 						$decisions->processDecision($decisionData, $this->game['id'], $this->company['id'], $this->round['round_number']);

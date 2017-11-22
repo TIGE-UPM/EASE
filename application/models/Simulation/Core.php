@@ -340,15 +340,16 @@
 					$time_needed=$company->getTimeNeeded($factory_number);
 					//var_dump($time_needed);
 					if ($time_needed>$time_available){
-						// print_r('<br>'.$company->getId().' Fábrica ' . $factory_number . ' Capacidad Insuficiente:');
-						// print_r('<br>   -  Tiempo Necesario: '.$time_needed);
-						// print_r('<br>   -  Tiempo Disponible: '.$time_available);
+						print_r('<br/>'.$company->getId().' Fábrica ' . $factory_number . ' Capacidad Insuficiente:');
+						print_r('<br/>   -  Tiempo Necesario: '.$time_needed);
+						print_r('<br/>   -  Tiempo Disponible: '.$time_available);
+						print_r('<br/>');
 						$factory_overload['factory_'.$factory_number]=1;
-					}
-					else{
-						// print_r('<br>'.$company->getId().' Fábrica ' . $factory_number .' Capacidad Suficiente');
-						// print_r('<br>   -  Tiempo Necesario: '.$time_needed);
-						// print_r('<br>   -  Tiempo Disponible: '.$time_available);
+					} else {
+						print_r('<br/>'.$company->getId().' Fábrica ' . $factory_number .' Capacidad Suficiente');
+						print_r('<br/>   -  Tiempo Necesario: '.$time_needed);
+						print_r('<br/>   -  Tiempo Disponible: '.$time_available);
+						print_r('<br/>');
 						$factory_overload['factory_'.$factory_number]=0;
 						// foreach ($this->_regions as $region){
 							// foreach ($this->_channels as $channel){
@@ -799,7 +800,7 @@
 				//$quality=$company->getProductQuality($product->getProductNumber());
 				$quality=$company->getProductQualityFunctionality($product->getProductNumber());
 				//VERO
-				echo("Maxima: " . $this->_max_quality . " y media " . $this->_avg_quality . "<br/>");
+				echo("<br/>Maxima: " . $this->_max_quality . " y media " . $this->_avg_quality . "<br/>");
 				if ($quality == $this->_max_quality){
 					$n=1;
 					$qualityScore=$m*($quality+$functionalities)+$n;
@@ -855,13 +856,22 @@
 					//
 					
 					//if (($this->_round['round_number']==4)&&($product->getProductNumber()>=4)) { //((($this->_games->getProductsAvailibilityBySomeone($this->_game['id'],
-					if (($this->_round['round_number']==4)&&($product->getProductNumber()==3)) {
+					
+					// AHG 20171115 Cambio de condiciones para que reparta todo el mercado cuando un producto es nuevo.
+					// AHG 20171115 if (($this->_round['round_number']==4)&&($product->getProductNumber()==3)) {
+					$product_availability = $this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']);
+					$prev_product_availability = $this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']-1);
+					 if (($this->_round['round_number']==4) && ($product_availability['product_number_'. $product->getProductNumber()] == 1) && ($product->getProductNumber())>2){
 						//$this->_round['round_number']))==1)&&(($this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']-1))==0)) {
+						echo("<br/>Ronda 4. Nuevo producto y se reparte todo el mercado.");
 						$share_total[$company->getId()]=$share[$company->getId()];
-					} elseif (($this->_round['round_number']==5)&&($product->getProductNumber()==4)) {
+					// AHG 20171115 } elseif (($this->_round['round_number']==5)&&($product->getProductNumber()==4)) {
+					} elseif (($this->_round['round_number']==5) && ($product_availability['product_number_'. $product->getProductNumber()] == 1) && ($prev_product_availability['product_number_'. $product->getProductNumber()] == 0) && ($product->getProductNumber())>2) {
 						//$this->_round['round_number']))==1)&&(($this->_games->getProductsAvailibilityBySomeone($this->_game['id'], $this->_round['round_number']-1))==0)) {
+						echo("<br/>Ronda 5. Nadie tenía el producto y se reparte todo el mercado.");
 						$share_total[$company->getId()]=$share[$company->getId()];		
 					} else {
+						echo("<br/>Alguien tenía el producto. Se usa fidelización.");
 						$ms=new Model_DbTable_Outcomes_Rd_MarketShares();
 						// INTERESANTE: past_share, usado para la fidelización, no va sobre cuota real, sino cuota ideal. Tiene sentido, dado que algunos usuarios compraron nuestro producto porque el que les gustaba no estaba disponible. Esos no son clientes fieles.
 						$past_share=$ms->getPastShare($this->_game['id'], $company->getId(), $this->_round['round_number'],
@@ -1681,7 +1691,7 @@
 			$investment= new Model_DbTable_Outcomes_In_Investment();
 			foreach ($this->_companies as $company){
 				$result=$company->getInvestmentInterest();
-				echo("Core - función investment" . $result . "<br/>");
+				//echo("Core - función investment" . $result . "<br/>");
 				if($this->_round_number==1){
 					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_losses', 0);
 					$investment->setInvestment($this->_game['id'], $this->_round['round_number'], $company->getId(), 'fi_investment_earnings', 0);
@@ -1719,7 +1729,7 @@
 					}
 				}*/
 				$stock_value=$this->_balance[$company->getId()]['stock'];
-				echo("CHECK POINT 3: stock_value = ".$stock_value."<br/>");
+				//echo("CHECK POINT 3: stock_value = ".$stock_value."<br/>");
 				if($this->_round['round_number']>1){	
 					$this->_outcomes_prev_stock_value=$stock_value-$company->getPrevStockValue($this->_game['id'], $this->_round['round_number'],$company->getId());
 				} else {
@@ -1796,9 +1806,9 @@
 			$this->_outcomes_performance=new Model_DbTable_Outcomes_Bs_Performance();
 			$outcomes=new Model_DbTable_Outcomes();
 			foreach ($this->_companies as $company){
-				$atmorphere=$company->getWorkAtmosphere();
+				$atmosphere=$company->getWorkAtmosphere();
 				$this->_outcomes_round_humanresources->delete('game_id = '.$this->_game['id'].' AND company_id = '.$company->getId().' AND round_number ='.$this->_round['round_number']);
-				$this->_outcomes_round_humanresources->insert(array('game_id'=>$this->_game['id'], 'company_id'=>$company->getId(), 'round_number'=>$this->_round['round_number'], 'type'=>'hr_atmosphere', 'value'=>$atmorphere));
+				$this->_outcomes_round_humanresources->insert(array('game_id'=>$this->_game['id'], 'company_id'=>$company->getId(), 'round_number'=>$this->_round['round_number'], 'type'=>'hr_atmosphere', 'value'=>$atmosphere));
 				$cualification=$company->getCualificationLevel();
 				$this->_outcomes_round_humanresources->insert(array('game_id'=>$this->_game['id'], 'company_id'=>$company->getId(), 'round_number'=>$this->_round['round_number'], 'type'=>'hr_cualification', 'value'=>$cualification));
 				$numberOfFactories=$company->getNumberOfFactories();
