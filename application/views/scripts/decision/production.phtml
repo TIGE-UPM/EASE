@@ -279,7 +279,8 @@
 					nProduct=document.getElementById("nProduct").getElementsByTagName("input");
 
 					for(i=1;i<=nProduct[0].value; i++){
-						$('#funcionalities_param_'+i).removeAttr("disabled");			
+						//$('#funcionalities_param_'+i).removeAttr("disabled");	 Parece que esto daba problemas. Ver https://stackoverflow.com/questions/1191113/how-to-ensure-a-select-form-field-is-submitted-when-it-is-disabled		
+						$('#funcionalities_param_'+i).prop('disabled', false);			
 					}
 				  
 				});
