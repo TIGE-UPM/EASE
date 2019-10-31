@@ -1829,6 +1829,7 @@
 					   +$this->_balance[$company->getId()]['activeInvestment']
 					   +$this->_balance[$company->getId()]['liquid_assets']);
 				$reserves=$this->_balance[$company->getId()]['reserves'];
+				$incomes=0; //Añadido 20191031 AHG-EAN: Inicializado para que el cálculo de los márgenes de operación no sume las ventas de todas las empresas
 				foreach ($this->_channels as $channel){
 					$incomes+=$company->getIncomes($channel->getChannelNumber());
 				}
