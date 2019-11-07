@@ -26,11 +26,11 @@
 <?php if (isset($this->round_number)){ ?>
 	<div id="image_and_button">
 		<img src="/images/outcomes_2.gif" alt="i+d" width="90" height="110"/>
-		<div>
+		<!--<div>
 			<form method="post" style="float:right">					
 				<input type="button" name="export" onclick="location.href='<?php echo $this->url(array('controller'=>'outcomes', 'action'=>'download')) . "?game_id=".$this->game['id']."&round_number=".$this->round_number?>'" value="Exportar">				
-			</form>				
-		</div>
+			</form>
+		</div>	-->
 	</div>
 	<div class="outcomes_header1">
 		<div>
@@ -1712,6 +1712,15 @@
 						<td class="hor_group_odd categories col2">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
 						<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['roa'],2, '.', ',')?>&nbsp;%</td>
 					</tr>
+					<tr>
+						<?php $shareholders_funds_2[$this->company['id']]=0;?>
+						<?php $shareholders_funds_2[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['capital'];
+							$shareholders_funds_2[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['reserves'];
+							$shareholders_funds_2[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['year_result'];?>					
+						<td class="hor_group_odd categories col1"></td>
+						<td class="hor_group_odd categories col2">Rentabilidad financiera&nbsp;&nbsp;</td>
+						<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format(($result[$this->company['id']]/$shareholders_funds_2[$this->company['id']])*100,2, '.', ',')?>&nbsp;%</td>
+					</tr>
 					<tr>	
 						<td class="hor_group_even categories col1"></td>
 						<td class="hor_group_even categories col2">Payout Ratio&nbsp;&nbsp;</td>
@@ -1725,14 +1734,14 @@
 					Ratios Acumulados
 				</div>
 				<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
-					<tr>	
+					<!--<tr>	
 						<td class="hor_group_odd categories col1"></td>
 						<td class="hor_group_odd categories col2">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
 						<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['ac_roa'],2, '.', ',')?>&nbsp;%</td>
-					</tr>
+					</tr>-->
 					<tr>	
 						<td class="hor_group_even categories col1"></td>
-						<td class="hor_group_even categories col2">Rentabilidad para el accionista&nbsp;&nbsp;</td>
+						<td class="hor_group_even categories col2">Retorno sobre el capital invertido</td>
 						<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['roe'],2, '.', ',')?>&nbsp;%</td>
 					</tr>
 				</table>
@@ -2283,7 +2292,7 @@
 										if($this->game_product_availability['product_number_'.$product['product_number']]==1){
 											foreach ($this->regions as $region){
 												foreach ($this->channels as $channel){
-													$situation=$this->prices_research;
+													$situation=$this->prices_research;													
 													$max=$this->prices_max;
 													$min=$this->prices_min;
 													$precio_minimo_producto_region_canal = $min['product_number_'.$product['product_number']]['region_number_'.$region['region_number']]['channel_number_'.$channel['channel_number']];

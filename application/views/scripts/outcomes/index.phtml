@@ -1715,6 +1715,16 @@
 							<td class="hor_group_odd categories col2">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
 							<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['roa'],2, '.', ',')?>&nbsp;%</td>
 						</tr>
+						<tr>
+							<?php $shareholders_funds_2[$this->company['id']]=0;?>
+							<?php $shareholders_funds_2[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['capital'];
+								$shareholders_funds_2[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['reserves'];
+								$shareholders_funds_2[$this->company['id']]+=$this->outcomes_balance_sheet[$this->company['id']]['year_result'];?>						
+							<td class="hor_group_odd categories col1"></td>
+							<td class="hor_group_odd categories col2">Rentabilidad financiera&nbsp;&nbsp;</td>
+							<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format(($this->outcomes_balance_sheet[$this->company['id']]['year_result']/$shareholders_funds_2[$this->company['id']])*100,2, '.', ',')?>&nbsp;%</td>
+						</tr>
+						
 						<tr>	
 							<td class="hor_group_even categories col1"></td>
 							<td class="hor_group_even categories col2">Payout Ratio&nbsp;&nbsp;</td>
@@ -1728,14 +1738,14 @@
 						Ratios Acumulados
 					</div>
 					<table class="resultados_parcial" style="margin-left: auto; margin-right: auto">
-						<tr>	
+						<!--<tr>	
 							<td class="hor_group_odd categories col1"></td>
 							<td class="hor_group_odd categories col2">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
 							<td class="hor_group_odd categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['ac_roa'],2, '.', ',')?>&nbsp;%</td>
-						</tr>
+						</tr>-->
 						<tr>	
 							<td class="hor_group_even categories col1"></td>
-							<td class="hor_group_even categories col2">Rentabilidad para el accionista&nbsp;&nbsp;</td>
+							<td class="hor_group_even categories col2">Retorno sobre el capital invertido</td>
 							<td class="hor_group_even categories vertical_group_open col3"nowrap><?php echo number_format($this->outcomes_performance[$this->company['id']]['roe'],2, '.', ',')?>&nbsp;%</td>
 						</tr>
 					</table>
@@ -2261,7 +2271,7 @@
 						<li><a href="#mktReseach_tab">Comparativa Marketing</a></li>
 						<li><a href="#spectedResearch_tab">Lanzamientos Esperados</a></li>
 						<li><a href="#accountResearch_tab">Ctas. Anuales</a></li>
-						
+						<li><a href="#ratiosResearch_tab">Ratios</a></li>
 					</ul>
 				</div>
 				<!-- Crecimiento de Canales-->
@@ -2499,6 +2509,15 @@
 						<h3>No ha decidido contratar el estudio de Cuentas Anuales</h3>
 					<?php }?>
 				</div>
+				<!--RATIOS (si se contrata estudio de cuentas anuales-->
+				<div id='ratiosResearch_tab'>
+					<?php if($this->market_researches['accountResearch']==1){
+						$this->gameTables($this, "ratiosResearch");
+					}
+					else {?>
+						<h3>No ha decidido contratar el estudio de Cuentas Anuales</h3>
+					<?php }?>
+				</div>				
 			</div>
 		</div>
 	</div>
