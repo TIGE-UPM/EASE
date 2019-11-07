@@ -1272,7 +1272,7 @@
 														$product->getProductNumber(), 
 														$region->getRegionNumber(),
 														$channel->getChannelNumber(),
-														$new, $pr_cost);	
+														$stock, $pr_cost);	
 									// AHG 20171027
 									//$stock_value+=$company->getStockValue($product->getProductNumber(), $region->getRegionNumber(), $channel->getChannelNumber());
 									$stock_value+=$company->getStockValueRound($this->_round['round_number'], $product->getProductNumber(), $region->getRegionNumber(), $channel->getChannelNumber());
@@ -1841,22 +1841,36 @@
 				$curret_assets=($this->_balance[$company->getId()]['stock']+$this->_balance[$company->getId()]['trade_debtors']+$this->_balance[$company->getId()]['liquid_assets']);
 				$curret_liabilities=($this->_balance[$company->getId()]['short_term_debts']+$this->_balance[$company->getId()]['creditors']);
 				$treasury=$this->_balance[$company->getId()]['liquid_assets'];
-				$solvency=($curret_assets/$curret_liabilities)*100;
-				$liquidity=($treasury/$curret_liabilities)*100;
-				if($curret_liabilities==0){
+				//20191107 AHG-EAN Actualizado cálculo de solvencia y liquidez
+				$solvency=($active/$liabilities)*100;
+				$liquidity=($curret_assets/$curret_liabilities)*100;
+				// $solvency=($curret_assets/$curret_liabilities)*100; MAL
+				// $liquidity=($treasury/$curret_liabilities)*100; MAL
+				if($liabilities==0){
 					$solvency=-1;
+				}
+				if($curret_liabilities==0){
 					$liquidity=-1;
 				}
 				$dividends=$company->getPaidDividends();
 				//$payout_ratio=($dividends/$profit)*100;
 				$payout_ratio=($dividends/$past_year_profit)*100;
-				$roa=(($profit+$interests)/$active)*100;
-				//$roa=($profit/$active)*100;
+				//AHG-EAN 20191107 Cambio ROA = (EBIT/ACTIVE)
+				$ebt=0;
+				if ($profit>0) {
+					$ebt=($profit/0.75);
+				} else {
+					$ebt=$profit;
+				}
+				$roa=(($ebt+$interests)/$active)*100; 
+				//
+				//$roa=(($profit+$interests)/$active)*100; <- AHG-EAN 20191107 Cambio cálculo ROA a nueva fórmula
+				//$roa=($profit/$active)*100; MAL
 				//Ratios Acumulados
 				$ac_profit=$profit+$reserves;
 				$ac_roa=($ac_profit/$active)*100;
 				$capital=$this->_balance[$company->getId()]['capital'];
-				$roe=($ac_profit/$capital)*100;				
+				$roe=($ac_profit/$capital)*100;	// Return on invested capital			
 				//Guardamos Ratios Anuales
 				$this->_outcomes_performance->insert(array('game_id'=>$this->_game['id'], 'company_id'=>$company->getId(), 'round_number'=>$this->_round['round_number'], 'type'=>'margin', 'value'=>$margin));
 				$this->_outcomes_performance->insert(array('game_id'=>$this->_game['id'], 'company_id'=>$company->getId(), 'round_number'=>$this->_round['round_number'], 'type'=>'indebtedness', 'value'=>$indebtedness));
