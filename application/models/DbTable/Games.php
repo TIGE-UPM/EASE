@@ -849,9 +849,9 @@
 			$amount=($total_market_size/$ChannelsNumber)/$companies_counter;
 			
 			$option[0]=array('value'=>ceil(0.0*$amount), 'descriptor'=>'Ninguno');
-			$option[1]=array('value'=>ceil(0.6*$amount), 'descriptor'=>'OpciÃ³n 1: '.number_format(ceil(0.6*$amount), 2, '.', ',').' â‚¬');
-			$option[2]=array('value'=>ceil(0.9*$amount), 'descriptor'=>'OpciÃ³n 2: '.number_format(ceil(0.9*$amount), 2, '.', ',').' â‚¬');
-			$option[3]=array('value'=>ceil(1.2*$amount), 'descriptor'=>'OpciÃ³n 3: '.number_format(ceil(1.2*$amount), 2, '.', ',').' â‚¬');
+			$option[1]=array('value'=>ceil(0.6*$amount), 'descriptor'=>'Opci&oacute;n 1: '.number_format(ceil(0.6*$amount), 2, '.', ',').' &euro;');
+			$option[2]=array('value'=>ceil(0.9*$amount), 'descriptor'=>'Opci&oacute;n 2: '.number_format(ceil(0.9*$amount), 2, '.', ',').' &euro;');
+			$option[3]=array('value'=>ceil(1.2*$amount), 'descriptor'=>'Opci&oacute;n 3: '.number_format(ceil(1.2*$amount), 2, '.', ',').' &euro;');
 			
 			return $option;
 		}
@@ -1113,6 +1113,7 @@
 			$result_region=$result_channel['region_'.$region_number];
 			$company_price=$result_region;
 			$max=0;
+			$array_min = array(); 									// AHG 20191107 Eliminación de precios mínimos iguales a cero
 			$min=0;
 			$min_counter=0;
 			$companies=$this->getCompaniesInGame($game_id);
@@ -1125,9 +1126,11 @@
 					$price=$result_region;
 				}
 				else $price=$company_price;
-				//var_dump($price);
+				array_push($array_min, $price);  					// AHG 20191107 Eliminación de precios mínimos iguales a cero
 				if($min_counter==0){
-					$min=$price;
+					if($price>0){
+						$min=$price;
+					}	
 					$min_counter++;
 				}
 				if ($price>$max){
@@ -1136,12 +1139,16 @@
 				if (($price<$min)&&($price!=0)){
 					$min=$price;
 				}
-			}
+			}			
+			$numArray_min = array_map('intval', $array_min); 		// AHG 20191107 Eliminación de precios mínimos iguales a cero (se puede hacer lo mismo para precios máximos)
+																	// Aquí convertimos a entero para quitar los ceros en la siguiente función.
+			if (!empty(array_diff($numArray_min, array(0)))) { 		// AHG 20191107 Eliminación de precios mínimos iguales a cero (quiamos ceros y revisamos que el array no esté vacío;
+																	// por ejemplo, precios de productos no lanzados)
+				$min = min(array_diff($numArray_min, array(0))); 	// AHG 20191107 Eliminación de precios mínimos iguales a cero
+			} 														// AHG 20191107 Eliminación de precios mínimos iguales a cero
 			if($min==$max){
 				return 100;
 			}
-			//$scale=$max-$min;
-			//$situation=(($company_price*100)/$scale)-$scale;
 			$situation=(($company_price-$min)/($max-$min))*100;
 			$array['max']=$max;
 			$array['min']=$min;
