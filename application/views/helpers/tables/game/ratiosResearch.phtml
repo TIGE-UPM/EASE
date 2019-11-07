@@ -1,0 +1,147 @@
+<table class="outcomes_table">
+
+		<div id="performance_outcomes" class="tab">			
+				<table class="outcomes_table">
+					<thead>
+						<th colspan='2' class='invisible'>
+						
+						</th>
+						<?php foreach ($view->companies as $company){?>					
+						<th class="vertical_group_open">
+							<strong>
+							<?php echo $company['name']?>
+							</strong>
+						</th>
+					<?php } ?>
+					</thead>
+					<thead>
+						<th colspan='2'class='titulo_cuenta_resultados2 invisible categories'>
+							Ratios Anuales
+						</th>
+						<?php foreach ($view->companies as $company){?>
+							<th></th>
+						<?php }?>
+					</thead>
+					<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Margen de operación&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+						<td class="hor_group_even vertical_group_open" nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['margin'],2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Endeudamiento&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['indebtedness'],2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Liquidez&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+							<?php if($view->outcomes_performance[$company['id']]['liquidity']==-1.00){?>
+							<td class="hor_group_even vertical_group_open"nowrap>n/a</td>
+							<?php } else { ?>
+							<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['liquidity'],2, '.', ',')?>&nbsp;%</td>
+							<?php } ?>
+						<?php } ?>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Solvencia&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+							<?php if($view->outcomes_performance[$company['id']]['solvency']==-1.00){?>
+							<td class="hor_group_even vertical_group_open"nowrap>n/a</td>
+							<?php } else { ?>
+							<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['solvency'],2, '.', ',')?>&nbsp;%</td>
+							<?php } ?>
+						<?php } ?>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['roa'],2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
+					<tr>
+						<?php foreach ($view->companies as $company){		
+							$shareholders_funds_2[$company['id']]=0;?>							
+							<?php $shareholders_funds_2[$company['id']]+=$view->outcomes_balance_sheet[$company['id']]['capital'];
+								  $shareholders_funds_2[$company['id']]+=$view->outcomes_balance_sheet[$company['id']]['reserves'];
+								  $shareholders_funds_2[$company['id']]+=$view->outcomes_balance_sheet[$company['id']]['year_result'];?>
+				   		<?php }//for company ?>			
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Rentabilidad financiera&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+							<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format(($view->outcomes_balance_sheet[$company['id']]['year_result']/$shareholders_funds_2[$company['id']])*100,2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
+					<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Payout Ratio&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['payout_ratio'],2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
+					<thead>
+						<th colspan='2'class='titulo_cuenta_resultados2 invisible categories'>
+							Ratios Acumulados
+						</th>
+						<?php foreach ($view->companies as $company){?>
+							<th></th>
+						<?php }?>
+					</thead>
+					<!--<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['ac_roa'],2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>-->
+					<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Retorno sobre el capital invertido&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['roe'],2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
+					<br/>
+					<br/>
+<!--					<thead>
+						<th colspan='2'class='titulo_cuenta_resultados2 invisible categories'>
+							Evaluación del desempe&ntilde;o
+						</th>
+						<?php foreach ($view->companies as $company){?>
+							<th></th>
+						<?php }?>
+					</thead>
+					<tr>	
+						<td class="hor_group_odd categories"></td>
+						<td class="hor_group_odd categories">Indicador de actividad&nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+						<td class="hor_group_odd vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['performance_index'],2, '.', ',')?>&nbsp;</td>
+						<?php } ?>
+					</tr>
+					<thead>
+						<th colspan='2'class='titulo_cuenta_resultados2 invisible categories'>
+							Valoración burs&aacute;til
+						</th>
+						<?php foreach ($view->companies as $company){?>
+							<th></th>
+						<?php }?>
+					</thead>
+					<tr>	
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Indicador de cotización burs&aacute;til &nbsp;&nbsp;</td>
+						<?php foreach ($view->companies as $company){?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($view->outcomes_performance[$company['id']]['exchange_index'],2, '.', ',')?>&nbsp;</td>
+						<?php } ?>
+					</tr>
+-->
+				</table>
+				<br/>
+				<br/>
+		</div>
+</table> 
