@@ -1179,6 +1179,19 @@
 						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($this->outcomes_performance[$company['id']]['roa'],2, '.', ',')?>&nbsp;%</td>
 						<?php } ?>
 					</tr>
+					<tr>
+						<?php foreach ($this->companies as $company){
+							$shareholders_funds_2[$company['id']]=0;?>							
+							<?php $shareholders_funds_2[$company['id']]+=$this->outcomes_balance_sheet[$company['id']]['capital'];
+								  $shareholders_funds_2[$company['id']]+=$this->outcomes_balance_sheet[$company['id']]['reserves'];
+								  $shareholders_funds_2[$company['id']]+=$this->outcomes_balance_sheet[$company['id']]['year_result'];?>
+				   		<?php }//for company ?>					
+						<td class="hor_group_even categories"></td>
+						<td class="hor_group_even categories">Rentabilidad financiera&nbsp;&nbsp;</td>
+						<?php foreach ($this->companies as $company){?>
+						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format(($result[$company['id']]/$shareholders_funds_2[$company['id']])*100,2, '.', ',')?>&nbsp;%</td>
+						<?php } ?>
+					</tr>
 					<tr>	
 						<td class="hor_group_even categories"></td>
 						<td class="hor_group_even categories">Payout Ratio&nbsp;&nbsp;</td>
@@ -1194,16 +1207,16 @@
 							<th></th>
 						<?php }?>
 					</thead>
-					<tr>	
+					<!--<tr>	
 						<td class="hor_group_even categories"></td>
 						<td class="hor_group_even categories">(ROA) Retorno sobre activos&nbsp;&nbsp;</td>
 						<?php foreach ($this->companies as $company){?>
 						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($this->outcomes_performance[$company['id']]['ac_roa'],2, '.', ',')?>&nbsp;%</td>
 						<?php } ?>
-					</tr>
+					</tr>-->
 					<tr>	
 						<td class="hor_group_even categories"></td>
-						<td class="hor_group_even categories">Rentabilidad para el accionista&nbsp;&nbsp;</td>
+						<td class="hor_group_even categories">Retorno sobre el capital invertido&nbsp;&nbsp;</td>
 						<?php foreach ($this->companies as $company){?>
 						<td class="hor_group_even vertical_group_open"nowrap><?php echo number_format($this->outcomes_performance[$company['id']]['roe'],2, '.', ',')?>&nbsp;%</td>
 						<?php } ?>
