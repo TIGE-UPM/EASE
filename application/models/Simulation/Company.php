@@ -1164,6 +1164,16 @@
 			}
 			return 0;
 		}
+		// 20191108 AHG FUNCTION OVERLOAD
+		function getMkFixedCost2($channel_number, $region_number, $product_number){		// ¡Notar que cuando se llama desde Core.php enviamos el producto como tercer argumento!
+			$units=0;
+			$units+=$this->getUnitsAvailable($product_number, $channel_number, $region_number);
+			if ($units>0){
+				return ($this->_core->_games->getMkChannelCost($this->_game_id, $this->_round_number, $channel_number, $region_number, 'fixed_cost'));
+			}
+			return 0;
+		}
+
 		
 		//iniciativas
 		function getInitiativesProductionCost(){
