@@ -281,7 +281,7 @@
 									$counter++;    
 								  }
 							?>
-						<th colspan='<?php echo (2*$counter)?>' class="vertical_group_open">	
+						<th colspan='<?php echo (3*$counter)?>' class="vertical_group_open">	
 
 						</th>
 				</thead>
@@ -298,7 +298,7 @@
 							}else{
 								$vertical_class='';
 							}?>
-							<th colspan='2' class="<?php echo $vertical_class ?>">
+							<th colspan='3' class="<?php echo $vertical_class ?>">
 								<?php echo ($region['name'])?>
 							</th>
 					    <?php }//for region ?>
@@ -322,7 +322,12 @@
 							<th class="<?php echo $vertical_class ?>" style="color:#808080">
 								Tamaño Mercado
 							</th>
+							<th class="<?php echo $vertical_class ?>" style="color:darkgreen">
+								Diferencia
+							</th>
+							
 					    <?php }//for region ?>
+						
 				</thead>
 				<?php 
 				$hgroup=0;
@@ -338,9 +343,9 @@
 								<td class="<?php echo $hor_class?>">
 								</td>
 								<td class="<?php echo $hor_class?>">
-									<?php if ($channel['channel_number']==1){
-										echo ('Producto: '.$product['name']);
-									}?>
+									<?php // if ($channel['channel_number']==1){
+										echo ('Producto: '.$product['name']); ?>
+
 								</td>
 							<?php 	$newVGroup=true;?>						
 							<?php
@@ -356,8 +361,12 @@
 									<?php echo number_format($total_sales['product_'.$product['product_number']]['region_'.$region['region_number']],0, '.', ',')?>
 								</td>
 								<td class="<?php echo $hor_class.' '.$vertical_class?>" style="color:#808080">
-									<?php echo ($this->outcomes_market_sizes['product_'.$product['product_number']]['region_'.$region['region_number']])?>
+									<?php echo number_format($this->last_round_market_sizes['product_'.$product['product_number']]['region_'.$region['region_number']],0, '.', ',')?>
 								</td>
+								<td class="<?php echo $hor_class.' '.$vertical_class?>" style="color:darkgreen">
+									<?php echo number_format(($this->last_round_market_sizes['product_'.$product['product_number']]['region_'.$region['region_number']])-($total_sales['product_'.$product['product_number']]['region_'.$region['region_number']]),0, '.', ',')?>
+								</td>
+								
 							<?php }//for region?>			
 						</tr>
 			<?php }
@@ -450,6 +459,112 @@
 					}//for product
 						?>
 					</table>
+			
+			<br/><br/><br/>
+			
+			<table class="outcomes_table">
+				<thead>
+					<th colspan='2' class='invisible'>
+						<h1 style="color:#B22222">VENTAS TOTALES POR MERCADOS</h1>
+					</th>
+							<?php $counter=0;
+								  foreach ($this->regions as $region){
+									$counter++;    
+								  }
+							?>
+						<th colspan='<?php echo (3*$counter)?>' class="vertical_group_open">	
+
+						</th>
+				</thead>
+				<thead>
+					<th colspan='2' class='invisible'>
+					</th>
+					
+						<?php $newVGroup=true;
+						?>					
+						<?php foreach ($this->regions as $region){
+							if ($newVGroup){
+								$vertical_class='vertical_group_open';
+								$newVGroup=false;
+							}else{
+								$vertical_class='';
+							}?>
+							<th colspan='3' class="<?php echo $vertical_class ?>">
+								<?php echo ($region['name'])?>
+							</th>
+					    <?php }//for region ?>
+				    
+				</thead>
+				<thead>
+					<th colspan='2' class='invisible'>
+					</th>
+						<?php $newVGroup=true;?>					
+						<?php foreach ($this->regions as $region){
+							$newVGroup=true;
+							if ($newVGroup){
+								$vertical_class='vertical_group_open';
+								$newVGroup=false;
+							}else{
+								$vertical_class='';
+							}?>
+							<th class="<?php echo $vertical_class ?>">
+								Ventas Acumuladas
+							</th>
+							<th class="<?php echo $vertical_class ?>" style="color:#808080">
+								Tamaño Mercado
+							</th>
+							<th class="<?php echo $vertical_class ?>" style="color:darkgreen">
+								Diferencia
+							</th>
+							
+					    <?php }//for region ?>
+						
+				</thead>
+				<?php 
+				$hgroup=0;
+				foreach ($this->products as $product){
+					if($this->game_product_availability['product_number_'.$product['product_number']]==1){
+						$hgroup++;
+						$hor_class='hor_group_odd';
+						if ($hgroup % 2 == 0){
+							$hor_class='hor_group_even';
+						}
+							?>					
+							<tr>
+								<td class="<?php echo $hor_class?>">
+								</td>
+								<td class="<?php echo $hor_class?>">
+									<?php // if ($channel['channel_number']==1){
+										echo ('Producto: '.$product['name']); ?>
+
+								</td>
+							<?php 	$newVGroup=true;?>						
+							<?php
+							foreach ($this->regions as $region){
+								$newVGroup=true;
+								if ($newVGroup){
+									$vertical_class='vertical_group_open';
+									$newVGroup=false;
+								}else{
+									$vertical_class='';
+								}?>
+								<td class="<?php echo $hor_class.' '.$vertical_class?>">
+									<?php echo number_format($total_sales['product_'.$product['product_number']]['region_'.$region['region_number']],0, '.', ',')?>
+								</td>
+								<td class="<?php echo $hor_class.' '.$vertical_class?>" style="color:#808080">
+									<?php echo number_format($this->last_round_market_sizes['product_'.$product['product_number']]['region_'.$region['region_number']],0, '.', ',')?>
+								</td>
+								<td class="<?php echo $hor_class.' '.$vertical_class?>" style="color:darkgreen">
+									<?php echo number_format(($this->last_round_market_sizes['product_'.$product['product_number']]['region_'.$region['region_number']])-($total_sales['product_'.$product['product_number']]['region_'.$region['region_number']]),0, '.', ',')?>
+								</td>
+								
+							<?php }//for region?>			
+						</tr>
+			<?php }
+				}//for product
+					?>
+				</table>
+
 		</div>
 		
 		<div id="results_outcomes" class="tab">
