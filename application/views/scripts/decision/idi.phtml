@@ -59,7 +59,7 @@
 			<br/>
 			<div class="fieldContainer">
 				<div class="fieldHeader" id="newIdiFieldButton">
-					<?php if ($this->round_number<3){?> Otras decisiones <?php } else { ?>Nuevos productos <?php } ?>		
+				<?php if ($this->round_number<3){?> Otras decisiones <?php } else { ?>Nuevos productos <?php } ?>		
 				</div>
 				<div id="newIdiFieldContainer">
 					<?php if ($this->round_number<3){?> <h3 style="color:grey;text-align:center">No disponible para esta ronda</h3><?php }?>
@@ -76,7 +76,19 @@
 							</thead>
 						<?php $idiP=1;?>
 						<?php foreach ($this->idiProducts as $idiProduct){?>
-						<?php if($this->product_availability['product_number_'.$idiProduct['product_number']]!=1) {?>
+						<?php $success=0;
+							if($this->product_availability['product_number_'.$idiProduct['product_number']]==1) {$success=1;} ?>					
+							<?php if ($success==1) { ?>
+							<tr>
+								<td><?php echo $idiProduct['name']?></td>
+								<td><select disabled="disabled" name="idi[newIdi][idiproduct_<?php echo $idiP?>][product_number_<?php echo $idiProduct['product_number']?>][newidivalue]" style="margin-left:10px;" value="-">
+									<option value="1" selected>-</option>
+									</select>									
+								</td>
+								<td><input disabled="disabled" type="text" name="idi[newIdi][idiproduct_<?php echo $idiP?>][product_number_<?php echo $idiProduct['product_number']?>][newidibudget]" id="newidibudget"
+									display="block" value="Lanzado exitosamente"></input></td>
+							</tr>						
+								<?php } else { ?>													
 							<tr>
 								<td><?php echo $idiProduct['name']?></td>
 								<td><select name="idi[newIdi][idiproduct_<?php echo $idiP?>][product_number_<?php echo $idiProduct['product_number']?>][newidivalue]" style="margin-left:10px;" >
@@ -90,10 +102,12 @@
 									<?php echo isset($this->newIdiDecision)? 
 									'value = "'.$this->newIdiDecision['idiproduct_'.$idiP]['product_number_'. $idiProduct['product_number']]['newidibudget']
 									.'"':""?></input></td>
-								<?php $idiP++;?>
-								<?php } ?>
-								<?php } ?>
 							</tr>
+								
+							<?php } ?>								
+							<?php $idiP++;?>										
+						<?php } ?>
+
 						</table>
 
 					</div>
