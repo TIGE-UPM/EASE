@@ -422,6 +422,14 @@
 				}
 			return $sizes;
 		}
+		function getRoundMarketsSizes($game_id, $round_number){
+			$marketSizes=new Model_DbTable_Games_Param_Markets_Sizes();
+			$results=$marketSizes->fetchAll('game_id = '.$game_id. ' AND round_number = '. $round_number, array('product_number ASC' , 'region_number ASC'));
+			foreach ($results as $result){
+				$sizes ['product_'.$result['product_number']]['region_'.$result['region_number']]=$result['size'];
+				}
+			return $sizes;
+		}
 		function getMarketSizeEvolution($game_id, $round_number, $product_number, $region_number){
 			$marketSizesEvolution=new Model_DbTable_Games_Evolution_Markets_Sizes();
 			$result=$marketSizesEvolution->fetchRow('game_id = '.$game_id.' AND round_number = '.$round_number. ' AND product_number = '.$product_number. ' AND region_number = '.$region_number);
