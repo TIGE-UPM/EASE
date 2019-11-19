@@ -727,6 +727,8 @@
 				$this->view->idiProducts=$idiProducts;
 				
 				$this->view->outcomes_market_sizes=$games->getMarketsSizes($_GET['game_id']);
+				$this->view->last_round_market_sizes=$games->getRoundMarketsSizes($_GET['game_id'], $_GET['round_number']);
+				
 				//var_dump($this->view->outcomes_market_sizes);die();
 				foreach ($this->view->companies as $company) {
 					$array[$company['id']]=$games->getYearAmortization($_GET['game_id'], $_GET['round_number'], $company['id']);
