@@ -1088,7 +1088,7 @@
 							$taxes[$company['id']]=0;
 						} 
 						else{
-							$taxes[$company['id']]=($ebitda[$company['id']] - $amortization[$company['id']]-$fi_costs[$company['id']]) *0.25;
+							$taxes[$company['id']]=($ebitda[$company['id']] - $amortization[$company['id']]-$total_fi_cost[$company['id']]) *0.25;
 						}?>
 					<th class="vertical_group_open"nowrap style="background-color:#FAFAD2;color:#000000"><strong><?php echo number_format($taxes[$company['id']],2, '.', ',').' €'?></strong></th>
 					<?php }//for company ?>

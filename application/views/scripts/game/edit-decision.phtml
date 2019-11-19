@@ -177,6 +177,10 @@
 
 						<?php }//for?>
 					</select>
+					<!-- Mostramos mejoras I+D+i sumando todas las rondas -->
+					<?php for ($i=1;$i<=10;$i++){?>
+						<?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)?"(".(($this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']])+($this->idiChangesUpToThisRound['product_'.$product['product_number']]['product_quality_'.$qualityParam['quality_param_number']])).")":""?>
+					<?php }//for?>
 					&nbsp;&nbsp;
 
 					<?php } ?>
@@ -1176,6 +1180,25 @@
 						<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
 						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
 					</thead>
+					<?php $numberd=1;?>
+					<?php $factory_number_deterioration=1;?>
+					<?php foreach ($this->initiativesDET as $initiativesdet) {?>
+					<?php foreach ($this->game_factories as $factory) {?>
+					<tr>
+						<td><?php echo $initiativesdet['name']?>: F&aacute;brica <?php echo $factory_number_deterioration?></td>
+						<td><select name="initiatives[initiativedeterioration][initiativedeterioration_number_1][factory_number_<?php echo $factory['factory_number']?>]" id="initiativesProd<?php echo $numberd?>" display="block" >
+								<?php foreach ($this->initiativevalue as $initiativevalue){?>
+								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativedeteriorationDecision) && $this->initiativedeteriorationDecision['factory_number_'.$factory['factory_number']])? "selected":""?> />
+								<?php echo $initiativevalue['descriptor']?>
+								</option>
+								<?php } ?>
+							</select>
+						</td>
+						<td><?php echo number_format($initiativesdet['cost'], 2, '.', ',').' €'?></td>
+						<?php $factory_number_deterioration++;?>
+						<?php } ?>
+						<?php } ?>
+					</tr>
 					<?php $numberp=1;?>
 					<?php foreach ($this->initiativesProd as $initiativesprod) {
 							$chosen=0;
@@ -1203,25 +1226,6 @@
 						<td><?php echo number_format($initiativesprod['cost'], 2, '.', ',').' €'?></td>
 						<?php $numberp++;?>
 						<?php } ?>	
-					</tr>
-					<?php $numberd=1;?>
-					<?php $factory_number_deterioration=1;?>
-					<?php foreach ($this->initiativesDET as $initiativesdet) {?>
-					<?php foreach ($this->game_factories as $factory) {?>
-					<tr>
-						<td><?php echo $initiativesdet['name']?>: F&aacute;brica <?php echo $factory_number_deterioration?></td>
-						<td><select name="initiatives[initiativedeterioration][initiativedeterioration_number_1][factory_number_<?php echo $factory['factory_number']?>]" id="initiativesProd<?php echo $numberd?>" display="block" >
-								<?php foreach ($this->initiativevalue as $initiativevalue){?>
-								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativedeteriorationDecision) && $this->initiativedeteriorationDecision['factory_number_'.$factory['factory_number']])? "selected":""?> />
-								<?php echo $initiativevalue['descriptor']?>
-								</option>
-								<?php } ?>
-							</select>
-						</td>
-						<td><?php echo number_format($initiativesdet['cost'], 2, '.', ',').' €'?></td>
-						<?php $factory_number_deterioration++;?>
-						<?php } ?>
-						<?php } ?>
 					</tr>
 				</table>
 			</div>
