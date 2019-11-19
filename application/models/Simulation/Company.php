@@ -72,6 +72,8 @@
 		protected $_idi_newproducts_solicited;
 		protected $_idi_newproducts_budget_total;
 		protected $_idi_newproducts_budget_round;
+		protected $_idi_product_changes;
+		protected $_idi_product_changes_round;
 		
 		protected $_stocks;
 		protected $_stock_value;
@@ -235,7 +237,8 @@
 			$this->_idi_newproducts_budget_round=$this->_idi->getRoundNewIdiProductsBudget($this->_game_id, $this->_company_id, $this->_round_number);
 			$this->_idi_newproducts_number=$this->_idi->getNewIdiProductsNumber($this->_game_id, $this->_company_id, $this->_round_number);
 			//funcionando correctamente. Cambios propuestos en los productos disponibles
-			$this->_idi_product_changes=$this->_idi->getIdiChagesInProducts($this->_game_id, $this->_company_id, $this->_round_number);
+			$this->_idi_product_changes=$this->_idi->getIdiChangesInProducts($this->_game_id, $this->_company_id);
+			$this->_idi_product_changes_round=$this->_idi->getIdiChangesInProductsThisRound($this->_game_id, $this->_company_id, $this->_round_number);
 			//faltan los costes de los cambios propuestos sobre los productos existentes
 			//TO-DO: Cálculo costes
 		}
@@ -351,7 +354,7 @@
 			//incluye cambios de calidad de los productos realizados en I+D+i
 			while(isset($this->_qualities['product_'.$product_number]['quality_param_'.$quality_counter])){
 				$quality_actual=$this->_qualities['product_'.$product_number]['quality_param_'.$quality_counter];
-				$quality_changes=$this->_idi_product_changes['product_'.$product_number]['quality_param_'.$quality_counter];
+				$quality_changes=$this->_idi_product_changes['product_'.$product_number]['product_quality_'.$quality_counter];
 				$quality_param_final=$quality_actual+$quality_changes;
 				if($quality_param_final<1){
 					$quality_param_final=1;
@@ -359,13 +362,17 @@
 				if($quality_param_final>10){
 					$quality_param_final=10;
 				}
-				$quality_table->setQualityParam($this->_game_id, $this->_company_id, $quality_param_final, $product_number, $quality_counter);
+				//echo("<br/> EQUIPO ".$this->_company_id." - PRODUCTO ".$product_number." PARAM CALIDAD ".$quality_counter.". QUALITY INICIAL : ".$quality_actual." QUALITY CHANGES (TOTAL) :".$quality_changes." QUALITY TOTAL: ".$quality_param_final);				
+				//$quality_table->setQualityParam($this->_game_id, $this->_company_id, $quality_param_final, $product_number, $quality_counter);
+				// Quitamos el Update para llevar el tracking de calidades ronda a ronda
 				//VERO
 				//$average+=($quality_param_final)*($this->_qualities_weight['quality_param_'.$quality_counter]);
 				$average+=($quality_param_final)*($this->_qualities_weight['quality_param_number_'.$quality_counter]['product_number_'.$product_number]);
 				//VERO
 				$quality_counter++;
 			}
+			echo("<br/>");
+			echo("QUALITY SCORE: ");
 			var_dump($average);
 			$quality_average=round($average*0.01);
 			return $quality_average;
@@ -382,7 +389,7 @@
 
 			while(isset($this->_qualities['product_'.$product_number]['quality_param_'.$quality_counter])){
 				$quality_actual=$this->_qualities['product_'.$product_number]['quality_param_'.$quality_counter];
-				$quality_changes=$this->_idi_product_changes['product_'.$product_number]['quality_param_'.$quality_counter];
+				$quality_changes=$this->_idi_product_changes['product_'.$product_number]['product_quality_'.$quality_counter];
 				$quality_param_final=$quality_actual+$quality_changes;
 				if($quality_param_final<1){
 					$quality_param_final=1;
@@ -390,7 +397,8 @@
 				if($quality_param_final>10){
 					$quality_param_final=10;
 				}
-				$quality_table->setQualityParam($this->_game_id, $this->_company_id, $quality_param_final, $product_number, $quality_counter);
+				//$quality_table->setQualityParam($this->_game_id, $this->_company_id, $quality_param_final, $product_number, $quality_counter);
+				// Quitamos el Update para llevar el tracking de calidades ronda a ronda
 				//VERO
 				//$average+=($quality_param_final)*($this->_qualities_weight['quality_param_'.$quality_counter]);
 				$average_quality+=($quality_param_final)*($this->_qualities_weight['quality_param_number_'.$quality_counter]['product_number_'.$product_number]);
@@ -1248,8 +1256,8 @@
 		function getIdiChangesCosts(){
 			$totalCost=0;
 			$product_number=1;
-			while (isset($this->_idi_product_changes['product_'.$product_number])){
-				$product_changes=$this->_idi_product_changes['product_'.$product_number];
+			while (isset($this->_idi_product_changes_round['product_'.$product_number])){
+				$product_changes=$this->_idi_product_changes_round['product_'.$product_number];
 				$param=1;
 				$average_change=0;
 				$changeCost=0;
@@ -1340,7 +1348,7 @@
 						$hired_percentage=0.01*$this->_recruitmentPercentage[$factory['factory_number']];
 					}
 					// Contratamos al personal para la extensión con los datos de la región.
-					$hr_staff['staff_ext']=($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number']))*$hired_percentage;
+					$hr_staff['staff_ext']=($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number'],1))*$hired_percentage;
 					// Rotación de personal. El personal contratado depende de la atmósfera de trabajo. Contratamos nuevos cada ronda para compensar los que se van.
 					$old_staff=$this->_core->_games->getOrganizationParam($this->_game_id, 'production_workers');
 					$old_staff+=$this->_core->_games->getOrganizationParam($this->_game_id, 'packaging_workers');
@@ -1429,7 +1437,7 @@
 				}
 				// Contratamos al personal para la extensión con los datos de la región.
 				//$staff_ext1=ceil(($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number']))*$hired_percentage);
-				$staff_ext=ceil(($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number']))*$hired_percentage, 1); // El último parámetro es para que contrate sólo a los correspondientes a la última ampliación
+				$staff_ext=ceil(($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number'],1))*$hired_percentage); // El último parámetro es para que contrate sólo a los correspondientes a la última ampliación
 				// echo("<br/>Staff: " . $staff . "<br/>");
 				// echo("<br/>New hired staff: " . $new_hired_staff . "<br/>");
 				// echo("<br/>Ext staff rd-1: " . $staff_ext . "<br/>");
@@ -1509,7 +1517,7 @@
 				}
 				// Contratamos al personal para la extensión con los datos de la región.
 				//$staff_ext1=ceil(($this->_core->_games->getExtensionEmployees($this->_game_id, ($this->_round_number-1), $this->_company_id, $factory['factory_number']))*$hired_percentage);
-				$staff_ext=ceil(($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number']))*$hired_percentage, 1); // El último parámetro es para que forme sólo a los correspondientes a la última ampliación
+				$staff_ext=ceil(($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number'],1))*$hired_percentage); // El último parámetro es para que forme sólo a los correspondientes a la última ampliación
 				// echo("<br/>Staff: " . $staff . "<br/>");
 				// echo("<br/>New hired staff: " . $new_hired_staff . "<br/>");
 				// echo("<br/>Ext staff rd-1: " . $staff_ext . "<br/>");
@@ -1599,7 +1607,7 @@
 				// Contratamos al personal para la extensión con los datos de la región.
 				//for ($round==3;$round<=$this->_round_number;$round++) {
 				// AHG 20151115 No hace falta el bucle, porque ya hay bucle de rondas en getExtensionEmployees a través de getExtensionFactory. El último parámetro es 0 para que considere los sueldos de las ampliaciones de todas las rondas.
-					$staff_ext+=ceil(($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number']))*$hired_percentage, 0);
+					$staff_ext+=ceil(($this->_core->_games->getExtensionEmployees($this->_game_id, $this->_round_number, $this->_company_id, $factory['factory_number'],0))*$hired_percentage);
 				//}
 				$total = $staff+$staff_ext;
 				$wages = $this->_sal;
@@ -1810,13 +1818,14 @@
 						// Separamos profit del resto de activos líquidos (profit se suma en getLiquidAssets como parte del resultado del ejercicio)
 						if($term == 1){
 							echo("Plazo de inversión: 1 año.<br/>");
-							//$liquid_assets += $result;		
+							//$liquid_assets += $amount;		
 							$profit += $result;
 						} elseif ($term_aux==0) {
 							echo("Se ha hecho esta ronda, y es a más de un año.<br/>");
 							$liquid_assets -= ($amount+$result);
 							//Explicación de la resta de $result: Este beneficio va en la cuenta de resultados, pero no debe ir a liquid_assets ya que pasa a ser parte del activo de inversiones. Con esto compensamos en el activo la parte de intereses ganados de la cuenta de resultados que no va a tesorería sino al activo.
-							$profit+=$result;	// Operación incluida por si es necesario el profit final en algún momento (ahora mismo $profit no se usa, aunque incluye el total de intereses ganados/perdidos esta ronda.
+							//$profit+=$result;	// Operación incluida por si es necesario el profit final en algún momento (ahora mismo $profit no se usa, aunque incluye el total de intereses ganados/perdidos esta ronda.
+							//20191118 Quitado $profit+=$result; porque no es profit sino inversión como activo no corriente
 							$activeInvestment+=$result+$amount;//+$result_final;
 						} elseif ($term_aux==$term-1) {
 							echo("Vence este año.<br/>");
@@ -1828,15 +1837,21 @@
 							$profit+=$result_current;
 							$liquid_assets +=($amount+$result_prev);
 						} else {
-							echo("Sigue activa.");
-							$result_total=$this->getAllResultsByInvestment($this->_round_number, $round_number, $investment_number); // Resultados totales
-							//$result_prev=$this->getAllResultsByInvestment(($this->_round_number-1), $round_number, $investment_number); // Resultados anteriores
-							//$result_current=$result_total-$result_prev; // Resultado de este año
+							echo("Sigue activa.<br/>");
+							$result_total=$this->getAllResultsByInvestment($this->_round_number, $round_number, $investment_number); // Resultados totales						
+							// AHG 20191118 Para cuadrar balance
+							$result_prev=$this->getAllResultsByInvestment(($this->_round_number-1), $round_number, $investment_number); // Resultados anteriores
+							$result_current=$result_total-$result_prev; // Resultado de este año
 							//echo("Cantidad inicial: " . $amount . ", resultados previos: " . $result_prev . ", y resultado de la inversión: " . $result_current . "<br/>");
 							//echo("A tesorería: " . ($amount+$result_prev) . "<br/>"); //¿Por qué esto? Si sigue activa, nada va a tesorería
 							//$profit=$result_total;
 							//$result_final=$this->getAllResultsByInvestment($this->_round_number, $round_number, $investment_number);
 							$activeInvestment+=($result_total+$amount);
+							$liquid_assets -= $result_current; // AHG 20191118 Quitamos lo de este año del activo. Necesario porque en getLiquidAssets() estamos sumando el resultado
+							// del ejercicio dentro de los liquid assets y el profit de una inversión activa no es activo corriente sino que va al no corriente.
+							// De esta forma se compensa el pasivo (year result) con el activo no corriente (inversión) y en el cálculo del activo corriente sumamos y restamos
+							// las ganancias por inversión en el year result y en el liquid assets de la inversión, respectivamente.
+							// Definitivamente es mejor revisar la rutina y cambiarlo todo en término de profit/liquid_assets/activeInvestment
 						}
 						echo("Activos líquidos: " . $liquid_assets . ", inversión activa: " . $activeInvestment . " y profit del ejercicio: " . $profit . "<br/>");
 					}
