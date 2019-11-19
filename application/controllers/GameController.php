@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 	class GameController extends Zend_Controller_Action {
 		public $_controllerTitle= "Juegos - ";
 		public function preDispatch(){
@@ -49,7 +49,7 @@
 
 			
 			$trademedia[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-			$trademedia[1]=array('trademedia_number'=>2, 'name'=>'PromociÃ³n');
+			$trademedia[1]=array('trademedia_number'=>2, 'name'=>'Promoción');
 			
 			$channel_payterms[0]=array('value'=>0, 'descriptor'=>'Inmediato');
 			$channel_payterms[1]=array('value'=>1, 'descriptor'=>'Aplazado 1 mes');
@@ -175,13 +175,13 @@
 			//VERO
 
 
-			$game_id=205;
-			$round=3;
-			//var_dump($round);
-			$company_id=113;
+			// $game_id=205;
+			// $round=3;
+			// //var_dump($round);
+			// $company_id=113;
 			$decision_investment=new Model_DbTable_Decisions_Fi_Investment();
 			$game=new Model_DbTable_Games();
-			$n_investment = $game->getNumberOfInvestments($game_id);
+			$n_investment = $game->getNumberOfInvestments($_GET['game_id']);
 			$outcomes=new Model_DbTable_Outcomes_In_InvestmentUnitary();
 			$investment_param=new Model_DbTable_Games_Param_Markets_InvestmentsParams();
 			$evolution=new Model_DbTable_Games_Evolution_Fi_Investment();
@@ -189,9 +189,9 @@
 				//var_dump("Inversión".$investment_number);
 				$result=0;
 				$result_final=0;
-				for ($round_number=1; $round_number<=$round; $round_number++){
+				for ($round_number=1; $round_number<=$_GET['round']; $round_number++){
 
-					$investments=$decision_investment->getDecision($game_id, $company_id, $round_number);
+					$investments=$decision_investment->getDecision($_GET['game_id'], $_GET['company_id'], $_GET['round']);
 					$term_aux = $round-$round_number;
 					$term= $investments['investment_number_'.$investment_number]['term'];
 					$amount= $investments['investment_number_'.$investment_number]['amount'];
@@ -200,7 +200,7 @@
 					$term= $investments['investment_number_'.$investment_number]['term'];*/
 					
 					if($term_aux < $term ){
-						$result=$outcomes->getInvestment($game_id, $company_id, $round_number, $investment_number);
+						$result=$outcomes->getInvestment($_GET['game_id'], $_GET['company_id'], $_GET['round'], $investment_number);
 						if($term == 1){
 							//var_dump("Entro en 1");
 							$liquid_assets +=$result;
@@ -271,6 +271,10 @@
 			$in_decisions=new Model_DbTable_Decisions_Initiatives();
 			$mr_decisions=new Model_DbTable_Decisions_MarketResearches();
 			$idi_decisions=new Model_DbTable_Decisions_Idi();
+			//AHG 20191118
+			$this->view->idiChangesUpToThisRound=$idi_decisions->getIdiChangesInProductsUpToThisRound($_GET['game_id'], $_GET['company_id'], $_GET['round']);
+			//AHG 20191118
+
 			//VERO
 			$st_decisions=new Model_DbTable_Decisions_Stock();
 			$st_outcomes=new Model_DbTable_Outcomes_St_Units();
@@ -687,9 +691,9 @@
 				$this->view->media=$game_media;
 				//Trademedia
 				$trademedia[0]=array('trademedia_number'=>1, 'name'=>'Patrocinio');
-				$trademedia[1]=array('trademedia_number'=>2, 'name'=>'PromociÃ³n');
+				$trademedia[1]=array('trademedia_number'=>2, 'name'=>'Promoción');
 				$this->view->trademedia=$trademedia;
-				//Iniciativas. De momento no se usa, para el futuro se podr’a desglosar el coste por cada iniciativa de cada area
+				//Iniciativas. De momento no se usa, para el futuro se podría desglosar el coste por cada iniciativa de cada area
 				$game_initiatives=$games->getInitiatives($_GET['game_id']);	
 				$game_initiatives_prod=$games->getInitiativesProd($_GET['game_id']);
 				$game_initiatives_hr=$games->getInitiativesHR($_GET['game_id']);
@@ -733,7 +737,7 @@
 					$factories=$games->getFactories($_GET['game_id'],$_GET['round_number'],$_GET['id']);
 				}
 				
-				//generacioón del array de cuotas de mercado
+				//generación del array de cuotas de mercado
 				$this->view->array_cuotas_mercado = prepare_array_cuotas_mercado($this->view);
 
 				
@@ -1026,7 +1030,7 @@
 		}
 		
 		function addcompanyAction(){
-			$this->view->title .= " Editar - AÃ±adir Empresa ";
+			$this->view->title .= " Editar - Añadir Empresa ";
 			$this->view->headTitle($this->view->title, 'PREPEND');
 			$this->view->controllerName='game';
 			$this->view->actionName="addcompany";
@@ -1044,7 +1048,7 @@
 				else {					
 					$companies = new Model_DbTable_Companies();					
 					if (! $companies->exists(array('game_id'=>$game_id, 'name'=>$formData['name']))){	
-					//Ojo: daba un error si el nombre del equipo era un nÃºmero (p.ej. "1"), dado que el fetchRow de exists en Companies.php [DbTable_Companies] encontraba coincidencias aunque no existiera el equipo (!!!)
+					//Ojo: daba un error si el nombre del equipo era un número (p.ej. "1"), dado que el fetchRow de exists en Companies.php [DbTable_Companies] encontraba coincidencias aunque no existiera el equipo (!!!)
 					//TODO: Ahora no parece detectar nombres duplicados de equipos en un juego, por lo que no entra nunca en el "else" posterior.
 						$companyData=array('name'=>$formData['name'], 'game_id'=>$game_id, 'registration_password'=>$formData['registration_password']);
 						$companies -> addCompany($companyData);
@@ -1709,18 +1713,18 @@
 			$offset++;
 
 
-			$outcomes_investments=$outcomes->getInterestInvestment($this->game['id'], $round_number);
+			$outcomes_investments=$outcomes->getInterestInvestment($game_id, $round_number);
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses ganados por inversiones financieras'));
 			$col=1;
 			foreach ($companies as $company){
-				$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_investments[$company['id']]['fi_investment_earnings']);
+				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_investments[$company['id']]['fi_investment_earnings']);
 				$col++;
 			}
 			$offset++;
 			$worksheet->setCellValueByColumnAndRow(0, $offset, utf8_encode('Intereses perdidos por inversiones financieras'));
 			$col=1;
 			foreach ($companies as $company){
-				$worksheet->setCellValueByColumnAndRow(1, $offset, $outcomes_investments[$company['id']]['fi_investment_losses']);
+				$worksheet->setCellValueByColumnAndRow($col, $offset, $outcomes_investments[$company['id']]['fi_investment_losses']);
 				$col++;
 			}
 			$offset++;

@@ -192,7 +192,10 @@
 			$st_decisions=new Model_DbTable_Decisions_Stock();
 			$st_outcomes=new Model_DbTable_Outcomes_St_Units();
 			//VERO
-
+			$idi_decisions=new Model_DbTable_Decisions_Idi();
+			//AHG 20191118
+			$this->view->idiChangesUpToThisRound=$idi_decisions->getIdiChangesInProductsUpToThisRound($this->game['id'], $this->company['id'], $this->round['round_number']);
+			//AHG 20191118
 
 			$lastDecision=$decisions->getActiveRoundLastDecisionSaved();
 			$this->view->regionDecision=$lastDecision['factories'];
@@ -414,7 +417,8 @@
 			}else{
 				$this->view->unitsStockRightDecision=$st_outcomes_prev;
 			}
-			//VERO	
+			//VERO
+
 		}
 	
 		function marketingAction(){
@@ -747,7 +751,7 @@
 				$lastDecision=$decisions->getActiveRoundLastDecisionSaved();
 				//var_dump($lastDecision); die();
 				$this->view->changeIdiDecision=$lastDecision['changeIdi'];
-				$this->view->newIdiDecision=$lastDecision['newIdi'];
+				$this->view->newIdiDecision=$lastDecision['newIdi'];			
 			}
 			
 		}
@@ -954,10 +958,19 @@
 			$fi_decisions=new Model_DbTable_Decisions_Finance();
 			$in_decisions=new Model_DbTable_Decisions_Initiatives();
 			$idi_decisions=new Model_DbTable_Decisions_Idi();
+			// AHG 20191118
+			// if ($idi_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
+				// $this->view->idiChangesUpToThisRound=$idi_decisions->getIdiChangesInProductsUpToThisRound($this->game['id'], $this->company['id'], $_GET['round_number']);											
+			// }				
+			//AHG 20191118
+			$mktres_decisions=new Model_DbTable_Decisions_MarketResearches();
+			
+
 			$validate_decisions=new Model_DbTable_Decisions_Validate();
 			//VERO
 			$st_decisions=new Model_DbTable_Decisions_Stock();
 			//VERO
+
 		
 			if ($pr_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
 				$pr_lastDecision=$pr_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
@@ -1042,7 +1055,8 @@
 				//VERO
 			}
 			if ($in_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
-				$in_lastDecision=$in_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
+				$this->view->initiativesDecision=$in_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
+				$in_lastDecision=$in_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);					
 					for ($i = 1; $i < 3; $i++) {
 						$auxp[$i-1] = $in_lastDecision['initiativeproduction']['initiativeproduction'.$i];
 					}
@@ -1070,6 +1084,14 @@
 				$this->view->changeIdiDecision=$idi_lastDecision['changeIdi'];
 				$this->view->newIdiDecision=$idi_lastDecision['newIdi'];
 			}
+				// AHG 20191118
+				$this->view->idiChangesUpToThisRound = $idi_decisions->getIdiChangesInProductsUpToThisRound($this->game['id'], $this->company['id'], $_GET['round_number']);
+				// AHG 20191118
+			
+			if ($mktres_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
+				$this->view->marketResearchDecision=$mktres_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
+			}
+			
 			if ($validate_decisions->existsPrevious($this->game['id'], $this->company['id'], $_GET['round_number'])){
 				$validate_lastDecision=$validate_decisions->getDecisionArray($this->game['id'], $this->company['id'], $_GET['round_number']);
 				$this->view->decisionValidated=$validate_lastDecision['validated'];
