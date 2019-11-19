@@ -178,7 +178,7 @@
 		</div>
 
 		<br/>
-
+		</div>
 		<div class="fieldContainer">
 			<div class="fieldHeader" id="qualityFieldButton">
 				Calidad			
@@ -213,10 +213,13 @@
 				<select <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[quality_params][product_quality_<?php echo $qualityParam['quality_param_number'];?>][product_<?php echo $product['product_number'];?>]">
 					<?php for ($i=1;$i<=10;$i++){?>
 						<option value="<?php echo $i?>" <?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)? "selected":""?>>
-					<?php echo $i?>
+					<?php echo $i?>					
 				</option>
 			<?php }//for?>
 		</select>
+		<?php for ($i=1;$i<=10;$i++){?>
+			<?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)?"(".(($this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']])+($this->idiChangesUpToThisRound['product_'.$product['product_number']]['product_quality_'.$qualityParam['quality_param_number']])).")":""?>
+		<?php }//for?>
 		&nbsp;&nbsp;
  
 		<?php } ?>
@@ -232,10 +235,11 @@
 				$new_launch=1;
 			}
 		?>
+
 		<select multiple="multiple"  style="overflow: hidden;"  class="multiSelect" display="block" <?php if (($this->round_number>1) && $new_launch==0){?>disabled="disabled"<?php } ?> name="production_decision[functionality_params][product_number_<?php echo $product['product_number'];?>][]"  id="funcionalities_param_<?php echo $id?>" >	
-			<?php foreach ($this->functionalities as $functionalities){?> 
-					<option value="<?php echo $functionalities['value']?>" <?php for($i=0; $i<count($this->functionalities); $i++){?> <?php echo  (isset($this->FunctionalitiesDecision) && $this->FunctionalitiesDecision['product_number_'.$product['product_number']][$i]==$functionalities['value'])? "selected":""?><?php }//for?>>
-					<?php echo $functionalities['descriptor']?>
+			<?php foreach ($this->functionalities as $functionality){?> 
+					<option value="<?php echo $functionality['value']?>" <?php for($i=0; $i<count($this->functionalities); $i++){?> <?php echo  (isset($this->FunctionalitiesDecision) && $this->FunctionalitiesDecision['product_number_'.$product['product_number']][$i]==$functionality['value'])? "selected":""?><?php }//for?>>
+					<?php echo $functionality['descriptor']?>
 					</option>
 			<?php } ?>
 		</select>
@@ -248,7 +252,7 @@
 		<?php $id++;?>
 	<?php }//for product ?>	
 	<div id="nProduct"><input type ="hidden" value="<?php echo $id;?>"></div>
-</div>
+
 			<script>
 				$(function(){
 					$("#popupForm").hide();

@@ -123,17 +123,24 @@
 				<br />
 				<div class="fieldDiv" style="color:#4169E1" align="center">
 					  <?php foreach ($this->qualityParams as $qualityParam){?>
-					  <?php if ($qualityParam['product_number']==$product['product_number']){?>
-					  <?php echo $qualityParam['name'] ?> : &nbsp
-					<select disabled="disabled" name="production_decision[quality_params][product_quality_<?php echo $qualityParam['quality_param_number'];?>][product_<?php echo $product['product_number'];?>]">
-						<?php for ($i=1;$i<=10;$i++){?>
-							<option value="<?php echo $i?>" <?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)? "selected":""?>>
+						<?php if ($qualityParam['product_number']==$product['product_number']){?>
+							<?php echo $qualityParam['name'] ?> : &nbsp
+							<select disabled="disabled" name="production_decision[quality_params][product_quality_<?php echo $qualityParam['quality_param_number'];?>][product_<?php echo $product['product_number'];?>]">
+							<?php for ($i=1;$i<=10;$i++){?>
+								<option value="<?php echo $i?>" <?php echo (isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)? "selected":""?>>
 								<?php echo $i?>
-							</option>
-						<?php }//for?>
-					</select>
+								</option>
+							<?php }//for?>
+							</select>
+
+							<!-- Mostramos mejoras I+D+i sumando todas las rondas -->
+							<?php for ($i=1;$i<=10;$i++){?>
+								<?php echo ((isset($this->qualitiesDecision) && $this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']]==$i)?"(".(($this->qualitiesDecision['product_quality_'.$qualityParam['quality_param_number']]['product_'.$product['product_number']])+($this->idiChangesUpToThisRound['product_'.$product['product_number']]['product_quality_'.$qualityParam['quality_param_number']])).")":"")?>
+							<?php }//for?>
+
 					&nbsp;&nbsp;
-					<?php } ?>
+						<?php } ?>
+			
 					<?php } ?>
 					</div>
 						
@@ -766,6 +773,25 @@
 						<th class="small">&nbsp;&nbsp;Llevar a cabo&nbsp;&nbsp;</th>
 						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
 					</thead>
+					<?php $numberd=1;?>
+					<?php $factory_number_deterioration=1;?>
+					<?php foreach ($this->initiativesDET as $initiativesdet) {?>
+					<?php foreach ($this->game_factories as $factory) {?>
+					<tr>
+						<td><?php echo $initiativesdet['name']?>: F&aacute;brica <?php echo $factory_number_deterioration?></td>
+						<td><select disabled="disabled" name="initiatives[initiativedeterioration][initiativedeterioration_number_1][factory_number_<?php echo $factory['factory_number']?>]" id="initiativesProd<?php echo $numberd?>" display="block">
+								<?php foreach ($this->initiativevalue as $initiativevalue){?>
+								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativedeteriorationDecision) && $this->initiativedeteriorationDecision['factory_number_'.$factory['factory_number']])? "selected":""?>>
+								<?php echo $initiativevalue['descriptor']?>
+								</option>
+								<?php } ?>
+							</select>
+						</td>
+						<td><?php echo $initiativesdet['cost']?> (&euro;)</td>
+						<?php $factory_number_deterioration++;?>
+						<?php } ?>
+						<?php } ?>
+					</tr>
 					<?php $numberp=1;?>
 					<?php foreach ($this->initiativesProd as $initiativesprod) {
 							$chosen=0;
@@ -794,25 +820,6 @@
 						<td><?php echo $initiativesprod['cost']?> (&euro;)</td>
 						<?php $numberp++;?>
 						<?php } ?>	
-					</tr>
-					<?php $numberd=1;?>
-					<?php $factory_number_deterioration=1;?>
-					<?php foreach ($this->initiativesDET as $initiativesdet) {?>
-					<?php foreach ($this->game_factories as $factory) {?>
-					<tr>
-						<td><?php echo $initiativesdet['name']?>: F&aacute;brica <?php echo $factory_number_deterioration?></td>
-						<td><select disabled="disabled" name="initiatives[initiativedeterioration][initiativedeterioration_number_1][factory_number_<?php echo $factory['factory_number']?>]" id="initiativesProd<?php echo $numberd?>" display="block">
-								<?php foreach ($this->initiativevalue as $initiativevalue){?>
-								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativedeteriorationDecision) && $this->initiativedeteriorationDecision['factory_number_'.$factory['factory_number']])? "selected":""?>>
-								<?php echo $initiativevalue['descriptor']?>
-								</option>
-								<?php } ?>
-							</select>
-						</td>
-						<td><?php echo $initiativesdet['cost']?> (&euro;)</td>
-						<?php $factory_number_deterioration++;?>
-						<?php } ?>
-						<?php } ?>
 					</tr>
 				</table>
 			</div>
@@ -872,12 +879,13 @@
 						<th class="small">&nbsp;&nbsp;Coste asociado&nbsp;&nbsp;</th>
 					</thead>
 					<?php $numberh=1;?>
+					<!-- Hola<?php var_dump($this->initiativesDecision); ?> -->
 					<?php foreach ($this->initiativesHR as $initiativeshr) {?>
 					<tr>
 						<td><?php echo $initiativeshr['name']?></td>
 						<td><select disabled="disabled" name="initiatives[initiativehumanresources][initiativehumanresources_number_<?php echo $numberh?>]" id="initiativesHuman<?php echo $numberh?>" display="block">
 					 			<?php foreach ($this->initiativevalue as $initiativevalue){?>
-								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativehumanresourcesDecision) && $this->initiativehumanresourcesDecision['initiativehumanresources_number_'.$numberh])? "selected":""?>>
+								<option value="<?php echo $initiativevalue['value']?>" <?php echo (isset($this->initiativehumanresourcesDecision) && ($this->initiativesDecision['initiativehumanresources']['initiativehumanresources_number_'.$numberh]==$initiativevalue['value']))? "selected":""?>>
 								<?php echo $initiativevalue['descriptor']?>
 								</option>
 								<?php } ?>
@@ -1019,9 +1027,11 @@
 						<div id="changeIdiFieldDescription" class="fieldDescription">
 						<br />
 						<div class="fieldDiv" style="color:#4169E1" align="center">
-							  <?php foreach ($this->qualityParams as $qualityParam){?>
+						<?php foreach ($this->qualityParams as $qualityParam){?>
+						<?php if ($qualityParam['product_number']==$product['product_number']) { ?>
 							  <?php echo $qualityParam['name'] ?> : &nbsp;
-							<select disabled="disabled" name="idi[changeIdi][product_<?php echo $product['product_number'];?>][product_quality_<?php echo $qualityParam['quality_param_number'];?>]">
+							  							<select disabled="disabled" name="idi[changeIdi][product_<?php echo $product['product_number'];?>][product_quality_<?php echo $qualityParam['quality_param_number'];?>]">
+								<!-- <?php var_dump($this->changeIdiDecision); ?> -->
 								<?php if (isset($this->changeIdiDecision)) { ?>
 										<?php foreach ($this->changeidi as $changeidi){?> 
 											<option value="<?php echo $changeidi['value']?>" 
@@ -1037,8 +1047,15 @@
 										<?php } //chageidi ?>				
 								<?php }//else?>
 							</select>
+							<!--<input name="idi[changeIdi][product_<?php echo $product['product_number'];?>][product_quality_<?php echo $qualityParam['quality_param_number'];?>]" type="text"
+								value="<?php echo (isset($this->changeIdiDecision) ? $this->changeIdiDecision['product_'.$product['product_number']]['product_quality_'.$qualityParam['quality_param_number']]:"") ?>" readonly="readonly">-->
 							&nbsp;&nbsp;
 							<?php } ?>
+							
+							
+					<?php } //endif ?> 
+
+							
 						</div>
 						</div>
 					<?php } // if?>
