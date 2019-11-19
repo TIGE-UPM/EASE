@@ -145,17 +145,53 @@
 			return $array;
 		}
 		
-		function getIdiChagesInProducts($game_id, $company_id, $round_number){
+		function getIdiChangesInProducts($game_id, $company_id){  //, $round_number){
+			$array=array();
+			$idi_changes= new Model_DbTable_Decisions_Idi_Changes();
+			/*$decisions=$idi_changes->fetchAll('game_id = '.$game_id.
+								   ' AND company_id = '.$company_id.
+								   ' AND round_number = '.$round_number);*/
+			/* 20191118 Eliminado $round_number para que sume las subidas de calidad de todas las rondas */
+			$decisions=$idi_changes->fetchAll('game_id = '.$game_id.
+								   ' AND company_id = '.$company_id);			   
+			foreach ($decisions as $decision){
+				$array['product_'.$decision['product_number']]['product_quality_'.$decision['product_quality']]+=$decision['changes'];
+				// echo("<br/>DUMP");
+				// var_dump($array);
+				// echo("<br/>END DUMP<br/>");
+				
+			}
+			return $array;
+		}
+	
+
+		/* 20191118 Añadida función para que calcule los costes de cambios únicamente de la ronda actual */	
+		function getIdiChangesInProductsThisRound($game_id, $company_id, $round_number){
 			$array=array();
 			$idi_changes= new Model_DbTable_Decisions_Idi_Changes();
 			$decisions=$idi_changes->fetchAll('game_id = '.$game_id.
 								   ' AND company_id = '.$company_id.
 								   ' AND round_number = '.$round_number);
 			foreach ($decisions as $decision){
-				$array['product_'.$decision['product_number']]['product_quality_'.$decision['product_quality']]=$decision['changes'];
+				$array['product_'.$decision['product_number']]['product_quality_'.$decision['product_quality']]+=$decision['changes'];
 			}
 			return $array;
 		}
+	
+		/* 20191118 Añadida función para que calcule los costes de cambios hasta la ronda actual. Usado por el DecisionController */	
+		function getIdiChangesInProductsUpToThisRound($game_id, $company_id, $round_number){
+			$array=array();
+			$idi_changes= new Model_DbTable_Decisions_Idi_Changes();
+			$decisions=$idi_changes->fetchAll('game_id = '.$game_id.
+								   ' AND company_id = '.$company_id);
+			foreach ($decisions as $decision){
+				if($decision['round_number']<=$round_number){
+					$array['product_'.$decision['product_number']]['product_quality_'.$decision['product_quality']]+=$decision['changes'];
+				}
+			}
+			return $array;
+		}
+	
 	
 	}
 
